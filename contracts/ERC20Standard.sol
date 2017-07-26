@@ -2,7 +2,7 @@ pragma solidity ^0.4.8;
 
 /*ERC20 standard:*/
 
-contract ERC20Coin{
+contract ERC20Standard{
 	
 	uint256 public totalSupply;
 

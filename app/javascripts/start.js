@@ -3,22 +3,43 @@ import "../stylesheets/app.css";
 import { default as Web3} from 'web3';
 import { default as contract } from 'truffle-contract'
 
-import createcoin_artifacts from '../../build/contracts/CoinCreator.json'
+import createtoken_artifacts from '../../build/contracts/TokenCreator.json'
 import newtoken_artifacts from '../../build/contracts/NewToken.json'
 
 var NewToken = contract(newtoken_artifacts);
-var CreateCoin = contract(createcoin_artifacts);
+var CreateToken= contract(createtoken_artifacts);
 
 var accounts;
 var account;
 var contractInstance;
-var createCoinEvent;
+var createTokenEvent;
 
 window.App = {
 	start: function() {
-		CreateCoin.setProvider(web3.currentProvider);
-		contractInstance = CreateCoin.deployed();
-		createCoinEvent = contractInstance.CoinCreated;
+		var self = this;
+		CreateToken.setProvider(web3.currentProvider);
+		NewToken.setProvider(web3.currentProvider);
+		CreateToken.deployed().then(function(instance){
+			createTokenEvent = instance.TokenCreated();	
+			createTokenEvent.watch(function (err, result) {
+				if (err) {
+					console.log(error);
+				} else {
+					var address = result.args.tokenAddress;
+					self.setStatus(web3.toAscii(result.args.name)+" created at "+address);
+					var newtoken = NewToken.at(address); 
+					var defaultAddress = web3.eth.accounts[0];
+					var balance = web3.eth.getBalance(defaultAddress);
+					console.log("Balance is " + balance);
+					newtoken.balanceOf(defaultAddress).then(function (result){
+						var initial = result;
+						console.log("Initial supply is " + initial);
+						balance = web3.eth.getBalance(defaultAddress);
+						console.log("Balance is " + balance);
+					});
+				}
+			})
+		});
 		web3.eth.getAccounts(function(err,accs){
 			if (err != null) {
 				alert("Error getting your accounts");

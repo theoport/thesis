@@ -1,10 +1,11 @@
-import "./BaseCoin.sol";
+import "./BaseToken.sol";
 
 pragma solidity ^0.4.8;
 
-contract NewToken is BaseCoin{
+contract NewToken is BaseToken{
 	
 	bytes32 public name;
+	address creator;
 
 	function NewToken(
 		uint256 initialAmount,

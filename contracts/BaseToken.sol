@@ -1,15 +1,16 @@
-import "./ERC20Coin.sol";
+import "./ERC20Standard.sol";
 
 pragma solidity ^0.4.8;
 
-contract BaseCoin is ERC20Coin{
+contract BaseToken is ERC20Standard{
 	
 	mapping (address => uint256) balances;
 	mapping (address  => mapping (address => uint256)) allowance;
 	
 	function balanceOf(address owner) constant returns (uint256 balance){
-		return balances[owner];
+		balance = balances[owner];
 	}
+
 	function transfer(address to, uint256 value) returns (bool success){
 		if (balances[msg.sender] < value){
 			return false;
@@ -19,6 +20,7 @@ contract BaseCoin is ERC20Coin{
 		balances[msg.sender]-=value;
 		return true;
 	}
+
 	function transferFrom(address from, address to, uint256 value) returns (bool success){
 		if (balances[from] >= value && allowance[from][msg.sender] >= value){
 			balances[from] -= value;
