@@ -4,12 +4,20 @@ import "./NewToken.sol";
 
 contract TokenCreator{
 	
-	event TokenCreated(bytes32 indexed name, address tokenAddress);
-	 
-	function makeToken(uint256 initialSupply, bytes32 name) returns (address){ 
-		NewToken bc = (new NewToken(initialSupply,name));
-		TokenCreated(name,address(bc));
-		bc.transfer(msg.sender, initialSupply);
-		return address(bc);
+	uint256 constant PARAMETERS = 4;
+	
+	event TokenManagerCreated (bytes32 tokenName, address at);
+ 
+	function makeTokenManager(
+		uint256 initialSupply, 
+		uint256 issuanceRate,
+		bytes32 name,
+		uint256 consensusPercent,		
+		uint256[NOPARAMETERS] issuanceRate,
+		bool contractRefunds
+		) { 
+		TokenManager manager = new TokenManager(initialSupply, issuanceRate, name, 
+																						consensusPercent, issuanceRate, contractRefunds);
+		TokenManagerCreated(name,address(manager));
 	}
 }
