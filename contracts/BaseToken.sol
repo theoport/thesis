@@ -4,16 +4,34 @@ pragma solidity ^0.4.8;
 
 contract BaseToken is ERC20Standard{
 
+	uint256 noAccountsBlocked = 0;
+	uint256[3] issuanceRate;
+	uint256 lastUpdate = 0;
+	uint256 creationTime;
+	
 	mapping (address => uint256) balances;
 	mapping (address  => mapping (address => uint256)) allowance;
 	mapping (address => bool) blocked;
 	mapping (uint256 => address) accountsBlocked;
 	
+	modifier updateSupply() {
+		var daysPassed = (now - creationTime)/ (1 days); 
+		if (daysPassed > lastUpdate) {
+			for (uint i = lastUpdate + 1; i > daysPassed; i++) {
+				uint temp = issuanceRate[2] * (i ** 3) + issuanceRate[1] * (i ** 2) + issuanceRate[0] * i;
+				balances[address(this)] += temp;
+				totalSupply += temp;
+			}
+			lastUpdate = daysPassed;
+		}
+		_;
+	}
+	
 	function balanceOf(address owner) constant returns (uint256 balance){
 		balance = balances[owner];
 	}
 
-	function transfer(address to, uint256 value) returns (bool success){
+	function transfer(address to, uint256 value) updateSupply returns (bool success){
 		if (balances[msg.sender] < value){
 			return false;
 		}
@@ -23,7 +41,7 @@ contract BaseToken is ERC20Standard{
 		return true;
 	}
 
-	function transferFrom(address from, address to, uint256 value) returns (bool success){
+	function transferFrom(address from, address to, uint256 value) updateSupply returns (bool success){
 		if (balances[from] >= value && allowance[from][msg.sender] >= value){
 			balances[from] -= value;
 			balances[to] += value;

@@ -8,13 +8,16 @@ contract NewToken is BaseToken{
 	address manager;
 
 	function NewToken(
-		uint256 initialAmount,
-		bytes32 _name
+		uint256 _initialAmount,
+		bytes32 _name,
+		uint256[3] _issuanceRate
 		) {
 		manager = msg.sender;
-		balances[tx.origin] = initialAmount;
-		totalSupply = initialAmount;
+		balances[address(this)] = _initialAmount;
+		creationTime = 0;
+		totalSupply = _initialAmount;
 		name = _name;
+		issuanceRate = _issuanceRate;
 	}
 }
 		

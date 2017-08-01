@@ -1,6 +1,6 @@
 //var ConvertLib = artifacts.require("./ConvertLib.sol");
-var CreateCoin = artifacts.require("./CoinCreator.sol");
+var CreateToken = artifacts.require("./TokenCreator.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(CreateCoin);
+  deployer.deploy(CreateToken);
 };
