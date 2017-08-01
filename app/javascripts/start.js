@@ -5,29 +5,43 @@ import { default as contract } from 'truffle-contract'
 
 import createtoken_artifacts from '../../build/contracts/TokenCreator.json'
 import newtoken_artifacts from '../../build/contracts/NewToken.json'
+import tokenmanager_artifacts from '../../build/contracts/TokenManager.json'
 
-var NewToken = contract(newtoken_artifacts);
-var CreateToken= contract(createtoken_artifacts);
+let NewToken = contract(newtoken_artifacts);
+let CreateToken= contract(createtoken_artifacts);
+let TokenManager = contract(tokenmanager_artifacts);
 
-var accounts;
-var account;
-var contractInstance;
-var createTokenEvent;
+let accounts;
+let account;
+let createTokenInstance;
+let tokenManagerInstance;
+let newTokenInstance;
+let createTokenEvent;
+let tokenAddresses = [];
 
 window.App = {
 	start: function() {
-		var self = this;
+		let self = this;
 		CreateToken.setProvider(web3.currentProvider);
-		NewToken.setProvider(web3.currentProvider);
-		CreateToken.deployed().then(function(instance){
+		//NewToken.setProvider(web3.currentProvider);
+		//TokenManager.setProvider(web3.currentProvider);
+		createTokenInstance = CreateToken.deployed;
+		createTokenManagerEvent = createTokenInstance.TokenManagerCreated();
+
+		/*CreateToken.deployed().then(function(instance){
 			createTokenEvent = instance.TokenCreated();	
-			createTokenEvent.watch(function (err, result) {
+		*/
+
+			createTokenManagerEvent.watch(function (err, result) {
+
 				if (err) {
 					console.log(error);
 				} else {
-					var address = result.args.tokenAddress;
-					self.setStatus(web3.toAscii(result.args.name)+" created at "+address);
-					var newtoken = NewToken.at(address); 
+					self.setStatus(web3.toAscii(result.args.tokenName)+" created at "+result.args.tokenAddress);
+					tokenAddresses.push[result.args.tokenName, result.args.tokenAddress];
+					
+
+					/*var newtoken = NewToken.at(address); 
 					var defaultAddress = web3.eth.accounts[0];
 					var balance = web3.eth.getBalance(defaultAddress);
 					console.log("Balance is " + balance);
@@ -36,10 +50,14 @@ window.App = {
 						console.log("Initial supply is " + initial);
 						balance = web3.eth.getBalance(defaultAddress);
 						console.log("Balance is " + balance);
-					});
-				}
-			})
-		});
+					});*/
+
+			}
+			let option = document.createElement("option");
+			option.text = tokenAddresses[tokenAddresses.length - 1];
+			$("#tokenList").add(option);
+		})
+		//});
 		web3.eth.getAccounts(function(err,accs){
 			if (err != null) {
 				alert("Error getting your accounts");
@@ -63,13 +81,9 @@ window.App = {
 	},
 
 	makeNewCoin: function(){
-		var self = this;
-		var name = document.getElementById("name").value;
-		var amount = document.getElementById("amount").value;
+		var name = $("#name").value;
+		var amount = $("#initialAmount").value;
 		var creator;
-		var newtoken;
-		var _address;
-		console.log("Check1");
 		CreateCoin.deployed().then(function(instance){
 			creator = instance;
 			creator.makeNewCoin(amount, name, {from: account, gas: 400000});

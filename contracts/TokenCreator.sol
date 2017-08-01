@@ -4,7 +4,7 @@ import "./TokenManager.sol";
 
 contract TokenCreator{
 	
-	event TokenManagerCreated (bytes32 tokenName, address at);
+	event TokenManagerCreated (bytes32 tokenName, address tokenAddress);
  
 	function makeTokenManager(
 		uint256 initialSupply, 
