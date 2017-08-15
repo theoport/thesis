@@ -10,7 +10,8 @@ contract NewToken is BaseToken{
 	function NewToken(
 		uint256 _initialAmount,
 		bytes32 _name,
-		uint256[3] _issuanceRate
+		uint256[2] _issuanceRate,
+		uint256 _upperCap
 		) {
 		manager = msg.sender;
 		balances[address(this)] = _initialAmount;
@@ -18,6 +19,7 @@ contract NewToken is BaseToken{
 		totalSupply = _initialAmount;
 		name = _name;
 		issuanceRate = _issuanceRate;
+		upperCap = _upperCap;
 	}
 }
 		

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>This is the TokenSpace</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="/build/tokenSpace.bundle.js"></script>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="col-sm-6 col-sm-offset-3">
+	<div class="jumbotron text-center">
+		<h1>TokenSpace</h1>
+		<label for="tokenChoices">Please choose the TokenSpace you want to enter</label>	
+		<select class="form-control" id="tokenList" onchange="window.location.href = '/tokenSpace/' + this.value;"></select>
+		<button class="btn btn-default" id="hideShow" type="button">Hide/Show list of descriptions</button>	
+		<table id="descriptionList" style="visibility:hidden">
+			<tr>
+				<th>Token</th>
+				<th>Description</th>
+			</tr>
+		<% for (var i = 0; i < data.length; i++) { %>
+			<tr>
+				<th><%= data[i].name %></th>
+				<th><%= data[i].description %></th>
+			</tr>
+		<% } %>
+		<button class="btn btn-default" id="hideShow" type="button">Hide</button>	
+		</table>
+	</div>
+</div>
+</body>
+</html>

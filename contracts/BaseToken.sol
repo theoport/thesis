@@ -5,9 +5,11 @@ pragma solidity ^0.4.8;
 contract BaseToken is ERC20Standard{
 
 	uint256 noAccountsBlocked = 0;
-	uint256[3] issuanceRate;
+	uint256[2] issuanceRate;
 	uint256 lastUpdate = 0;
 	uint256 creationTime;
+	uint256 upperCap;
+	bool limitReached = false;
 	
 	mapping (address => uint256) balances;
 	mapping (address  => mapping (address => uint256)) allowance;
@@ -15,14 +17,32 @@ contract BaseToken is ERC20Standard{
 	mapping (uint256 => address) accountsBlocked;
 	
 	modifier updateSupply() {
-		var daysPassed = (now - creationTime)/ (1 days); 
-		if (daysPassed > lastUpdate) {
-			for (uint i = lastUpdate + 1; i > daysPassed; i++) {
-				uint temp = issuanceRate[2] * (i ** 3) + issuanceRate[1] * (i ** 2) + issuanceRate[0] * i;
-				balances[address(this)] += temp;
-				totalSupply += temp;
+		if(!limitReached) {
+			var daysPassed = (now - creationTime)/ (1 days); 
+
+			if (daysPassed > lastUpdate) {
+
+				for (uint i = lastUpdate + 1; i > daysPassed; i++) {
+
+					uint temp = issuanceRate[1] * i + issuanceRate[0];	
+
+					if (temp <= 0) {
+						limitReached = true;
+						break;
+					}
+
+					balances[address(this)] += temp;
+					totalSupply += temp;
+
+					if (totalSupply >= upperCap) {
+						uint previous = totalSupply;
+						totalSupply = upperCap;
+						balances[address(this)] -= (previous - totalSupply);
+						limitReached = true;
+					}
+				}
+				lastUpdate = daysPassed;
 			}
-			lastUpdate = daysPassed;
 		}
 		_;
 	}
@@ -72,4 +92,4 @@ contract BaseToken is ERC20Standard{
 	function allow(address owner, address spender) constant returns (uint256 remaining){
 		return allowance[owner][spender];
 	}
-}	
+}

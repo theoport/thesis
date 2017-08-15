@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Creating your own token</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="/build/tokenFactory.bundle.js"></script>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<% if (data.message) {alert(data.message);} %>
+<div class="col-sm-6 col-sm-offset-3">
+	<div class="jumbotron text-center">
+		<h1>Token Factory</h1>
+		<br>
+	
+		<label for="name">Name:</label>
+		<div class="input-group">
+			<span class="input-group-btn">
+				<button class="btn btn-secondary" id="nameInfo" type="button">
+					<div class="fa fa-info"></div>
+				</button>
+			</span>	
+			<input type="text" id="name" class="form-control" placeholder="e.g. myCoin"></input>
+		</div>
+
+		<label for="initialAmount">Initial amount:</label>
+		<div class="input-group">
+			<span class="input-group-btn">
+				<button class="btn btn-secondary" id="amountInfo" type="button">
+					<span class="fa fa-info"></span>
+				</button>
+			</span>	
+			<input type="text" id="initialAmount" class="form-control" placeholder="e.g. 10000"></input>
+		</div>
+
+		<label style="text-align: left;" for="consensusPercent">Consensus rule:</label>
+		<div class="input-group">
+			<span class="input-group-btn">
+				<button class="btn btn-secondary" id="consensusInfo" type="button">
+					<span class="fa fa-info" ></span>
+				</button>
+			</span>	
+			<input type="text" id="consensusPercent" class="form-control" placeholder="e.g. 75"></input>
+			<span class="input-group-addon" id="basic-addon1">%</span>
+		</div>
+		
+		<label style="text-align: left;" for="issuanceRate">Issuance rate:</label>
+		<div class="input-group">	
+			<span class="input-group-btn">
+				<button class="btn btn-secondary" id="issuanceInfo" type="button">
+					<span class="fa fa-info"></span>
+				</button>
+			</span>	
+			<input type="text" id="issuanceRate" class="form-control" placeholder="e.g. -2,100"></input>
+		</div>
+
+		<label style="text-align: left;" for="upperCap">Upper Cap:</label>
+		<div class="input-group">	
+			<span class="input-group-btn">
+				<button class="btn btn-secondary" id="capInfo" type="button">
+					<span class="fa fa-info" ></span>
+				</button>
+			</span>	
+			<input type="text" id="upperCap" class="form-control" placeholder="e.g. 100000"></input>
+		</div>
+		
+		<label for="contractRefunds">Should the contract refund?</label>
+		<div class="input-group">		
+			<span class="input-group-btn">
+				<button class="btn btn-secondary" type="button" id="refundInfo">
+					<span class="fa fa-info"></span>
+				</button>
+			</span>	
+		</div>
+		<select class="form-control" id="contractRefunds">
+			<option value="" disabled="disabled" selected="selected">Please Select</option>
+			<option value="true">Yes</option>
+			<option value="false">No</option>
+		</select>
+
+		<button class="btn btn-default blockchain" id="create" onclick="App.makeNewToken()">Create Token</button>
+		<p><span id="status"></span></p>
+		<br>
+		<a class="btn btn-default" href="/"><span class="fa fa-home"></span> Home</a>
+		<a class="btn btn-default" href="/tokenSpace"><span class="fa fa-comments"></span> Enter Tokenspace</a>	
+	</div>
+</div>
+<div class="topcorner">	
+	<span id="accountInfo"></span>
+	<br><br>
+	<span id="networkInfo"></span>
+</div>
+</body>
+</html>
+	
+

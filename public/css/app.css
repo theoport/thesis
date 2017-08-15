@@ -1,0 +1,18 @@
+body {
+	padding-top: 80px;
+}
+
+.topcorner {
+	position: fixed;
+	top: 0;
+	right: 0;
+	background-color: PaleGreen;
+	border-radius: 20px;
+	padding: 20px;
+}
+
+.blockchain {
+	background-color: Navy;
+	color: White;
+	font-family: "Lucida Console", Monaco, monospace;
+}

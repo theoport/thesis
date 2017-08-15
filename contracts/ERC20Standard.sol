@@ -12,5 +12,6 @@ contract ERC20Standard{
 	function allow(address owner, address spender) constant returns (uint256 remaining);
 	event Transfer(address indexed from, address indexed to, uint256 value);
 	event Approval(address indexed owner, address indexed spender, uint256 value);
+
 }
 

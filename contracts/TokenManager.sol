@@ -123,7 +123,6 @@ contract TokenManager {
 		address updatedContract;
 	}
 		
-	event TokenCreated(bytes32 name, address at);
 	event VoteScheduled(uint256 time, uint256 id, uint256[3] tag);
 	event VotingOutcome(bool success, uint256 id);
 	event NewHighestBid(address sender, uint256 amount, uint256 auctionId);
@@ -142,18 +141,18 @@ contract TokenManager {
 		uint256 _initialAmount, 
 		bytes32 _name, 
 		uint256 _consensusPercent,
-		uint256[3] _issuanceRate,
+		uint256[2] _issuanceRate,
+		uint256 _upperCap,
 		bool _contractRefunds
 	) payable {
-		creator = tx.origin;
-		etherBalance = msg.value;
-		initialAmount = _initialAmount;
-		consensusPercent = _consensusPercent;
-		contractRefunds = _contractRefunds;
-		version = 0;
-		token = new NewToken(_initialAmount, _name, _issuanceRate);
-		tokenAddress = address(token);
-		TokenCreated(_name, tokenAddress);
+		creator 					= tx.origin;
+		etherBalance 			= msg.value;
+		initialAmount			= _initialAmount;
+		consensusPercent 	= _consensusPercent;
+		contractRefunds 	= _contractRefunds;
+		version 					= 0;
+		token 						= new NewToken(_initialAmount, _name, _issuanceRate, _upperCap);
+		tokenAddress 			= address(token);
 		}
 
 	function getTokenAddress() constant returns (address) {return tokenAddress;}
