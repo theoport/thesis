@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Token = require('../models/Token');
+const nl2br = require('nl2br');
 
 
 module.exports = {
@@ -7,6 +8,7 @@ module.exports = {
 	getToken: getToken,
 	addToken: addToken,
 	notAllowed: notAllowed,
+	getTokenSource: getTokenSource
 };
 
 function getAllTokens(req,res){
@@ -19,8 +21,8 @@ function getAllTokens(req,res){
 }
 
 function getToken(req,res){
-	const _address = req.params.address;
-	Token.findOne({address: _address}, (err, token) => {
+	const _id= req.params.id;
+	Token.findOne({id: _id}, (err, token) => {
 		if (err){
 			res.status(400).json(err);
 		}
@@ -31,9 +33,11 @@ function getToken(req,res){
 	});
 }
 
+
+
 function addToken(req,res){
-	const _address = req.body.address;
-	Token.findOne({address: _address}, (err, token) => {
+	const _id= req.body.id;
+	Token.findOne({id: _id}, (err, token) => {
 		if (err){
 			res.status(400).json(err);
 		}
@@ -49,7 +53,7 @@ function addToken(req,res){
 			});
 		}
 		else {
-			res.json({message: "Token already exists at that address"});
+			res.json({message: "Token already exists with that ID"});
 		}
 	});
 }
@@ -88,3 +92,15 @@ function deleteToken(req,res){
 }
 */
 		
+function getTokenSource(req,res) {
+	const _id = req.params.id;
+	Token.findOne({id: _id}, (err, token) => {
+		if (err){
+			res.status(400).json(err);
+		}
+		if (!token) {
+			res.status(404).json({message: "token not found."});
+		}
+		res.send(nl2br(token.sourceCode, false));
+	});
+}

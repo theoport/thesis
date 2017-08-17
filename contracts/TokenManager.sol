@@ -19,6 +19,7 @@ contract TokenManager {
 
 	enum subject{UPDATE, BUG} 
 	address creator;
+	uint public creationTime;
 	uint256 private etherBalance; // etherbalance to which the contract refuels itself
 	address public tokenAddress; // address of the token managed by this contract
 	NewToken token;
@@ -151,7 +152,8 @@ contract TokenManager {
 		consensusPercent 	= _consensusPercent;
 		contractRefunds 	= _contractRefunds;
 		version 					= 0;
-		token 						= new NewToken(_initialAmount, _name, _issuanceRate, _upperCap);
+		creationTime 			= now; 
+		token 						= new NewToken(_initialAmount, _name, _issuanceRate, _upperCap, creationTime);
 		tokenAddress 			= address(token);
 		}
 

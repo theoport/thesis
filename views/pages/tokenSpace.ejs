@@ -14,19 +14,13 @@
 	<div class="jumbotron text-center">
 		<h1>TokenSpace</h1>
 		<label for="tokenChoices">Please choose the TokenSpace you want to enter</label>	
-		<select class="form-control" id="tokenList" onchange="window.location.href = '/tokenSpace/' + this.value;"></select>
+		<select class="form-control" id="tokenList" onchange="window.location.href = '/tokenHome/' + this.value;"></select>
 		<button class="btn btn-default" id="hideShow" type="button">Hide/Show list of descriptions</button>	
-		<table id="descriptionList" style="visibility:hidden">
+		<table id="descriptionList">
 			<tr>
 				<th>Token</th>
 				<th>Description</th>
 			</tr>
-		<% for (var i = 0; i < data.length; i++) { %>
-			<tr>
-				<th><%= data[i].name %></th>
-				<th><%= data[i].description %></th>
-			</tr>
-		<% } %>
 		<button class="btn btn-default" id="hideShow" type="button">Hide</button>	
 		</table>
 	</div>

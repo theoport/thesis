@@ -1,4 +1,5 @@
 import { default as Web3 } from 'web3';
+import { default as SHA256} from 'crypto-js/sha256';
 
 import NewTokentxt from '../../public/txt/NewToken.txt';
 import BaseTokentxt from '../../public/txt/BaseToken.txt';
@@ -53,6 +54,7 @@ window.App = {
 		web3.version.getNetwork((err,result) => {
 		
 			netId = result;
+			console.log(" id is " + netId);
 			let temp = "createTokenObject.networks.netId.address"; 
 			let t = temp.split(".");
 			let obj = createTokenObject;
@@ -90,28 +92,43 @@ window.App = {
 	startWatch: function() {
 		let self = this;
 		ctInstance = CreateToken.at(ctAddress);
+
+		var timeEvent = ctInstance.TellTheTime({}, {fromBlock: 0, toBlock: 'latest'});
+		timeEvent.watch( function(err, res) {
+			console.log("tick");
+			if (err) {
+			console.log(err);
+			}
+			else {
+				console.log((res.args.time).toNumber());
+			}
+		});
+
+			
 		//start watching contract 
-		var anEvent = ctInstance.TokenManagerCreated({},{fromBlock: 0, toBlock: 'latest'});
+		var anEvent = ctInstance.TokenManagerCreated({}, {fromBlock: 'latest'});
 		anEvent.watch( function(err, result) {
 			
 			if (err) {
 				console.log(err);
 			} else {
-				
 				self.setStatus("Success: " + web3.toAscii(result.args.tokenName) + " created at " + result.args.tokenAddress
 				+ "<br> with manager at " + result.args.tokenManagerAddress);
-				let _description = $('#description').html();	
+				let _description = $("#description").val();	
 				let _sourceCode = ERC20Standardtxt + BaseTokentxt + NewTokentxt;
 				console.log(_sourceCode);
+				let _date = new Date(result.args.creationTime.toNumber() * 1000);
+				let _id = SHA256(result.args.creationTime + result.args.tokenAddress);
 				$.ajax({
 					type: 'POST',
 					url: '/api/tokens',
 					data: {
-						name: web3.toAscii(result.args.tokenName),
+						id: _id.toString(),
+						name: web3.toAscii(result.args.tokenName).replace(/\u0000/g, ''),
 						creator: result.args.creator,
 						address: result.args.tokenAddress,
 						addressManager: result.args.tokenManagerAddress,
-						creationDate: Date.now(),
+						creationDate: _date,
 						previousAddress: "0",
 						description: _description,
 						sourceCode: _sourceCode, 
@@ -189,6 +206,9 @@ $(document).ready(function() {
 	});
 	$("#consensusInfo").hover(function() {
 		$(this).css('cursor', 'pointer').attr('title', "Please enter the amount of consensus required to implement updates on the token.");
+	});
+	$("#descriptionInfo").hover(function() {
+		$(this).css('cursor', 'pointer').attr('title', "Please give a short description of what you intend to achieve with this new token. New users will be able to see this description and join your effort in making it a success.");
 	});
 });
 	

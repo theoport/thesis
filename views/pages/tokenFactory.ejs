@@ -10,7 +10,9 @@
 	<link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
-<% if (data.message) {alert(data.message);} %>
+<% if (data.length > 0 && data[0].hasOwnProperty('error')) { %>
+	<div class="alert alert-danger"><%= data[0].message %></div>
+<% } %>
 <div class="col-sm-6 col-sm-offset-3">
 	<div class="jumbotron text-center">
 		<h1>Token Factory</h1>
@@ -80,6 +82,16 @@
 			<option value="true">Yes</option>
 			<option value="false">No</option>
 		</select>
+
+		<label for="description">Description</label>
+		<div class="input-group">		
+			<span class="input-group-btn">
+				<button class="btn btn-secondary" type="button" id="descriptionInfo">
+					<span class="fa fa-info"></span>
+				</button>
+			</span>	
+		</div>
+		<textarea rows="5" id="description" class="form-control"></textarea>
 
 		<button class="btn btn-default blockchain" id="create" onclick="App.makeNewToken()">Create Token</button>
 		<p><span id="status"></span></p>

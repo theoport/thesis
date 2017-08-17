@@ -4,8 +4,8 @@ import "./TokenManager.sol";
 
 contract TokenCreator{
 	
-		event TokenManagerCreated (bytes32 tokenName, address tokenManagerAddress, address tokenAddress, address creator);
-//		event TokenManagerCreated (bytes32 tokenName, address tokenManagerAddress);
+		event TokenManagerCreated (bytes32 tokenName, address tokenManagerAddress, address tokenAddress, address creator, uint creationTime);
+		event TellTheTime(uint time);
  
 	function makeTokenManager(
 		uint256 initialSupply, 
@@ -15,10 +15,10 @@ contract TokenCreator{
 		uint256 upperCap,
 		bool contractRefunds
 		) { 
+		TellTheTime(now);
 		TokenManager manager = new TokenManager(initialSupply, name, 
 																						consensusPercent, issuanceRate, upperCap, contractRefunds);
 	
-		TokenManagerCreated(name, address(manager), manager.getTokenAddress(), tx.origin);
-//		TokenManagerCreated(name,address(manager));
+		TokenManagerCreated(name, address(manager), manager.getTokenAddress(), tx.origin, manager.creationTime());
 	}
 }

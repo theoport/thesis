@@ -1,9 +1,10 @@
 import {default as Web3} from 'web3';
+import {default as SHA256} from 'crypto-js/sha256';
 
 import createTokenObject from '../../build/contracts/TokenCreator.json';
 
 let CreateToken;
-let ctAddress, ctInstance;
+let ctAddress, ctInstance, netId;
 let tokens = [];
 
 window.App = {
@@ -38,12 +39,15 @@ window.App = {
 					console.log(logs);
 
 					for (var i = 0; i < logs.length ; i++) {
-						tokens.push(logs[i].args.tokenAddress); 
+						console.log(logs[i].args.creationTime.toNumber());
+						var id = SHA256((logs[i].args.creationTime).toNumber() + logs[i].args.tokenAddress);
+						console.log(id.toString());
+						tokens.push(id.toString()); 
 					}
 
 					self.makeList();
 				}
-			}
+			});
 		});
 	},
 	
@@ -54,16 +58,22 @@ window.App = {
 			datatype: 'json',
 			success: function(responseData, textStatus, jqXHR) {
 
+				var tempId;
 				var tempAddr;
 				var tempName;
+				var tempDesc;
 
 				for (var i = 0; i < responseData.length; i++) {
-					tempAddr = '' + responseData[i].address;	
+					tempId = '' + responseData[i].id;	
+					tempAddr = '' + responseData[i].address;
 					tempName = '' + responseData[i].name;
-					if ($.inArray(tempAddr,tokens) {
+					tempDesc = '' + responseData[i].description;
+					if (($.inArray(tempId,tokens)) >= 0) {
 						$("#tokenList").append($("<option></option>")
-															.attr('value', tempAddr)
+															.attr('value', tempId)
 															.text(tempName + ", " + tempAddr)); 
+						$("#descriptionList").append($("<tr></tr>")
+															.html("<td>" + tempName + "</td><td>" + tempDesc + "</td>")); 
 					}
 				}
 			},

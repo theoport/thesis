@@ -7,7 +7,9 @@ module.exports = {
 	showHome: showHome,
 	showAbout: showAbout,
 	showTokenFactory: showTokenFactory,
-	showTokenSpace: showTokenSpace
+	showTokenSpace: showTokenSpace,
+	showTokenHome: showTokenHome,
+	showTokenForum: showTokenForum
 };
 
 function showHome(req,res){
@@ -19,24 +21,59 @@ function showAbout(req,res){
 }
 
 function showTokenFactory(req,res){
-	var data = returnTokens();
-	res.render('pages/tokenFactory', {data: data});
+	Token.find({}, (err, tokens) => {
+		if (err){
+			var data = [{message: err}];
+			res.render('pages/tokenFactory', {data: data});
+		}
+		else {
+			var data = tokens; 
+			res.render('pages/tokenFactory', {data: data});
+		}
+	});
 }
 
 function showTokenSpace(req,res){
-	var data = returnTokens();
-	res.render('pages/tokenSpace', {data: data});
+	Token.find({}, (err, tokens) => {
+		if (err){
+			res.render('pages/tokenSpace', {data: [{message: err}]});
+		}
+		else {
+			res.render('pages/tokenSpace', {data: tokens});
+		}
+	});
 }
 
+function showTokenHome(req,res) {
+	const _id = req.params.id;
+	Token.findOne({id: _id}, (err, token) => {
+		if (err) {
+			res.render('pages/tokenHome', {token: {error: err}});
+		} else {
+			res.render('pages/tokenHome', {token: token});
+		}
+	});
+}
+	
+function showTokenForum(req,res) {
+	const _id = req.params.id;
+	Token.findOne({id: _id}, (err, token) => {
+		if (err) {
+			res.render('pages/tokenForum', {token: {error: err}});
+		} else {
+			res.render('pages/tokenForum', {token: token});
+		}
+	});
+}
+/*
 function returnTokens() {
 	Token.find({}, (err, tokens) => {
-		var data;
 		if (err){
-			return {message: err};	
+			return [{message: err}];	
 		}		
-		return tokens;
+		return [{message: "SUCCESS"}];
 	});
 }
 
 
-
+*/
