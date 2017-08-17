@@ -101,6 +101,6 @@ function getTokenSource(req,res) {
 		if (!token) {
 			res.status(404).json({message: "token not found."});
 		}
-		res.send(nl2br(token.sourceCode, false));
+		res.send("<pre>" + nl2br(token.sourceCode, false) + "</pre>");
 	});
 }

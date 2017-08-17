@@ -10,12 +10,16 @@ contract TokenManager {
 	would have to require further voting, as otherwise too much 
 	trust is put in the hands of the creator.*/
 
-	uint256 constant PARAMETERS = 4;
-	uint256 constant INFOS = 3;
-	uint256 constant BUGEXTENSION = 3 days;
-	uint256 constant INSECTHUNT = 1 days;
-	uint256 constant NOTICETIME = 1 days;
-	uint256 constant BOUNTYHUNT = 1 days;
+	uint256 PARAMETERS = 4;
+	uint256 INFOS = 3;
+
+	struct config {
+		uint256 BUGEXTENSION;
+		uint256 INSECTHUNT;
+		uint256 NOTICETIME;
+		uint256 BOUNTYHUNT;
+		uint256 UPDATETRIES;
+	}
 
 	enum subject{UPDATE, BUG} 
 	address creator;
@@ -60,7 +64,8 @@ contract TokenManager {
 
 	struct Vote{
 		bool active;
-		uint256 totalVotes;
+		uint256 totalYesVotes;
+		uint256 totalNoVotes;
 		uint256 totalPossibleVotes;
 		uint256 startTime;
 		uint256 endTime;
@@ -110,11 +115,9 @@ contract TokenManager {
 	anything. Not at all perfect yet.*/
  
 	struct Update {
-		uint256 descriptionHash;
+		uint256 id;
 		uint256 bugBounty;
 		uint256 timeWindow;
-		uint256 version;
-		bytes32 name;
 		address developer;
 		uint256 price;
 		bool active;
@@ -126,6 +129,7 @@ contract TokenManager {
 		
 	event VoteScheduled(uint256 time, uint256 id, uint256[3] tag);
 	event VotingOutcome(bool success, uint256 id);
+	event UpdateOutcome(bool success, uint256 id);
 	event NewHighestBid(address sender, uint256 amount, uint256 auctionId);
 	event AuctionEnd(uint256 id, address winner, uint256 price);
 	event Failure(uint256 time, bytes32 message, uint256 id);
@@ -134,7 +138,10 @@ contract TokenManager {
 	event BountyStarted(uint256 updateVersion, uint256 descriptionHash, bytes32 name);
 	event BugFound(address by, uint256 updateVersion, uint256 bugId, uint256 descriptionHash);
 	event AuctionStarted(uint256 startTime, uint256 id, uint256 amount);
+	event InsectHuntStarted(uint256 startTime, uint256 id);
 	event UpdateToken(address newToken);
+	event UpdateStarted(uint256 id, uint256 time);
+	event NewVote();
 
 	//Constructor, creates new token
 
@@ -176,16 +183,15 @@ contract TokenManager {
 	referral. After the bounty is started, anyone can compete for the job for the 
 	specified amount of time.*/
 
-	function startBounty (uint256 _descriptionHash, bytes32 _name)public{
+	function startBounty (uint256 _id, bytes32 _name)public{
 		require (!bountyCompetition.active && !update.active);
 		bountyCompetition.active = true;
 		bountyCompetition.startTime = now;
-		bountyCompetition.endTime = bountyCompetition.startTime + BOUNTYHUNT;
+		bountyCompetition.endTime = bountyCompetition.startTime + config.BOUNTYHUNT;
 		bountyCompetition.bestPrice = 0;
-		update.descriptionHash = _descriptionHash;
-		update.name = _name;
-		update.version++;
-		BountyStarted(update.version, update.descriptionHash, update.name);
+		update.id= _id;
+		UpdateStarted(update.id);
+		BountyStarted(update.id);
 	}
 
 	/* Lets anyone bid for bounty, if one is active. Frontend takes care of 
@@ -197,7 +203,7 @@ contract TokenManager {
 		if (price < bountyCompetition.bestPrice || bountyCompetition.bestPrice == 0) {
 			bountyCompetition.bestPrice = price;
 			bountyCompetition.bidder = msg.sender;
-			NewBountyPrice(price, msg.sender, update.version); 
+			NewBountyPrice(price, msg.sender, update.id); 
 		}
 	}
 	
@@ -208,8 +214,12 @@ contract TokenManager {
 		assert(bountyCompetition.active);
 		assert(now >= bountyCompetition.endTime);
 		bountyCompetition.active = false;
-		BountyEnded(bountyCompetition.bidder, bountyCompetition.bestPrice, update.version);
-		voteOnUpdate(bountyCompetition.bidder, bountyCompetition.bestPrice);
+		BountyEnded(bountyCompetition.bidder, bountyCompetition.bestPrice, update.id);
+		if (bountyCompetition.bestPrice == 0){
+			UpdateOutcome(false, update.id)
+		} else {
+			voteOnUpdate(bountyCompetition.bidder, bountyCompetition.bestPrice);
+		}
 	}
 			
 
@@ -229,7 +239,7 @@ contract TokenManager {
 		update.insectHunt.descriptionHash = _descriptionHash;
 		update.insectHunt.finder = msg.sender;
 		//IS IT REALLY A BUG?	GIVE TIME FOR BUG FINDER AND DEVELOPER TO DISCUSS
-		update.endTime += NOTICETIME;	
+		update.endTime += config.NOTICETIME;	
 		update.insectHunt.id++;
 		BugFound(msg.sender, update.version, update.insectHunt.id, _descriptionHash);
 		startVote([uint256(subject.BUG), update.version, update.insectHunt.id]);
@@ -250,7 +260,7 @@ contract TokenManager {
 	
 	/* If vote is successfull, start update, can only be called by this contract */
 
-	function startUpdate () internal{
+	function startUpdate (_id) internal{
 		update.insectHunt.id = 0;
 		update.startTime = now;
 		update.endTime = update.startTime + update.timeWindow;
@@ -264,8 +274,9 @@ contract TokenManager {
 		assert (update.developer == msg.sender);
 		assert(now <= update.endTime);
 		update.insectHunt.active = true;
-		update.endTime = now + INSECTHUNT;
-		update.updatedContract = _updatedContract;
+		update.endTime = now + config.INSECTHUNT;
+		update.updatedContract = _updatedContract;	
+		InsectHuntStarted(now, update.id);
 	}
 
 	/* If no bugs are found, time passes and anyone can finalise the update, sending the 
@@ -280,8 +291,8 @@ contract TokenManager {
 		tokenAddress = update.updatedContract;
 		token = NewToken(tokenAddress);
 		version = update.version;
-		UpdateToken(tokenAddress);
 		update.active = false;
+		UpdateOutcome(true, update.id);
 	}
 
 	/*****************REFUEL***************/
@@ -336,28 +347,34 @@ contract TokenManager {
 		
 	/******************VOTE*********************/
 	
-	function startVote(uint256[3] _tag) canRefund {
+	function startVote(uint256[3] _tag, uint256 _id) canRefund {
 		assert(!vote.active);
 		vote.totalPossibleVotes = token.totalSupply() - token.balanceOf(address(this));
+		vote.totalNoVotes = 0;
+		vote.totalYesVotes = 0;
 		vote.active = true;
 		vote.startTime = now;
 		vote.endTime = vote.startTime + voteDuration;
-		vote.id++;
+		vote.id = _id;
 		vote.tag = _tag;
 		VoteScheduled(vote.id, vote.startTime, _tag); 
 	}
 	
-	function submitVote () returns (bool) {
+	function submitVote (bool yes) {
 		if (now >= vote.startTime && now <= vote.endTime ) {
-			vote.totalVotes += token.balanceOf(msg.sender);
+			if (yes) {
+				vote.totalYesVotes += token.balanceOf(msg.sender);
+			}
+			else {
+				vote.totalNoVotes += token.balanceOf(msg.sender);
+			}
 			token.block(msg.sender);
-			return true;
+			NewVote();
 		}
-		return false;
 	}
 
 	function endVote() canRefund returns (bool){
-		if (vote.active && (vote.totalVotes / vote.totalPossibleVotes) > consensusPercent){
+		if (vote.active && ((vote.totalYesVotes / vote.totalPossibleVotes) * 100) > consensusPercent){
 			
 			VotingOutcome(true, vote.id);
 			vote.active = false;
@@ -365,18 +382,23 @@ contract TokenManager {
 				update.insectHunt.foundOne = false;
 				update.insectHunt.active = false;
 				token.transfer(update.insectHunt.finder, update.bugBounty);
+
+				if (update.numberOfTries >= config.UPDATETRIES ) {
+					update.endTime = now;
+					UpdateOutcome(false, update.id);
+					return;
+				}	
+
 				update.price -= update.bugBounty;
-				update.endTime = now + BUGEXTENSION;
+				update.endTime = now + config.BUGEXTENSION;
 			} else if (uint256(vote.tag[0]) == uint256(subject.UPDATE)) { 
 				startUpdate();
 			}	
 
-		} else if (vote.active && now >= vote.endTime) {
+		} else if (vote.active && now >= vote.endTime || vote.active && ((voteTotalNoVotes / vote.totalPossibleVotes) * 100) > (100 - consensusPercent)) {
 			vote.active = false;
 			VotingOutcome(false, vote.id);
-			return true;
 		} 
-		return false;
 	}
 
 	/*******************REFUND******************/
