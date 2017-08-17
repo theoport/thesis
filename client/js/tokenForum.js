@@ -19,7 +19,9 @@ window.App = {
 		tmAddress = token.managerAddress;	
 		tmInstance = TokenManager.at(ctAddress);
 		self.fillMaps();			
-		self.fillPage();
+		self.fillUpdateTopics();
+		self.fillIssueTopics();
+		self.fillGeneralTopics();
 
 	fillMaps(): function() {
 		
@@ -44,8 +46,11 @@ window.App = {
 		}
 		
 		for (var key of updateMap.keys()) {
-			updateStatus.push([key,[false,false]]); 
+			updateStatus.push([key,[true,false]]); 
 		}
+	},
+	
+	fillUpdateTopics: function() {
 
 		var updateStatusMap = new Map(updateStatus);	
 
@@ -82,6 +87,7 @@ window.App = {
 						// If update is still active
 						if (updateStatus[i][1][0] == true) {
 			
+/*
 							$("#active").append($("<a></a>")
 													.attr('class', 'topic')
 													.attr('id', updateStatus[i][0])
@@ -94,18 +100,45 @@ window.App = {
 														"</small></h4>" +
 														"<p>" +
 														updateMap[updateStatus[i][0]].title +
-														"</p></div></div>"
+														"</p></div></div>"));
 															
-														
+													*/	
 									
-													"</div>")
-							// If update has started 
+							// If update has started
 							if (updateStatus[i][1][1] == true) {
+
+							$("#active").append($("<a></a>")
+													.attr({'class': 'topic',
+													'id': updateStatus[i][0]})
+													.html("<div style=\"background-color:yellow;\" class=\"media\">" +
+														"<div class=\"media-body\">" +	
+														"<h4 class\"media-heading\">" +
+														userMap[updateMap[updateStatus[i][0]].userId].name +
+														"<small>" +
+														updateMap[updateStatus[i][0]].creationDate +
+														"</small></h4>" +
+														"<p>" +
+														updateMap[updateStatus[i][0]].title +
+														"</p></div></div>"));
 									
 							} 
 
-							// If update hasn't been started yet	
+							// If update hasn't started 
 							else if (updateStatus[i][1][1] == false){
+
+							$("#active").append($("<a></a>")
+													.attr({'class': 'topic',
+													'id': updateStatus[i][0]})
+													.html("<div class=\"media\">" +
+														"<div class=\"media-body\">" +	
+														"<h4 class\"media-heading\">" +
+														userMap[updateMap[updateStatus[i][0]].userId].name +
+														"<small>" +
+														updateMap[updateStatus[i][0]].creationDate +
+														"</small></h4>" +
+														"<p>" +
+														updateMap[updateStatus[i][0]].title +
+														"</p></div></div>"));
 				
 							}
 						}
@@ -114,14 +147,48 @@ window.App = {
 
 							// If update was successful
 							if (updateStatus[i][1][1] == true) {
+
+							$("#archived").append($("<a></a>")
+													.attr({'class': 'topic',
+													'id': updateStatus[i][0]})
+													.html("<div style=\"background-volor:green;\"class=\"media\">" +
+														"<div class=\"media-body\">" +	
+														"<h4 class\"media-heading\">" +
+														userMap[updateMap[updateStatus[i][0]].userId].name +
+														"<small>" +
+														updateMap[updateStatus[i][0]].creationDate +
+														"</small></h4>" +
+														"<p>" +
+														updateMap[updateStatus[i][0]].title +
+														"</p></div></div>"));
 				
 							} 
 		
 							// If update wasn't successful	
 							else if (updateStatus[i][1][1] == false) {
+
+							$("#archived").append($("<a></a>")
+													.attr({'class': 'topic',
+													'id': updateStatus[i][0]})
+													.html("<div style=\"background-volor:red;\"class=\"media\">" +
+														"<div class=\"media-body\">" +	
+														"<h4 class\"media-heading\">" +
+														userMap[updateMap[updateStatus[i][0]].userId].name +
+														"<small>" +
+														updateMap[updateStatus[i][0]].creationDate +
+														"</small></h4>" +
+														"<p>" +
+														updateMap[updateStatus[i][0]].title +
+														"</p></div></div>"));
+				
 			
 							}
 						}
+					}
+				}
+			});
+		});
+	},
 							
 					
 				
