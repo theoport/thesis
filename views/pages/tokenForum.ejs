@@ -4,7 +4,9 @@
 	<title>Creating your own token</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<script src="/build/tokenHome.bundle.js"></script>
+	<script src="/build/tokenForum.bundle.js"></script>
+	<script><% var user = user %></script>
+	<script><% var token = token %></script>
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/css/app.css">
@@ -22,6 +24,7 @@
 				<li><a href="<%= '/tokenHome/' + token.id + '/contact'-%>">Contact</a></li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
+				<li><%= user.name %></li>
 				<li><a href="/tokenSpace"><span class="fa fa-sign-out"></span>Sign out</a></li>
 			</ul>
 		</div>
@@ -40,7 +43,7 @@
 	</div>
 
 	<!-- LEFT TAB CONTENT ////////////////////////////// -->	
-	<div class="col-sm-9"> 
+	<div class="col-sm-9" id="mainSection"> 
 	<div class="tab-content">
 
 	<!-- UPDATE////////////////////////////// -->	
@@ -59,20 +62,19 @@
 				</div>
 
 			</div>
-			<a href="#" class="btn btn-default" id="newUpdateThread">Create new thread</a> 
+			<a href="/updateTopic" class="btn btn-success">Create new thread</a> 
 
 		</div>
 		<!-- ISSUES //////////////////////////////// -->
 		<div id="issuesCat" class="tab-pane fade in">
-			<div><a href="#" id="newIssuesThread">Create new thread</a></div> 
-			Show all issues threads
-
+			<div id="issues"></div>
+			<a href="/issueTopic" class="btn btn-success">Create new thread</a> 
 		</div>
 
 		<!-- GENERAL //////////////////////////////// -->
 		<div id="generalCat" class="tab-pane fade in">
-			<div><a href="#" id="newGeneralThread">Create new thread</a></div> 
-			Show all general threads
+			<div id="general"></div>
+			<a href='/generalTopic' class="btn btn-success">Create new thread</a> 
 		</div>
 		</div>
 	</div>

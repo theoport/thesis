@@ -13,8 +13,19 @@
 <div class="col-sm-6 col-sm-offset-3">
 	<div class="jumbotron text-center">
 		<h1>TokenSpace</h1>
+		<% if (typeof(user) != 'undefined') {%>
+		<h2> <%= user.name %> </h2>
+		<% } %>
 		<label for="tokenChoices">Please choose the TokenSpace you want to enter</label>	
-		<select class="form-control" id="tokenList" onchange="window.location.href = '/tokenHome/' + this.value;"></select>
+		<span>
+		<select class="form-control" id="tokenList"></select>
+		<a class="btn btn-default" id="enterToken">Enter</a> 
+		</span>
+		<p>Login or Register:</p>
+		<a href="/login" class="btn btn-default"><span class="fa fa-user"></span> Login</a>
+		<a href="/signup" class="btn btn-default"><span class="fa fa-user"></span> Sign Up</a>
+	</div>
+	<div class="jumbotron text-left">
 		<button class="btn btn-default" id="hideShow" type="button">Hide/Show list of descriptions</button>	
 		<table id="descriptionList">
 			<tr>
@@ -25,5 +36,6 @@
 		</table>
 	</div>
 </div>
+
 </body>
 </html>

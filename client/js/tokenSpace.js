@@ -40,7 +40,7 @@ window.App = {
 
 					for (var i = 0; i < logs.length ; i++) {
 						console.log(logs[i].args.creationTime.toNumber());
-						var id = SHA256((logs[i].args.creationTime).toNumber() + logs[i].args.tokenAddress);
+						var id = SHA256((logs[i].args.creationTime).toNumber() + logs[i].args.tokenAddress + logs[i].args.tokenManagerAddress);
 						console.log(id.toString());
 						tokens.push(id.toString()); 
 					}
@@ -102,6 +102,9 @@ window.addEventListener('load', function() {
 $(document).ready(function(){
 	$("#hideShow").click(function() {
 		$("#descriptionList").toggle();
+	});
+	$("#enterToken").click(function() {
+		window.location.href='/tokenHome/' + $("#tokenList").val();
 	});
 });
 

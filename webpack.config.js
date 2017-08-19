@@ -4,7 +4,9 @@ module.exports = {
 	entry: {
 		home: './client/js/homepage.js',
 		tokenFactory: './client/js/makeToken.js',
-		tokenSpace: './client/js/tokenSpace.js'
+		tokenSpace: './client/js/tokenSpace.js',
+		tokenHome: './client/js/tokenHome.js',
+		tokenForum: './client/js/tokenForum.js'
 	},
 	output: {
 		path: path.resolve(__dirname, './client/build'),

@@ -9,7 +9,10 @@ module.exports = {
 	showTokenFactory: showTokenFactory,
 	showTokenSpace: showTokenSpace,
 	showTokenHome: showTokenHome,
-	showTokenForum: showTokenForum
+	showTokenForum: showTokenForum,
+	showLogin: showLogin,
+	showSignup: showSignup,
+	logout: logout,
 };
 
 function showHome(req,res){
@@ -39,7 +42,7 @@ function showTokenSpace(req,res){
 			res.render('pages/tokenSpace', {data: [{message: err}]});
 		}
 		else {
-			res.render('pages/tokenSpace', {data: tokens});
+			res.render('pages/tokenSpace', {data: tokens, user: req.user});
 		}
 	});
 }
@@ -50,7 +53,7 @@ function showTokenHome(req,res) {
 		if (err) {
 			res.render('pages/tokenHome', {token: {error: err}});
 		} else {
-			res.render('pages/tokenHome', {token: token});
+			res.render('pages/tokenHome', {token: token, user: req.user});
 		}
 	});
 }
@@ -61,19 +64,21 @@ function showTokenForum(req,res) {
 		if (err) {
 			res.render('pages/tokenForum', {token: {error: err}});
 		} else {
-			res.render('pages/tokenForum', {token: token});
+			res.render('pages/tokenForum', {token: token, user: req.user});
 		}
 	});
 }
-/*
-function returnTokens() {
-	Token.find({}, (err, tokens) => {
-		if (err){
-			return [{message: err}];	
-		}		
-		return [{message: "SUCCESS"}];
-	});
+
+function showLogin(req,res){
+	res.render('pages/login', {message: req.flash('loginMessage')});
 }
 
+function showSignup(req,res){
+	res.render('pages/signup', {message: req.flash('signupMessage')});
+}
 
-*/
+function logout(req,res){
+	req.logout();
+	res.redirect('/');
+}
+

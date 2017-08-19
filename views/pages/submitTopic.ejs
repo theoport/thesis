@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Creating your own token</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="/build/tokenFactory.bundle.js"></script>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="container">
+	<div class="col-sm-6 col-sm-offset-3">
+		<h1>Start new topic</h1>
+			<label>Category</label>
+			<select name="categoryId" form="submitTopic" class="form-control">
+				<option value="0">Updates</option>
+				<option value="1">Issues</option>
+				<option value="2">General</option> 
+			</select>
+		<form action "/api/topic" method="POST" id="submitTopic">
+			<div class="form-group">
+				<label>Title</label>
+				<input class="form-control" name="title">
+			</div>
+			<div class="form-group">
+				<label>Description</label>
+				<input class="form-control" name="description">
+			</div>
+			<input type="hidden" name="userId" value="<%=user.id%>">
+			<input type="hidden" name="creationDate" value="<%= Date.now() %>">
+			<button type="submit" class="btn btn-default">Submit</button>
+		</form>
+	</div>
+</div>
+			
+	

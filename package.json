@@ -14,17 +14,23 @@
     "url": "https://github.com/theoport/thesis.git"
   },
   "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.17.2",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.3",
     "crypto-js": "^3.1.9-1",
     "ejs": "^2.5.7",
     "express": "^4.15.4",
     "express-ejs-layouts": "^2.3.1",
     "express-layouts": "^1.0.0",
+    "express-session": "^1.15.5",
     "mongodb": "^2.2.30",
     "mongodb-uri": "^0.9.7",
     "mongoose": "^4.11.6",
     "nl2br": "0.0.3",
     "nodemon": "^1.11.0",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
     "truffle-contract": "^1.1.11",
     "web3": "^0.18.4"
   },

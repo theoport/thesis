@@ -118,7 +118,7 @@ window.App = {
 				let _sourceCode = ERC20Standardtxt + BaseTokentxt + NewTokentxt;
 				console.log(_sourceCode);
 				let _date = new Date(result.args.creationTime.toNumber() * 1000);
-				let _id = SHA256(result.args.creationTime + result.args.tokenAddress);
+				let _id = SHA256(result.args.creationTime + result.args.tokenAddress + result.args.tokenManagerAddress);
 				$.ajax({
 					type: 'POST',
 					url: '/api/tokens',

@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>Creating your own token</title>
+	<script> var token = token </script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="/build/tokenHome.bundle.js"></script>
@@ -22,7 +23,8 @@
 				<li><a href="<%= '/tokenHome/' + token.id + '/contact'-%>">Contact</a></li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
-				<li><a href="/tokenSpace"><span class="fa fa-sign-out"></span>Sign out</a></li>
+				<li><%= user.name %></li>
+				<li><a href="/logout"><span class="fa fa-sign-out"></span>Sign out</a></li>
 			</ul>
 		</div>
 	</div>
