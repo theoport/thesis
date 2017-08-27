@@ -19,6 +19,13 @@ module.exports = {
 	showThread: showThread,
 	showSetAttributes: showSetAttributes,
 	showMethods: showMethods,
+
+	//STILL TO DO:
+	showBidForBounty: showBidForBounty,
+	showSubmitUpdate: showSubmitUpdate,
+	showAuctionHouse: showAuctionHouse,
+	showSubmitBug: showSubmitBug
+	
 };
 
 function showHome(req,res){

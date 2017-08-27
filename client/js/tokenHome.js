@@ -60,8 +60,7 @@ window.App = {
 		var updateFinish = tmInstance.UpdateOutcome();
 
 		//VOTE
-		var voteStart = tmInstance.VoteStarted();
-		var voteFinish = tmInstance.VotingOutcome();
+		var voteStart = tmInstance.VoteStarted(); var voteFinish = tmInstance.VotingOutcome();
 
 		//AUCTION
 		var auctionStart = tmInstance.AuctionStarted();
@@ -85,13 +84,19 @@ window.App = {
 
 		events = [];
 
+		let d = new Date();
+		let nowInSeconds = d.getSeconds();
+
 		updateFinish.get((err,updateEnds) => {
 
 			for (var i = 0; i < updateEnds.length; i++) {
+
+				let date = new Date(updateEnds[i].args.time * 1000);
+
 				var success = (updateEnds[i].args.success)?'successful':'unsuccessful';
 				var html = "<div class=\"media-body\">" +
 				"<h4 class=\"media-heading\">Update Finished" +
-				"<small> at " + Date(updateStarts[i].args.time) + 
+				"<small> at " + date + 
 				"</small></h4>" +
 				"<p>" + success + "</p>"+  
 				"<a href=\"/tokenHome/" + token.id + "/forum/" + 
@@ -104,10 +109,14 @@ window.App = {
 			
 			updateStart.get((err,updateStarts) => {
 
+
 				for (var i = 0; i < updateStarts.length; i++) {
+
+					let date = new Date(updateStarts[i].args.time * 1000);
+
 					var html = "<div class=\"media-body\">" +
 					"<h4 class=\"media-heading\">Update Started" +
-					"<small> at " + Date(updateStarts[i].args.time) + 
+					"<small> at " + date + 
 					"</small></h4>" +
 					"<a href=\"/tokenHome/" + token.id + "/forum/" + 
 					updateStarts[i].args.updateId + "\">" + 
@@ -119,10 +128,14 @@ window.App = {
 					}
 				}
 				bountyFinish.get((err,bountyEnds) => {
+
 					for (var i = 0; i < bountyEnds.length; i++) {
+
+						let date = new Date(bountyEnds[i].args.time * 1000);
+
 						var html = "<div class=\"media-body\">" +
 						"<h4 class=\"media-heading\">BountyHunt Finished" +
-						"<small> at " + Date(bountyEnds[i].args.time) + 
+						"<small> at " + date + 
 						"</small></h4>" +
 						"<p>for <a href=\"/tokenHome/" + token.id + "/forum/" + 
 						bountyEnds[i].args.updateId + "\">" + 
@@ -135,42 +148,52 @@ window.App = {
 						if (bountyEnds[i].args.updateId == activeUpdate) {
 							$("#update").html("<h5>Update is pending.</h5>"+
 							"<a href=\"/tokenHome/" + token.id + "/forum/" +
-							updateStarts[i].args.updateId + "\">" +
+							bountyEnds[i].args.updateId + "\">" +
 							"Go to thread.</a>" +
 							"<p>Vote is active.</p>" +
 							"<p>Please vote if you haven'done so already.</p>");
 						}
 					}
 					bountyStart.get((err, bountyStarts) => {
+
 						for (var i = 0; i < bountyStarts.length ; i++) { 
+
+							let date = new Date(bountyStarts[i].args.time * 1000);
+							let finishDate = new Date(bountyStarts[i].args.finishTime *1000);
+
 							var html = "<div class=\"media-body\">" +
 							"<h4 class=\"media-heading\">BountyHunt Started" +
-							"<small> at " + Date(bountyStarts[i].args.time) + 
+							"<small> at " + date + 
 							"</small></h4>" +
 							"<p> for update #" + bountyStarts[i].args.updateId; 
 							if($.inArray(bountyStarts.args.updateId, finishedBounties) < 0) {
 								$("#update").html("<h5>Update is pending.</h5>"+
 								"<a href=\"/tokenHome/" + token.id + "/forum/" +
-								updateStarts[i].args.updateId + "\">" +
+								bountyStarts[i].args.updateId + "\">" +
 								"Go to thread.</a>" +
-								"<p>BountyHunt is active.</p>" +
-								if (Date(updateStarts[i].args.finishTime) > Date(now)) {
+								"<p>BountyHunt is active.</p>");
+								if (bountyStarts[i].args.finishTime > nowInSeconds) {
 									$("#update").append("<p>Are you a developer and want to work on this update?</p>" +
 									"<a href=\"/tokenHome/" + token.id + "/bidForBounty/" +
-									updateStarts[i].args.updateId + "\">" +
+									bountyStarts[i].args.updateId + "\">" +
 									"Bid for Bounty</a>" +
 									"<p>BountyHunt finishes on " + 
-									Date(updateStarts[i].args.finishTime) + "</p>");
-								} else if (Date(updateStarts[i].args.finishTime) < Date(now)) {
+									finishDate + "</p>");
+								} else if (bountyStarts[i].args.finishTime < nowInSeconds) {
 									$("#update").append("<p>BountyHunt is over, end it here:<br>" +
 									"<a class=\"btn btn-default blockchain\" onclick=\"App.endBounty()\">" +
 									"End Update</a></p>");
 								}	
 							}
-							events.push([auctionStarts[i].args.time, html]);	
+							events.push([bountyStarts[i].args.time, html]);	
 						}
 						developerStart.get((err,developerStarts) => {
+
 							for (var i = 0; i < bountyStarts.length ; i++) { 
+
+								let date = new Date(developerStarts[i].args.time * 1000);
+								let finishDate = new Date(developerStarts[i].args.finishTime *1000);
+
 								var html = "<div class=\"media-body\">" +
 								"<h4 class=\"media-heading\">Developer started working.</h4>" +
 								"<p> Developer: <br> " +
@@ -180,21 +203,23 @@ window.App = {
 								developerStarts[i].args.updateId + "\">" +
 								updateNames.get(developerStarts[i].args.updateId) +
 								"</a><br>"	
-								"<small> at " + Date(developerStarts[i].args.time) + 
+								"<small> at " + date + 
 								"</small></p>";
+								events.push([developerStarts[i].args.time, html]);	
 								if (developerStarts[i].args.updateId == activeUpdate) {
 									$("#update").html("<h5>Update is being developed.</h5>"+
 									"<a href=\"/tokenHome/" + token.id + "/forum/" +
-									updateStarts[i].args.updateId + "\">" +
+									developerStarts[i].args.updateId + "\">" +
 									"Go to thread.</a>" +
 									"<p>Developer is:<br>" + developerStarts[i].args.developer + "</p>"); 
-									if (Date(developerStarts[i].args.finishTime) > Date(now)) {
-										$("#update").append("<p>Deadline is: " + developerStarts[i].args.finishTime +
+									if (developerStarts[i].args.finishTime > nowInSeconds) {
+										$("#update").append("<p>Deadline is: " + Date(developerStarts[i].args.finishTime) +
 										"<br>Are you the developer and have finished?" +
 										"<br><a class=\"btn btn-default blockchain\" href=\"/tokenHome/" +
 										token.id + "/submitUpdate/" + developerStarts[i].args.udpateId + "\">" +
-										"Submit Update</a></p>");
-									} else if (Date(developerStarts[i].args.finishTime) < Date(now)) {
+										"Submit Update</a><br>" + 
+										"Deadline is: " + finishDate +"<p>");
+									} else if (developerStarts[i].args.finishTime < nowInSeconds) {
 										$("#update").append("<p>Deadline is finished and developer hasn't submitted any code!<br>" +
 										"End it here:<br>" +
 										"<a class=\"btn btn-default blockchain\" onclick=\"App.endUpdate()\">" +
@@ -204,12 +229,15 @@ window.App = {
 							}
 							VoteFinish.get((err, voteEnds) => {
 								for (var i = 0 ; i < voteEnds.length ; i++) {
+
+									let date = new Date(voteEnds[i].args.time * 1000);
+
 									var success = (voteEnds[i].args.success)?'successful':'unsuccessful';	
-									var voteFor = '';	
+									var html;
 									if (voteEnds[i].args.tag[0] == 0) {
-										var html = "<div class=\"media-body\">" +
+										html = "<div class=\"media-body\">" +
 										"<h4 class=\"media-heading\">Vote finished" +
-										"<small> at " + Date(voteEnds[i].args.time) + 
+										"<small> at " + date + 
 										"</small></h4>" +
 										"<p>for <a href=\"/tokenHome/" + token.id + "/forum/" + 
 										voteEnds[i].args.tag[1] + "\">" + 
@@ -218,11 +246,11 @@ window.App = {
 										"</div>"; 
 											
 									} else if (voteEnds[i].args.tag[0] == 1) {
-										var html = "<div class=\"media-body\">" +
-										"<h4 class=\"media-heading\">Vote Started" +
-										"<small> at " + Date(voteEnds[i].args.time) + 
+										html = "<div class=\"media-body\">" +
+										"<h4 class=\"media-heading\">Vote Finished" +
+										"<small> at " + date + 
 										"</small></h4>" +
-										"<p>for bug #" + voteEnds[i].args.tag[2] + "</p>
+										"<p>for bug #" + voteEnds[i].args.tag[2] + "</p>" +
 										"<p>in <a href=\"/tokenHome/" + token.id + "/forum/" + 
 										voteEnds[i].args.tag[1] + "\">" + 
 										updateNames.get(voteEnds[i].args.tag[1]) + "</a></p>" +
@@ -235,12 +263,15 @@ window.App = {
 								voteStart.get((err, voteStarts) => {
 			
 									for (var i = 0 ; i < voteStarts.length ; i++) {
+
+										let date = new Date(voteStarts[i].args.time * 1000);
+										let finishDate = new Date(voteStarts[i].args.finishTime *1000);
 								
-										var voteFor = '';	
-										if (voteStarts.args.tag[0] == 0) {
-											var html = "<div class=\"media-body\">" +
+										var html;
+										if (voteStarts[i].args.tag[0] == 0) {
+											html = "<div class=\"media-body\">" +
 											"<h4 class=\"media-heading\">Vote Started" +
-											"<small> at " + Date(voteStarts[i].args.time) + 
+											"<small> at " + date + 
 											"</small></h4>" +
 											"<p>for <a href=\"/tokenHome/" + token.id + "/forum/" + 
 											voteStarts[i].args.tag[1] + "\">" + 
@@ -254,15 +285,15 @@ window.App = {
 												"#" + voteStarts[i].args.tag[1] "</a></p>" +
 												"<p>Vote Count: <br><span id =\"voteYes\"></span>% for update" +
 												"<span id=\"voteNo\"></span> against udpate</p>");
-												if (Date(voteStarts[i].args.finishTime) > Date(now)) {
+												if (voteStarts[i].args.finishTime > nowInSeconds) {
 													$("#vote").append("<p>If you haven't done so already:</p>" +
 													"<a href=\"/tokenHome/" + token.id + 
 													"/forum/" + voteStarts[i].args.tag[1] +
 													"/voteForUpdate/" +
-													"Vote</a>";
+													"Vote</a>" +
 													"<p>Vote finishes on " + 
-													Date(voteStarts[i].args.finishTime) + "</p>");
-												} else if (Date(voteStarts[i].args.finishTime) < Date(now)) {
+													finishDate + "</p>");
+												} else if (voteStarts[i].args.finishTime < nowInSeconds) {
 													$("#vote").append("<p>Deadline is over.</p>" +
 													"End vote here:<br>" +
 													"<a class=\"btn btn-default blockchain\" onclick=\"App.endVote()\">" +
@@ -272,12 +303,12 @@ window.App = {
 												activeVote = voteStarts[i].args.tag; 
 			
 											}
-										} else if (voteStarts.args.tag[0] == 1) {
-											var html = "<div class=\"media-body\">" +
+										} else if (voteStarts[i].args.tag[0] == 1) {
+											html = "<div class=\"media-body\">" +
 											"<h4 class=\"media-heading\">Vote Started" +
-											"<small> at " + Date(voteStarts[i].args.time) + 
+											"<small> at " + date + 
 											"</small></h4>" +
-											"<p>for bug #" + voteStarts[i].args.tag[2] + "</p>
+											"<p>for bug #" + voteStarts[i].args.tag[2] + "</p>" +
 											"<p>in <a href=\"/tokenHome/" + token.id + "/forum/" + 
 											voteStarts[i].args.tag[1] + "\">" + 
 											updateNames.get(voteStarts[i].args.tag[1]) + "</a></p>" +
@@ -295,15 +326,15 @@ window.App = {
 												"Go to thread.</a>" +
 												"<p>Vote Count: <br><span id =\"voteYes\"></span>% think it's a bug." +
 												"<span id=\"voteNo\"></span> don't think it's a bug.</p>");
-												if (Date(voteStarts[i].args.finishTime) > Date(now)) {
+												if (voteStarts[i].args.finishTime > nowInSeconds) {
 													$("#vote").append("<p>If you haven't done so already:</p>" +
 													"<a href=\"/tokenHome/" + token.id + 
 													"/forum/" + voteStarts[i].args.tag[1] +
 													"/voteForBug/" + voteStarts[i].args.tag[2] +
-													"Vote</a>";
+													"Vote</a>" +
 													"<p>Vote finishes on " + 
-													Date(voteStarts[i].args.finishTime) + "</p>");
-												} else if (Date(voteStarts[i].args.finishTime) < Date(now)) {
+													finishDate + "</p>");
+												} else if (voteStarts[i].args.finishTime < nowInSeconds) {
 													$("#vote").append("<p>Deadline is over.</p>" +
 													"End vote here:<br>" +
 													"<a class=\"btn btn-default blockchain\" onclick=\"App.endVote()\">" +
@@ -316,14 +347,17 @@ window.App = {
 									}
 									newVote.get((err,votes) => {
 										if (votes[i].args.tag == activeVote) {
-											$("#voteYes").html(yes);		
-											$("#voteNo").html(no);		
+											$("#voteYes").html(votes[i].args.yes);		
+											$("#voteNo").html(votes[i].args.no);		
 										}
 										auctionFinish.get((err,auctionEnds) => {
-											for (var i ; i < auctionFinish.length ; i++) {
+											for (var i ; i < auctionEnds.length ; i++) {
+
+												let date = new Date(auctionEnds[i].args.time * 1000);
+
 												var html = "<div class=\"media-body\">" +
-												"<h4 class=\"media-heading\">Auction Started" +
-												"<small> at " + Date(auctionStarts[i].args.time) + 
+												"<h4 class=\"media-heading\">Auction Finished" +
+												"<small> at " + date + 
 												"</small></h4>" +
 												"<p>#" + auctionEnds[i].args.auctionId + "</p>" + 
 												"<p>Sold " + aunctionEnds[i].args.amount + " " +
@@ -335,13 +369,17 @@ window.App = {
 											}
 											auctionStart.get((err,auctionStarts) => {
 												for (var i = 0; i < auctionStarts.length ; i++) { 
+
+													let date = new Date(auctionStarts[i].args.time * 1000);
+													let finishDate = new Date(auctionStarts[i].args.finishTime *1000);
+
 													var html = "<div class=\"media-body\">" +
 													"<h4 class=\"media-heading\">Auction Started" +
-													"<small> at " + Date(auctionStarts[i].args.time) + 
+													"<small> at " + date + 
 													"</small></h4>" +
 													"<p>#" + auctionStarts[i].args.auctionId + 
 													" for " + auctionStarts[i].args.amount + " " + 
-													token.name +"</p></div>" +; 
+													token.name +"</p></div>"; 
 													events.push([auctionStarts[i].args.time, html]);	
 													if($.inArray(auctionStarts[i].args.auctionId, finishedAuctions < 0 )) {
 														$("#auction").html("<h5>Auction #" +
@@ -350,12 +388,12 @@ window.App = {
 														"<p>Selling " + auctionStarts[i].args.amount +
 														" " + token.name + ".</p>" +
 														"<button class=\"btn btn-default blockchain\" onclick=\"App.withdrawBets()\">Withdraw past bets</button>");
-														if (Date(auctionStarts[i].args.finishTime) > Date(now)) {
+														if (auctionStarts[i].args.finishTime > nowInSeconds) {
 															$("#auction").append("<a href=\"/tokenHome/" + token.id +
 															"/auctionHouse/" + auctionStarts[i].args.auctionId +
 															"\">Enter Bidding</a>" +
-															"<p>Finishes on " + Date(auctionStarts[i].args.finishTime) + "</p>");
-														} else if (Date(auctionStarts[i].args.finishTime) < Date(now)) {
+															"<p>Finishes on " + finishDate + "</p>");
+														} else if (auctionStarts[i].args.finishTime < nowInSeconds) {
 															$("#auction").append("<p>Auction is over.</p>" +
 															"<p>End it here:<br>" +
 															"<button class=\"btn btn-default blockchain\" onclick=\"App.endAuction()\">End Auction</button></p>");
@@ -366,12 +404,15 @@ window.App = {
 												}	
 												bugHuntFinish.get((err,bugHuntEnds) => {
 													for (var i = 0; i < bugHuntEnds.length ; i++) { 
+
+														let date = new Date(bugHuntEnds[i].args.time * 1000);
+
 														var html = "<div class=\"media-body\">" +
 														"<h4 class=\"media-heading\">BugHunt has finished" +
-														"<small> at " + Date(bugHuntEnds[i].args.time) + 
+														"<small> at " + date + 
 														"</small></h4>" +
 														"<p>for " + "<a href=\"/tokenHome/" + token.id +
-														"/form/" + bugHuntEnds[i].args.updateId + "\">" + 
+														"/forum/" + bugHuntEnds[i].args.updateId + "\">" + 
 														updateNames.get(bugHuntEnds[i].args.updateId) +
 														"</a></p></div>";
 														finishedBugHunts.push(bugHuntEnds[i].args.updateId);
@@ -379,15 +420,19 @@ window.App = {
 													}
 													bugHuntStart.get((err,bugHuntStarts) => {
 														for (var i = 0; i < bugHuntStarts.length ; i++) { 
+
+															let date = new Date(bugHuntStarts[i].args.time * 1000);
+															let finishDate = new Date(bugHuntStarts[i].args.finishTime *1000);
+
 															var html = "<div class=\"media-body\">" +
 															"<h4 class=\"media-heading\">BugHunt has started" +
-															"<small> at " + Date(bugHuntStarts[i].args.time) + 
+															"<small> at " + date + 
 															"</small></h4>" +
 															"<p>for " + "<a href=\"/tokenHome/" + token.id +
-															"/form/" + bugHuntStarts[i].args.updateId + "\">" + 
+															"/forum/" + bugHuntStarts[i].args.updateId + "\">" + 
 															updateNames.get(bugHuntStarts[i].args.updateId) +
 															"</a></p></div>";
-															events.push([bugHuntEnds[i].args.time, html]);	
+															events.push([bugHuntStarts[i].args.time, html]);	
 															if ($.inArray(bugHuntStarts[i].args.updateId, finishedBugHunts) < 0) {
 																var id = SHA256(bugHuntStarts[i].args.time + bugHuntStarts[i].args.updatedContract + token.ManagerAddress);
 																newTokenAddress = bugHuntStarts[i].args.updatedContract; 
@@ -397,31 +442,34 @@ window.App = {
 																"class=\"btn btn-default\"><span class=\"fa fa-file-text-o\"></span></a></h5>" +
 																"Contract is deployed at address:<br>" +
 																newTokenAddress + "</p>");
-																if (Date(bugHuntFinishTime) > Date(now)) {
+																if (bugHuntFinishTime > nowInSeconds) {
 																	$("#update").append("<p>BugHunt is active.<br>" +
 																	"Have you found a bug?<br>" +
 																	"<button class=\"btn btn-default\" href=\"/tokenHome/" +
 																	token.id + "/submitBug/" + bugHuntStarts[i].args.updateId + 
 																	"Submit Bug</button><br>" +
-																	"Finishes at " + Date(bugHuntFinishTime) + "</p>");
-																} else if (Date(bugHuntFinishTime) < Date(now)) {
+																	"Finishes at " + finishDate + "</p>");
+																} else if (bugHuntFinishTime < nowInSeconds) {
 																	$("#update").append("<p>BugHunt is active.</p>" +
 																	"<p>Deadline is over and code seems bug-free!<br>" +
 																	"Finalize it here:<br>" +
-																	"<a class=\"btn btn-default blockchain\" onclick=\"App.finalizeUpdate()\">" +
+																	"<a class=\"btn btn-default blockchain\" onclick=\"App.finaliseUpdate()\">" +
 																	"Finalize Update</a></p>"); 
 																}
 															}
 														}
 														bugFound.get((err, bugFinds) => {
 															for (var i = 0; i < bugFinds.length ; i++) { 
+
+																let date = new Date(bugFinds[i].args.time * 1000);
+
 																var html = "<div class=\"media-body\">" +
 																"<h4 class=\"media-heading\">Bug was Found" +
-																"<small> at " + Date(bugFinds[i].args.time) + 
+																"<small> at " + date + 
 																"</small></h4>" +
 																"<p>ID: " + bugFinds[i].args.bugId + "</p>" +
 																"<a href=\"/tokenHome/" + token.id +
-																"/form/" + bugFinds[i].args.updateId + "\">" + 
+																"/forum/" + bugFinds[i].args.updateId + "\">" + 
 																"Go to thread.</a>" +
 																"<p>Please inform yourself and vote on<br> whether this is a bug</p>";
 																activeBug = bugFinds[i].args.bugId;
@@ -429,29 +477,33 @@ window.App = {
 															}
 															wasABug((err, yesABug) => {
 																for (var i = 0; i < yesABug.length ; i++) { 
+
+																	let date = new Date(yesABug[i].args.time * 1000);
+																	let finishDate = new Date(yesABug[i].args.finishTime *1000);
+
 																	var html = "<div class=\"media-body\">" +
 																	"<h4 class=\"media-heading\">A bug was validated." + 
-																	"<small> at " + Date(yesABug[i].args.time) + 
+																	"<small> at " + date + 
 																	"</small></h4>" +
 																	"<p>ID: " + yesABug[i].args.bugId + "</p>" +
 																	"<a href=\"/tokenHome/" + token.id +
-																	"/form/" + yesABug[i].args.updateId + "\">" + 
-																	"Go to thread." + "</a></p>";
+																	"/forum/" + yesABug[i].args.updateId + "\">" + 
+																	"Go to thread." + "</a></p>" +
 																	"<p>The developer now has<br>" + yesABug[i].args.tries+ 
 																	" more tries to complete the update.<br>";  
-																	events.push([wasABug[i].args.time, html]);	
+																	events.push([yesABug[i].args.time, html]);	
 																	if (yesABug[i].args.bugId== activeBug) {
-																		if (Date(yesABug[i].args.finishTime) > Date(now)) {
+																		if (yesABug[i].args.finishTime > nowInSeconds) {
 																			$("#update").html("<h4>Update is being corrected after bug was found.</h4>" +
 																			"<p>The developer now has<br>" + yesABug[i].args.tries+ 
 																			" more tries to complete the update.<br>" +  
-																			"<p>Deadline is: " + yesABug[i].args.finishTime +
+																			"<p>Deadline is: " + finishDate +
 																			"<br>Are you the developer and have finished?" +
 																			"<br><a class=\"btn btn-default blockchain\" href=\"/tokenHome/" +
-																			token.id + "/submitUpdate/" + developerStarts[i].args.udpateId + "\">" +
+																			token.id + "/submitUpdate/" + yesABug[i].args.udpateId + "\">" +
 																			"Submit Update</a></p>");
-																		} else if (Date(yesABug[i].args.finishTime) < Date(now)) {
-																			$("#update").html= ("<h4>Update is active.</h4" +
+																		} else if (yesABug[i].args.finishTime < nowInSeconds) {
+																			$("#update").html("<h4>Update is active.</h4" +
 																			"<p>Deadline is over and developer hasn't submitted any code!<br>" +
 																			"End it here: <br>" +
 																			"<a class=\"btn btn-default blockchain\" onclick=\"App.endUpdate()\">" +
@@ -460,29 +512,40 @@ window.App = {
 																	}
 																}
 																wasNotABug((err, notABug) => { 
+
+
 																	for (var i = 0; i < notABug.length ; i++) { 
+
+																		let date = new Date(notABug[i].args.time * 1000);
+																		let finishDate = new Date(bugHuntFinishTime *1000);
+
 																		var html = "<div class=\"media-body\">" +
 																		"<h4 class=\"media-heading\">Bug was unvalidated." +
-																		"<small> at " + Date(notABug[i].args.time) + 
+																		"<small> at " + date + 
 																		"</small></h4>" +
-																		"<p>ID: " + yesABug[i].args.bugId + "</p>" +
+																		"<p>ID: " + notABug[i].args.bugId + "</p>" +
 																		"<a href=\"/tokenHome/" + token.id +
-																		"/form/" + yesABug[i].args.updateId + "\">" + 
+																		"/forum/" + notABug[i].args.updateId + "\">" + 
 																		"Go to thread." + "</a></p>";
-																		events.push([auctionStarts[i].args.time, html]);	
-																		if (notABug[i].args.bugId== activeBug) {
-																			if (bugHuntFinishTime > Date(now)) {
-																				$("#update").html("<h4>Update is active.</h4>" +
-																				"<p>Deadline is: " + bugHuntFinishTime +
-																				"<br>Are you the developer and have finished?" +
-																				"<br><a class=\"btn btn-default blockchain\" href=\"/tokenHome/" +
-																				token.id + "/submitUpdate/" + developerStarts[i].args.udpateId + "\">" +
-																				"Submit Update</a></p>");
-																			} else if (Date(yesABug[i].args.finishTime) < Date(now)) {
-																				$("#update").html= ("<h4>Update is active.</h4" +
+																		events.push([notABug[i].args.time, html]);	
+																		if (notABug[i].args.bugId == activeBug) {
+																			$("#update").html("<h5>Update has been submitted" +
+																			"<a href=\"/api/tokens/" + id + "/sourceCode\" target=\"_blank\"" +
+																			"class=\"btn btn-default\"><span class=\"fa fa-file-text-o\"></span></a></h5>" +
+																			"Contract is deployed at address:<br>" +
+																			newTokenAddress + "</p>");
+																			if (bugHuntFinishTime > nowInSeconds) {
+																				$("#update").append("<p>BugHunt is active.<br>" +
+																				"Have you found a bug?<br>" +
+																				"<button class=\"btn btn-default\" href=\"/tokenHome/" +
+																				token.id + "/submitBug/" + notABug[i].args.updateId + 
+																				"Submit Bug</button><br>" +
+																				"Finishes at " + finishDate + "</p>");
+																			} else if (bugHuntFinishTime < nowInSeconds) {
+																				$("#update").append("<p>BugHunt is active.</p>" +
 																				"<p>Deadline is over and code seems bug-free!<br>" +
-																				"<p>Finalize it here:<br>" +
-																				"<a class=\"btn btn-default blockchain\" onclick=\"App.finalizeUpdate()\">" +
+																				"Finalize it here:<br>" +
+																				"<a class=\"btn btn-default blockchain\" onclick=\"App.finaliseUpdate()\">" +
 																				"Finalize Update</a></p>"); 
 																			}
 																		}
@@ -504,13 +567,494 @@ window.App = {
 		});
 	},	
 
-	endUpdate: 
-	finalizeUpdate:
-	endVote:
-	withdrawBets:
-	endAuction:
-	endBounty:
+	startWatch: function(){
 
+		//UPDATE
+		var updateStart = tmInstance.UpdateStarted();
+		var updateFinish = tmInstance.UpdateOutcome();
+
+		//VOTE
+		var voteStart = tmInstance.VoteStarted();
+		var voteFinish = tmInstance.VotingOutcome();
+
+		//AUCTION
+		var auctionStart = tmInstance.AuctionStarted();
+		var auctionFinish = tmInstance.AuctionEnd();
+
+		var failure = tmInstance.Failure();
+
+		//BOUNTY
+		var bountyStart = 	tmInstance.BountyStarted();
+		var bountyFinish = tmInstance.BountyEnded();
+
+		var bugFound = tmInstance.BugFound();
+
+		//BUGHUNT
+		var bugHuntStart = tmInstance.BugHuntStarted();
+		var bugHuntFinish = tmInstance.BugHuntEnd();
+
+		var newVote = tmInstance.NewVote();
+
+		var developerStart = tmInstance.DeveloperStarted();
+
+		failure.watch((err,result) => {
+			if (err){ 
+				alert(err);
+			} else {
+				alert("failure: " + result.args.message);
+			}
+		});
+	
+		updateFinish.watch((err,updateEnd) => {
+
+			let date = new Date(updateEnd.args.time * 1000);
+
+			var success = (updateEnd.args.success)?'successful':'unsuccessful';
+			var html = "<div class=\"media-body\">" +
+			"<h4 class=\"media-heading\">Update Finished" +
+			"<small> at " + date + 
+			"</small></h4>" +
+			"<p>" + success + "</p>"+  
+			"<a href=\"/tokenHome/" + token.id + "/forum/" + 
+			updateEnd.args.updateId + "\">" + 
+			updateNames.get(updateEnd.args.updateId) + "</a>" +
+			"</div>"; 
+			$("#latestEvents").prepend(html);	
+			$("#update").html("<h5>No active updates</h5>");
+
+		});
+
+		updateStart.watch((err,updateStart) => {
+
+			let date = new Date(updateStart.args.time * 1000);
+
+			var html = "<div class=\"media-body\">" +
+			"<h4 class=\"media-heading\">Update Started" +
+			"<small> at " + date + 
+			"</small></h4>" +
+			"<a href=\"/tokenHome/" + token.id + "/forum/" + 
+			updateStart.args.updateId + "\">" + 
+			updateNames.get(updateStart.args.updateId) + "</a>" +
+			"</div>"; 
+			$("#latestEvents").prepend(html);	
+
+		});
+
+		bountyFinish.watch((err,bountyEnd) => {
+
+			let date = new Date(bountyEnd.args.time * 1000);
+
+			var html = "<div class=\"media-body\">" +
+			"<h4 class=\"media-heading\">BountyHunt Finished" +
+			"<small> at " + date + 
+			"</small></h4>" +
+			"<p>for <a href=\"/tokenHome/" + token.id + "/forum/" + 
+			bountyEnd.args.updateId + "\">" + 
+			updateNames.get(bountyEnd.args.updateId) + "</a></p>" +
+			"<p>Winner is: "+bountyEnd.args.winner +
+			"</p><p>Price for udpate is: " +
+			bountyEnd.args.price + "</p></div>";
+			$("#latestEvents").prepend(html);	
+
+			$("#update").html("<h5>Update is pending.</h5>"+
+			"<a href=\"/tokenHome/" + token.id + "/forum/" +
+			bountyEnd.args.updateId + "\">" +
+			"Go to thread.</a>" +
+			"<p>Vote is active.</p>" +
+			"<p>Please vote if you haven'done so already.</p>");
+		});
+
+		bountyStart.watch((err, bountyStart) => {
+
+			let date = new Date(bountyStart.args.time * 1000);
+			let finishDate = new Date(bountyStart.args.finishTime *1000);
+
+			var html = "<div class=\"media-body\">" +
+			"<h4 class=\"media-heading\">BountyHunt Started" +
+			"<small> at " + date + 
+			"</small></h4>" +
+			"<p> for update #" + bountyStart.args.updateId; 
+			$("#latestEvents").prepend(html);	
+			
+			$("#update").html("<h5>Update is pending.</h5>"+
+			"<a href=\"/tokenHome/" + token.id + "/forum/" +
+			bountyStart.args.updateId + "\">" +
+			"Go to thread.</a>" +
+			"<p>BountyHunt is active.</p>" +
+			"<p>Are you a developer and want to work on this update?</p>" +
+			"<a href=\"/tokenHome/" + token.id + "/bidForBounty/" +
+			bountyStart.args.updateId + "\">" +
+			"Bid for Bounty</a>" +
+			"<p>BountyHunt finishes on " + 
+			finishDate + "</p>");
+		});
+
+		developerStart.watch((err,developerStart) => {
+
+			let date = new Date(developerStart.args.time * 1000);
+			let finishDate = new Date(developerStart.args.finishTime * 1000);
+
+			var html = "<div class=\"media-body\">" +
+			"<h4 class=\"media-heading\">Developer started working.</h4>" +
+			"<p> Developer: <br> " +
+			developerStart.args.developer +
+			"Started working on update:<br>" + 
+			"<a href=\"/tokenHome/" + token.id + "/forum/" +
+			developerStart.args.updateId + "\">" +
+			updateNames.get(developerStart.args.updateId) +
+			"</a><br>" +
+			"<small> at " + date + 
+			"</small></p>";
+
+			$("#latestEvents").prepend(html);	
+
+			$("#update").html("<h5>Update is being developed.</h5>"+
+			"<a href=\"/tokenHome/" + token.id + "/forum/" +
+			developerStart.args.updateId + "\">" +
+			"Go to thread.</a>" +
+			"<p>Developer is:<br>" + developerStart.args.developer + "</p>" + 
+			"<p>Deadline is: " + finishDate +
+			"<br>Are you the developer and have finished?" +
+			"<br><a class=\"btn btn-default blockchain\" href=\"/tokenHome/" +
+			token.id + "/submitUpdate/" + developerStart.args.udpateId + "\">" +
+			"Submit Update</a></p>");
+		});
+
+		VoteFinish.watch((err, voteEnd) => {
+
+			let date = new Date(voteEnd.args.time * 1000);
+
+			var success = (voteEnd.args.success)?'successful':'unsuccessful';	
+			var html;
+			if (voteEnd.args.tag[0] == 0) {
+				html = "<div class=\"media-body\">" +
+				"<h4 class=\"media-heading\">Vote finished" +
+				"<small> at " + date + 
+				"</small></h4>" +
+				"<p>For update <a href=\"/tokenHome/" + token.id + "/forum/" + 
+				voteEnd.args.tag[1] + "\">" + 
+				updateNames.get(voteEnd.args.tag[1]) + "</a></p>" +
+				"<p>" + success + "</p>"+  
+				"</div>"; 
+					
+			} else if (voteEnd.args.tag[0] == 1) {
+				html = "<div class=\"media-body\">" +
+				"<h4 class=\"media-heading\">Vote Finished" +
+				"<small> at " + date + 
+				"</small></h4>" +
+				"<p>for bug #" + voteEnd.args.tag[2] + "</p>" +
+				"<p>in <a href=\"/tokenHome/" + token.id + "/forum/" + 
+				voteEnd.args.tag[1] + "\">" + 
+				updateNames.get(voteEnd.args.tag[1]) + "</a></p>" +
+				"<p>" + success + "</p>"+  
+				"</div>";
+			}
+			$("#latestEvents").prepend(html);	
+
+			$("#vote").html("<h5>No active votes.</h5>");
+		});
+
+		voteStart.watch((err, _voteStart) => {
+
+			let date = new Date(_voteStart.args.time * 1000);
+			let finishDate = new Date(_voteStart.args.finishTime * 1000);
+
+			var html;
+			if (_voteStart.args.tag[0] == 0) {
+
+				html = "<div class=\"media-body\">" +
+				"<h4 class=\"media-heading\">Vote Started" +
+				"<small> at " + date + 
+				"</small></h4>" +
+				"<p>for <a href=\"/tokenHome/" + token.id + "/forum/" + 
+				_voteStart.args.tag[1] + "\">" + 
+				updateNames.get(_voteStart.args.tag[1]) + "</a></p>" +
+				"</div>"; 
+
+				$("#vote").html("<h5>Vote is active.</h5>"+
+				"<p>Vote is on update." +
+				"<a href=\"/tokenHome/" + token.id + "/forum/" +
+				_voteStart.args.tag[1] + "\">" +
+				"#" + _voteStart.args.tag[1] "</a></p>" +
+				"<p>Vote Count: <br><span id =\"voteYes\"></span>% for update" +
+				"<span id=\"voteNo\"></span> against udpate</p>" +
+				"<p>If you haven't done so already:</p>" +
+				"<a href=\"/tokenHome/" + token.id + 
+				"/forum/" + _voteStart.args.tag[1] +
+				"/voteForUpdate/" +
+				"Vote</a>" +
+				"<p>Vote finishes on " + 
+				finishDate + "</p>");
+
+			} else if (_voteStart.args.tag[0] == 1) {
+
+				var html = "<div class=\"media-body\">" +
+				"<h4 class=\"media-heading\">Vote Started" +
+				"<small> at " + date + 
+				"</small></h4>" +
+				"<p>for bug #" + _voteStart.args.tag[2] + "</p>" +
+				"<p>in <a href=\"/tokenHome/" + token.id + "/forum/" + 
+				_voteStart.args.tag[1] + "\">" + 
+				updateNames.get(_voteStart.args.tag[1]) + "</a></p>" +
+				"</div>";
+
+				$("#vote").html("<h5>Vote is active.</h5>"+
+				"<p>Vote is on bug" +
+				"<a href=\"/tokenHome/" + token.id + "/forum/" +
+				_voteStart.args.tag[1]+ "/bug/" +
+				_voteStart.args.tag[2] + "\">" +
+				"#" + _voteStart.args.tag[2] + 
+				"</a><br>" +
+				"<a href=\"/tokenHome/" + token.id + "/forum/" +
+				_voteStart.args.tag[1] + "\">" +
+				"Go to thread.</a>" +
+				"<p>Vote Count: <br><span id =\"voteYes\"></span>% think it's a bug." +
+				"<span id=\"voteNo\"></span> don't think it's a bug.</p>" +
+				"<p>If you haven't done so already:</p>" +
+				"<a href=\"/tokenHome/" + token.id + 
+				"/forum/" + _voteStart.args.tag[1] +
+				"/voteForBug/" + _voteStart.args.tag[2] +
+				"Vote</a>" +
+				"<p>Vote finishes on " + 
+				finishDate + "</p>");
+			}
+			$("#latestEvents").prepend(html);	
+		}
+
+		newVote.watch((err,vote) => {
+			$("#voteYes").html(vote.args.yes);		
+			$("#voteNo").html(vote.args.no);		
+		});
+
+		auctionFinish.get((err,auctionEnd) => {
+
+			let date = new Date(auctionEnd.args.time * 1000);
+
+			var html = "<div class=\"media-body\">" +
+			"<h4 class=\"media-heading\">Auction Finished" +
+			"<small> at " + date + 
+			"</small></h4>" +
+			"<p>#" + auctionEnd.args.auctionId + "</p>" + 
+			"<p>Sold " + aunctionEnd.args.amount + " " +
+			token.name + " to " + auctionEnd.args.winner +
+			" for " + auctionEnd.args.price + " wei." +
+			"</div>";
+
+			$("#latestEvents").prepend(html);	
+
+			$("#auction").html("<h4>No active auctions</h4");
+		});
+
+		auctionStart.get((err,auctionStart) => {
+
+			let date = new Date(auctionStart.args.time * 1000);
+			let finishDate = new Date(auctionStart.args.finishTime * 1000);
+
+			var html = "<div class=\"media-body\">" +
+			"<h4 class=\"media-heading\">Auction Started" +
+			"<small> at " + date + 
+			"</small></h4>" +
+			"<p>#" + auctionStart.args.auctionId + 
+			" for " + auctionStart.args.amount + " " + 
+			token.name +"</p></div>"; 
+			$("#latestEvents").prepend(html);	
+
+			$("#auction").html("<h5>Auction #" +
+			auctionStart.args.auctionId +
+			" is active.</h5>" +
+			"<p>Selling " + auctionStart.args.amount +
+			" " + token.name + ".</p>" +
+			"<button class=\"btn btn-default blockchain\" onclick=\"App.withdrawBets()\">Withdraw past bets</button>" +
+			"<a href=\"/tokenHome/" + token.id +
+			"/auctionHouse/" + auctionStart.args.auctionId +
+			"\">Enter Bidding</a>" +
+			"<p>Finishes on " + finishDate + "</p>");
+		});	
+
+		bugHuntFinish.get((err,bugHuntEnd) => {
+
+			let date = new Date(bugHuntEnd.args.time * 1000);
+
+			var html = "<div class=\"media-body\">" +
+			"<h4 class=\"media-heading\">BugHunt has finished" +
+			"<small> at " + date + 
+			"</small></h4>" +
+			"<p>for " + "<a href=\"/tokenHome/" + token.id +
+			"/forum/" + bugHuntEnd.args.updateId + "\">" + 
+			updateNames.get(bugHuntEnd.args.updateId) +
+			"</a></p></div>";
+
+			$("#latestEvents").prepend(html);	
+		});
+
+		var newTokenAddress, bugHuntFinishTime;
+
+		bugHuntStart.get((err,_bugHuntStart) => {
+
+			let id = SHA256(_bugHuntStart.args.time + _bugHuntStart.args.updatedContract + token.ManagerAddress);
+			newTokenAddress = _bugHuntStart.args.updatedContract; 
+			bugHuntFinishTime = _bugHuntStart.args.finishTime;
+			let date = new Date(_bugHuntStart.args.time * 1000);
+			let finishDate = new Date(bugHuntFinishTime *1000);
+
+			var html = "<div class=\"media-body\">" +
+			"<h4 class=\"media-heading\">BugHunt has started" +
+			"<small> at " + date + 
+			"</small></h4>" +
+			"<p>for " + "<a href=\"/tokenHome/" + token.id +
+			"/forum/" + _bugHuntStart.args.updateId + "\">" + 
+			updateNames.get(_bugHuntStart.args.updateId) +
+			"</a></p></div>";
+
+			$("#latestEvents").prepend(html);	
+
+			$("#update").html("<h5>Update has been submitted" +
+			"<a href=\"/api/tokens/" + id + "/sourceCode\" target=\"_blank\"" +
+			"class=\"btn btn-default\"><span class=\"fa fa-file-text-o\"></span></a></h5>" +
+			"Contract is deployed at address:<br>" +
+			newTokenAddress + "</p>" +
+			"<p>BugHunt is active.<br>" +
+			"Have you found a bug?<br>" +
+			"<button class=\"btn btn-default\" href=\"/tokenHome/" +
+			token.id + "/submitBug/" + _bugHuntStart.args.updateId + 
+			"Submit Bug</button><br>" +
+			"Finishes at " + finishDate + "</p>");
+		});
+
+		bugFound.get((err, bugFind) => {
+
+			let date = new Date(bugFind.args.time * 1000);
+
+			let html = "<div class=\"media-body\">" +
+			"<h4 class=\"media-heading\">Bug was Found" +
+			"<small> at " + date + 
+			"</small></h4>" +
+			"<p>ID: " + bugFinds.args.bugId + "</p>" +
+			"<a href=\"/tokenHome/" + token.id +
+			"/forum/" + bugFinds.args.updateId + "\">" + 
+			"Go to thread.</a>" +
+			"<p>Please inform yourself and vote on<br> whether this is a bug</p>";
+
+			$("#latestEvents").prepend(html);	
+		});
+
+		wasABug((err, yesABug) => {
+
+			let date = new Date(yesABug.args.time * 1000);
+			let finishDate = new Date(yesABug.args.finishTime *1000);
+
+			let html = "<div class=\"media-body\">" +
+			"<h4 class=\"media-heading\">A bug was validated." + 
+			"<small> at " + date + 
+			"</small></h4>" +
+			"<p>ID: " + yesABug.args.bugId + "</p>" +
+			"<a href=\"/tokenHome/" + token.id +
+			"/forum/" + yesABug.args.updateId + "\">" + 
+			"Go to thread." + "</a></p>" +
+			"<p>The developer now has<br>" + yesABug.args.tries+ 
+			" more tries to complete the update.<br>";  
+
+			$("#latestEvents").prepend(html);	
+
+			$("#update").html("<h4>Update is being corrected after bug was found.</h4>" +
+			"<p>The developer now has<br>" + yesABug.args.tries+ 
+			" more tries to complete the update.<br>" +  
+			"<p>Deadline is: " + finishDate +
+			"<br>Are you the developer and have finished?" +
+			"<br><a class=\"btn btn-default blockchain\" href=\"/tokenHome/" +
+			token.id + "/submitUpdate/" + yesABug.args.udpateId + "\">" +
+			"Submit Update</a></p>");
+		});
+
+		wasNotABug((err, notABug) => { 
+
+			let date = new Date(notABug.args.time * 1000);
+			let finishDate = new Date(bugHuntFinishTime *1000);
+
+			let html = "<div class=\"media-body\">" +
+			"<h4 class=\"media-heading\">Bug was unvalidated." +
+			"<small> at " + date + 
+			"</small></h4>" +
+			"<p>ID: " + notABug.args.bugId + "</p>" +
+			"<a href=\"/tokenHome/" + token.id +
+			"/forum/" + notABug.args.updateId + "\">" + 
+			"Go to thread." + "</a></p>";
+
+			$("#latestEvents").prepend(html);	
+
+			$("#update").html("<h5>Update has been submitted" +
+			"<a href=\"/api/tokens/" + id + "/sourceCode\" target=\"_blank\"" +
+			"class=\"btn btn-default\"><span class=\"fa fa-file-text-o\"></span></a></h5>" +
+			"Contract is deployed at address:<br>" +
+			newTokenAddress + "</p>" +
+			"<p>BugHunt is active.<br>" +
+			"Have you found a bug?<br>" +
+			"<button class=\"btn btn-default\" href=\"/tokenHome/" +
+			token.id + "/submitBug/" + notABug.args.updateId + 
+			"Submit Bug</button><br>" +
+			"Finishes at " + finishDate + "</p>");
+		});
+	},
+
+	endUpdate: function() {
+		tmInstance.endUpdate({from: account, gas: 4000000}, (err,result) => {
+			if (err){
+				alert(err);
+			} else {
+				alert(result);
+			}
+		});
+	},
+
+	finaliseUpdate:
+		tmInstance.finaliseUpdate({from: account, gas: 4000000}, (err,result) => {
+			if (err){
+				alert(err);
+			} else {
+				alert(result);
+			}
+		});
+	},
+
+	endVote:
+		tmInstance.endVote({from: account, gas: 4000000}, (err,result) => {
+			if (err){
+				alert(err);
+			} else {
+				alert(result);
+			}
+		});
+	},
+
+	withdrawBets:
+		tmInstance.withdrawReturnedBids({from: account, gas: 4000000}, (err,result) => {
+			if (err){
+				alert(err);
+			} else {
+				alert(result);
+			}
+		});
+	},
+
+	endAuction:
+		tmInstance.endAuction({from: account, gas: 4000000}, (err,result) => {
+			if (err){
+				alert(err);
+			} else {
+				alert(result);
+			}
+		});
+	},
+
+	endBounty:
+		tmInstance.endBounty({from: account, gas: 4000000}, (err,result) => {
+			if (err){
+				alert(err);
+			} else {
+				alert(result);
+			}
+		});
+	},
 
 	checkData: function() {
 		console.log(token);

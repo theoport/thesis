@@ -26,6 +26,10 @@ router.get('/logout', 							siteController.logout);
 router.get('/tokenHome/:tokenId/forum/:topicId', 	siteController.showThread);
 router.get('/tokenHome/:tokenId/methos', siteController.showMethods);
 router.get('/tokenHome/:tokenId/setAttributes', siteController.showSetAttributes);
+router.get('/tokenHome/:tokenId/bidForBounty/:updateId', siteController.showBidForBounty);
+router.get('/tokenHome/:tokenId/submitUpdate/:updateId', sitecontroller.showSubmitUpdate);
+router.get('/tokenHome/:tokenid/auctionHouse/:auctionId', siteController.showAuctionHouse);
+router.get('/tokenHome/:tokenId/submitBug/:updatId', siteController.showSubmitBug);
 
 router.post('/signup', passport.authenticate('local-signup', {
 	successRedirect: '/tokenSpace',

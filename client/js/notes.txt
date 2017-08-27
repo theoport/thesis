@@ -1,0 +1,4 @@
+tokenhome/tokenid/bidForBounty/updateid
+tokenhome/tokenid/submitUpdate/updateid
+tokenhome/tokenid/auctionHouse/auctionId
+tokenhome/tokenid/submitBug/updateId

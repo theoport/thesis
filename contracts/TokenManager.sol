@@ -95,6 +95,8 @@ contract TokenManager {
 	as otherwise developer and bug-hunter can cooperate to make more money.*/
  
 	struct BugHunt {
+		uint256 startTime;
+		uint256 endTime;
 		bool active;
 		bool foundOne;
 		uint256 descriptionHash;
@@ -126,7 +128,7 @@ contract TokenManager {
 		uint numberOfTries;
 	}
 		
-	event VoteStarted(uint256 time, uint256[3] tag);
+	event VoteStarted(uint256 time, uint256 finishTime, uint256[3] tag);
 	event BugHuntEnd(uint256 time, uint256 updateId);
 	event VotingOutcome(uint256 time, bool success, uint256[3] tag);
 	event UpdateOutcome(uint256 time,bool success, uint256 updateId);
@@ -135,10 +137,10 @@ contract TokenManager {
 	event Failure(uint256 time, bytes32 message, uint256 id);
 	event NewBountyPrice(uint256 amount, address bidder, uint256 updateId);
 	event BountyEnded(uint256 time, address winner, uint256 price, uint256 updateId); 
-	event BountyStarted(uint256 time, uint256 updateId);
+	event BountyStarted(uint256 time, uint256 finishTime, uint256 updateId);
 	event BugFound(address by, uint256 updateId, uint256 bugId, uint256 descriptionHash);
-	event AuctionStarted(uint256 time, uint256 auctionId, uint256 amount);
-	event BugHuntStarted(uint256 time, uint256 id);
+	event AuctionStarted(uint256 time, uint256 finishTime, uint256 auctionId, uint256 amount);
+	event BugHuntStarted(uint256 time, uint256 finishTime, uint256 id, address updatedContract);
 	event UpdateStarted(uint256 time, uint256 updateId, uint256 safteyHash);
 	event DeveloperStarted(uint256 time, uint256 updateId, uint256 finishTime, uint256 developer);
 	event WasABug(uint256 updateId, uint256 bugId, uint256 finishTime, address developer, uint256 tries); 
@@ -196,8 +198,8 @@ contract TokenManager {
 		bountyCompetition.endTime = bountyCompetition.startTime + BOUNTYHUNT;
 		bountyCompetition.bestPrice = 0;
 		update.id= _id;
-		UpdateStarted(update.id, _safetyHash, bountyCompetition.startTime);
-		BountyStarted(update.id);
+		UpdateStarted(update.id, bountyCompetition.startTime, _safetyHash);
+		BountyStarted(bountyCompetition.startTime, bountyCompetition.endTime, update.id);
 	}
 
 	/* Lets anyone bid for bounty, if one is active. Frontend takes care of 
@@ -220,9 +222,9 @@ contract TokenManager {
 		assert(bountyCompetition.active);
 		assert(now >= bountyCompetition.endTime);
 		bountyCompetition.active = false;
-		BountyEnded(bountyCompetition.bidder, bountyCompetition.bestPrice, update.id);
+		BountyEnded(now, bountyCompetition.bidder, bountyCompetition.bestPrice, update.id);
 		if (bountyCompetition.bestPrice == 0){
-			UpdateOutcome(false, update.id);
+			UpdateOutcome(now, false, update.id);
 		} else {
 			voteOnUpdate(bountyCompetition.bidder, bountyCompetition.bestPrice);
 		}
@@ -236,7 +238,7 @@ contract TokenManager {
 	
 
 	function foundBug (uint256 _descriptionHash, uint256 _id) public {
-		assert(update.bugHunt.active);
+		assert(update.bugHunt.active && now);
 		if (update.bugHunt.foundOne) {
 			Failure(now, "A bug was already found", update.id);
 			return;
@@ -283,9 +285,11 @@ contract TokenManager {
 		assert(now <= update.endTime);
 		hasSubmitted = true;
 		update.bugHunt.active = true;
+		update.bugHunt.startTime = now;
+		update.bugHunt.endTime = update.bugHunt.startTime + BUGHUNT;
 		update.endTime = now + BUGHUNT;
 		update.updatedContract = _updatedContract;	
-		BugHuntStarted(now, update.id, update.updatedContract);
+		BugHuntStarted(update.bugHunt.startTime, update.bugHunt.endTime, update.id, update.updatedContract);
 	}
 
 	/* If no bugs are found, time passes and anyone can finalise the update, sending the 
@@ -302,13 +306,13 @@ contract TokenManager {
 		version++;
 		update.active = false;
 		BugHuntEnd(now, update.id);
-		UpdateOutcome(true, update.id);
+		UpdateOutcome(now, true, update.id);
 	}
 
 	function endUpdate() public {
 		assert(update.active && now >= update.endTime && !hasSubmitted);
 		update.active = false;
-		UpdateOutcome(false, update.id);
+		UpdateOutcome(now, false, update.id);
 	}
 		
 
@@ -322,7 +326,7 @@ contract TokenManager {
 		auction.highestBidder = 0;
 		auction.highestBid = 0;
 		auction.id++;
-		AuctionStarted(auction.startTime, auction.id, auction.amount);
+		AuctionStarted(auction.startTime, auction.endTime, auction.id, auction.amount);
 	}
 	
 	function bid() payable {
@@ -373,7 +377,7 @@ contract TokenManager {
 		vote.startTime = now;
 		vote.endTime = vote.startTime + VOTEDURATION;
 		vote.tag = _tag;
-		VoteStarted(vote.startTime, _tag); 
+		VoteStarted(vote.startTime, vote.endTime, _tag); 
 	}
 	
 	function submitVote (bool yes) {
@@ -385,14 +389,14 @@ contract TokenManager {
 				vote.totalNoVotes += token.balanceOf(msg.sender);
 			}
 			token.block(msg.sender);
-			NewVote(vote.tag, (vote.totalYesVotes * 100) / vote.totalPossibleVotes,(vote.totalNoVotes * 100) / vote.totalPossibleVotes);
+			NewVote(vote.tag, (vote.totalYesVotes * 100) / vote.totalPossibleVotes, (vote.totalNoVotes * 100) / vote.totalPossibleVotes);
 		}
 	}
 
 	function endVote() canRefund returns (bool){
 		if (vote.active && ((vote.totalYesVotes / vote.totalPossibleVotes) * 100) > consensusPercent){
 			
-			VotingOutcome(true, vote.tag);
+			VotingOutcome(now, true, vote.tag);
 			vote.active = false;
 			if (uint256(vote.tag[0]) == uint256(subject.BUG)) {
 				update.bugHunt.foundOne = false;
@@ -401,14 +405,14 @@ contract TokenManager {
 
 				if (--update.numberOfTries <= 0) {
 					update.endTime = now;
-					BugHuntEnd(update.id, now);
-					UpdateOutcome(false, update.id);
+					BugHuntEnd(now, update.id);
+					UpdateOutcome(now, false, update.id);
 					return;
 				}	
 
 				update.price -= update.bugBounty;
 				update.endTime = now + BUGEXTENSION;
-				BugHuntEnd(update.id, now);
+				BugHuntEnd(now, update.id);
 				WasABug(update.id, update.bugHunt.bugId, update.endTime, update.developer, update.numberOfTries);
 			} else if (uint256(vote.tag[0]) == uint256(subject.UPDATE)) { 
 				startUpdate();
@@ -416,9 +420,9 @@ contract TokenManager {
 
 		} else if (vote.active && now >= vote.endTime || vote.active && ((vote.totalNoVotes / vote.totalPossibleVotes) * 100) > (100 - consensusPercent)) {
 			vote.active = false;
-			VotingOutcome(false, vote.tag);
+			VotingOutcome(now, false, vote.tag);
 				if (uint256(vote.tag[0]) == uint256(subject.UPDATE)) {
-					UpdateOutcome(false, update.id);	
+					UpdateOutcome(now, false, update.id);	
 				}
 				else if (uint256(vote.tag[0]) == uint256(subject.BUG)) {
 					WasNotABug(update.id, update.bugHunt.bugId);
