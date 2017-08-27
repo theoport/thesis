@@ -2,7 +2,7 @@
 <html>
 <head>
 	<title>Creating your own token</title>
-	<script> var token = token </script>
+	<script> const token=<%- JSON.stringify(token) -%></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="/build/tokenHome.bundle.js"></script>
@@ -20,16 +20,17 @@
 			<ul class="nav navbar-nav">
 				<li class="active"><a href="<%= '/tokenHome/' + token.id -%>">Home</a></li>
 				<li><a href="<%= '/tokenHome/' + token.id + '/forum'-%>">Forum</a></li>
-				<li><a href="<%= '/tokenHome/' + token.id + '/contact'-%>">Contact</a></li>
+				<li><a href="<%= '/tokenHome/' + token.id + '/methods'-%>">Methods</a></li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
-				<li><%= user.name %></li>
+				<% if (typeof(user) != 'undefined') {%>
+				<li><%= user.username %></li>
+				<% } %>
 				<li><a href="/logout"><span class="fa fa-sign-out"></span>Sign out</a></li>
 			</ul>
 		</div>
 	</div>
 </nav>
-
 <div class="container-fluid text-left">
 	<div class="col-sm-3 sidenav" style="overflow:scroll;" >
 		<div class="media" id="latestEvents"></div>
@@ -37,13 +38,13 @@
 	<div class="col-sm-6 jumbotron">
 		<h1><%= token.name %><small><span id="tokenInfo"><a href="<%= '/api/tokens/' + token.id + '/sourceCode' -%>" target="_blank" class="btn btn-default"><span class="fa fa-file-text-o"></span></a></span></small></h1> 
 		<h3>Your account balance is: <span id="accountBalance"><i>undefined</i></span><%= token.name -%></h3>
+		<a class="btn btn-default" href="<%= '/tokenHome/' + token.id + /setAttributes' -%>">Set Attributes of Manager contract<small>Will only work of you are the creator of this token</small></a>
 
+	<div class="col-sm-3 noticeboard">
+		<div id="update"></div>
+		<div id="vote"></div>
+		<div id="auction"></div>
 	</div>
-	<div class="col-sm-3">
-		<div class="update" id="update"></div>
-		<div class="vote" id="vote"></div>
-	</div>
-</div>	
 	
 		
 </div>

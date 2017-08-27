@@ -3,6 +3,7 @@ const mongoDB					= require('mongodb'),
 			expressLayouts 	= require('express-ejs-layouts'),
 			bodyParser 			= require('body-parser'),
 			mongoose 				= require('mongoose'),
+			morgan 					= require('morgan'),
 			passport 				= require('passport'),
 			cookieParser 		= require('cookie-parser'),
 			session 				= require('express-session'),
@@ -15,6 +16,7 @@ const mongoDB					= require('mongodb'),
 			
 			
 require('./config/passport.js')(passport);                  
+app.use(morgan('dev'));
 //configure
 
 app.set('view engine', 'ejs');

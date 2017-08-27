@@ -25,7 +25,7 @@ module.exports = function(passport) {
 						return done(err);
 
 					if (user) {
-						return done(null, false, req.flash('singupMessage', 'That username already exists'));
+						return done(null, false, req.flash('signupMessage', 'That username already exists'));
 		
 					} else {
 				

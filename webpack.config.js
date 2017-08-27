@@ -6,7 +6,10 @@ module.exports = {
 		tokenFactory: './client/js/makeToken.js',
 		tokenSpace: './client/js/tokenSpace.js',
 		tokenHome: './client/js/tokenHome.js',
-		tokenForum: './client/js/tokenForum.js'
+		tokenForum: './client/js/tokenForum.js',
+		thread: 	'./client/js/thread.js',
+		methods: './client/js/methods.js',
+		updateThread: 	'./client/js/updateThread.js'
 	},
 	output: {
 		path: path.resolve(__dirname, './client/build'),

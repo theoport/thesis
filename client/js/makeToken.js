@@ -6,6 +6,7 @@ import BaseTokentxt from '../../public/txt/BaseToken.txt';
 import ERC20Standardtxt from '../../public/txt/ERC20Standard.txt';
 
 import createTokenObject from '../../build/contracts/TokenCreator.json';
+import tokenObject from '../../build/contracts/NewToken.json';
 
 let CreateToken; //= contract(createtokenobject.abi);
 let ctAddress;
@@ -127,10 +128,11 @@ window.App = {
 						name: web3.toAscii(result.args.tokenName).replace(/\u0000/g, ''),
 						creator: result.args.creator,
 						address: result.args.tokenAddress,
-						addressManager: result.args.tokenManagerAddress,
+						managerAddress: result.args.tokenManagerAddress,
 						creationDate: _date,
 						previousAddress: "0",
 						description: _description,
+						abi: tokenObject.abi,
 						sourceCode: _sourceCode, 
 					},
 					datatype: 'json',
@@ -163,7 +165,7 @@ window.App = {
 		
 		ctInstance.makeTokenManager(amount, name, consensusPercent, issuanceRate, upperCap, contractRefunds, {from: account, gas: 4000000}, (err, result) => {
 			if (err) {
-				console.log(e);
+				console.log(err);
 				self.setStatus("Error creating new Coin");
 			}
 			else {

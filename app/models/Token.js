@@ -6,6 +6,7 @@ const tokenSchema = new Schema({
 	name: 							{type: String, 	required: true},
 	creator: 						{type: String, 	required: true},
 	address: 						{type: String, 	required: true},
+	managerAddress:			{type: String, 	required: true},
 	creationDate: 			{type: Date, 		required: true},
 	previousAddress:	 	{type: String, 	required: true},
 	description: 				{type: String, 	required: false},

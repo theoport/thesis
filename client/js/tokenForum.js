@@ -1,5 +1,6 @@
 import {default as Web3} from 'web3'
 import tokenManagerObject from '../../build/contracts/TokenManager.json';
+import {default as configDB} from '../../config/database.js';
 
 let TokenManager;
 let tmAddress, tmInstance;
@@ -16,47 +17,69 @@ window.App = {
 	
 		TokenManager = web3.eth.contract(tokenManagerObject.abi);
 		tmAddress = token.managerAddress;	
-		tmInstance = TokenManager.at(ctAddress);
+		tmInstance = TokenManager.at(tmAddress);
 		self.fillMaps();			
 		self.fillUpdateTopics();
 		self.fillIssueTopics();
 		self.fillGeneralTopics();
-		self.fillComments();
 	},
 		
 
 	fillMaps: function() {
+
+		var $id = token.id;
 		
-		for (let i = 0; i < users.length ; i++) {
-			userMap.set(users[i].id, users[i]); 
-		}
+		$.ajax({
+			type: 'GET',
+			url: '/api/users',
+			datatype: 'json',
+			async: false,
+			success: function(responseData, textStatus, jqXHR) {
+			
+				for (let i = 0; i < responseData.length ; i++) {
+					userMap.set(responseData[i]._id, responseData[i]); 
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(textStatus);
+			}
+		});
 
-		for (let i = 0; i < issues.length ; i++) {
-			issueMap.set(users[i].id, users[i]); 
-		}
-
-		for (let i = 0; i < updates.length ; i++) {
-			updateMap.set(users[i].id, users[i]); 
-		}
-
-		for (let i = 0; i < generals.length ; i++) {
-			generalMap.set(users[i].id, users[i]); 
-		}
-
-		for (let i = 0; i < comments.length ; i++) {
-			commentMap.set(users[i].id, users[i]); 
-		}
-		
-		for (var key of updateMap.keys()) {
-			updateStatus.push([key,[true,false]]); 
-		}
+		$.ajax({
+			type: 'GET',
+			url: '/api/topics/' + $id,
+			datatype: 'json',
+			async: false,
+			success: function(responseData, textStatus, jqXHR) {
+			
+				for (let i = 0; i < responseData.length ; i++) {
+					switch (responseData[i].categoryId) {
+					
+						case configDB.updateId:
+							updateMap.set(responseData[i]._id, responseData[i]); 
+							break;
+						case configDB.issueId:	
+							issueMap.set(responseData[i]._id, responseData[i]); 
+							break;	
+						case configDB.generalId:	
+							generalMap.set(responseData[i]._id, responseData[i]); 
+							break;
+					}
+				}
+				for (var key of updateMap.keys()) {
+					updateStatus.push([key,[true,false]]); 
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(textStatus);
+			}
+		});
 	},
 	
 	fillUpdateTopics: function() {
 
 		var updateStatusMap = new Map(updateStatus);	
-
-		var updateStart = TokenManager.UpdateStarted();
+		var updateStart = tmInstance.UpdateStarted();
 		updateStart.get(function (err, logs) {
 			if (err) {
 				console.log(err);
@@ -66,7 +89,7 @@ window.App = {
 					updateStatusMap.set(logs[i].args.id, [true, true]);	
 				}
 			}
-			var updateFinish = TokenManager.UpdateOutcome();
+			var updateFinish = tmInstance.UpdateOutcome();
 			updateFinish.get(function (err, logs) {
 				if (err) {
 					console.log(err);	
@@ -79,7 +102,7 @@ window.App = {
 							updateStatusMap.set(logs[i].args.id, [false, false]);
 						}
 					}
-					updateStatus= Array.from(updateStatusMap());
+					updateStatus= Array.from(updateStatusMap);
 					updateStatus.sort(function(a,b) {
 						return (updateMap.get(b[0])).creationDate 
 											- (updateMap.get(a[0])).creationDate;
@@ -94,17 +117,19 @@ window.App = {
 
 							$("#active").append($("<a></a>")
 													.attr({'class': 'topic topic-update',
-													'id': updateStatus[i][0]})
-													.html("<div style=\"background-color:yellow;\" class=\"media\">" +
+													'href': './forum/' + updateStatus[i][0]})
+													.html("<div style=\"background-color:yellow;\" class=\" form-inline media\">" +
 														"<div class=\"media-body\">" +	
 														"<h4 class=\"media-heading\">" +
-														userMap[updateMap[updateStatus[i][0]].userId].username +
+														userMap.get(updateMap.get(updateStatus[i][0]).userId).username +
 														"<small>" +
-														updateMap[updateStatus[i][0]].creationDate +
+														updateMap.get(updateStatus[i][0]).creationDate +
 														"</small></h4>" +
 														"<h5>" +
-														updateMap[updateStatus[i][0]].title +
-														"</h5></div></div>"));
+														updateMap.get(updateStatus[i][0]).title +
+														"</h5></div></div>" +
+														"<span class=\"badge\" id=\"upvoteCount" +
+														updateStatus[i][0] + "\"></span>"));
 									
 							} 
 
@@ -113,17 +138,19 @@ window.App = {
 
 							$("#active").append($("<a></a>")
 													.attr({'class': 'topic topic-update',
-													'id': updateStatus[i][0]})
+													'href': './forum/' + updateStatus[i][0]})
 													.html("<div class=\"media\">" +
 														"<div class=\"media-body\">" +	
 														"<h4 class=\"media-heading\">" +
-														userMap[updateMap[updateStatus[i][0]].userId].username +
+														userMap.get(updateMap.get(updateStatus[i][0]).userId).username +
 														"<small>" +
-														updateMap[updateStatus[i][0]].creationDate +
+														updateMap.get(updateStatus[i][0]).creationDate +
 														"</small></h4>" +
 														"<h5>" +
-														updateMap[updateStatus[i][0]].title +
-														"</h5></div></div>"));
+														updateMap.get(updateStatus[i][0]).title +
+														"</h5></div></div>" +
+														"<span class=\"badge\" id=\"upvoteCount" +
+														updateStatus[i][0] + "\"></span>"));
 				
 							}
 						}
@@ -135,17 +162,19 @@ window.App = {
 
 							$("#archived").append($("<a></a>")
 													.attr({'class': 'topic topic-update',
-													'id': updateStatus[i][0]})
+													'href': './forum/' + updateStatus[i][0]})
 													.html("<div style=\"background-volor:green;\"class=\"media\">" +
 														"<div class=\"media-body\">" +	
 														"<h4 class=\"media-heading\">" +
-														userMap[updateMap[updateStatus[i][0]].userId].username +
+														userMap.get(updateMap.get(updateStatus[i][0]).userId).username +
 														"<small>" +
-														updateMap[updateStatus[i][0]].creationDate +
+														updateMap.get(updateStatus[i][0]).creationDate +
 														"</small></h4>" +
 														"<h5>" +
-														updateMap[updateStatus[i][0]].title +
-														"</h5></div></div>"));
+														updateMap.get(updateStatus[i][0]).title +
+														"</h5></div>" +
+														"<span class=\"badge\" id=\"upvoteCount" +
+														updateStatus[i][0] + "\"></span></div>"));
 				
 							} 
 		
@@ -154,21 +183,33 @@ window.App = {
 
 							$("#archived").append($("<a></a>")
 													.attr({'class': 'topic topic-update',
-													'id': updateStatus[i][0]})
+													'href': './forum/' + updateStatus[i][0]})
 													.html("<div style=\"background-volor:red;\"class=\"media\">" +
 														"<div class=\"media-body\">" +	
 														"<h4 class=\"media-heading\">" +
-														userMap[updateMap[updateStatus[i][0]].userId].username +
+														userMap.get(updateMap.get(updateStatus[i][0]).userId).username +
 														"<small>" +
-														updateMap[updateStatus[i][0]].creationDate +
+														updateMap.get(updateStatus[i][0]).creationDate +
 														"</small></h4>" +
 														"<h5>" +
-														updateMap[updateStatus[i][0]].title +
-														"</h5></div></div>"));
+														updateMap.get(updateStatus[i][0]).title +
+														"</h5></div>" +
+														"<span class=\"badge\" id=\"upvoteCount" +
+														updateStatus[i][0] + "\"></span></div>"));
 				
 			
 							}
 						}
+						$.ajax({
+							type: 'GET',
+							url: '/api/upvoteCount/' + updateStatus[i][0],
+							datatype: 'json',
+							success: function (responseData, textStatus, jqXHR) {
+								$("#upvoteCount" + updateStatus[i][0]).html(responseData);
+							},
+							error: function (jqXHR, textStatus, errorThrown) {
+							}
+						});
 					}
 				}
 			});
@@ -179,170 +220,82 @@ window.App = {
 
 		var issueArray= Array.from(issueMap.keys());
 		issueArray.sort(function(a,b) {
-			return (issueMap.get(b[0])).creationDate 
-								- (issueMap.get(a[0])).creationDate;
+			return (issueMap.get(b)).creationDate 
+								- (issueMap.get(a)).creationDate;
 		});
 		
 		for (let i = 0; i < issueArray.length; i++) {
 
 			$("#issues").append($("<a></a>")
 									.attr({'class': 'topic topic-issue',
-									'id': issueArray[i]})
+									'href': './forum/' + issueArray[i]})
 									.html("<div class=\"media\">" +
 										"<div class=\"media-body\">" +	
 										"<h4 class=\"media-heading\">" +
-										userMap[issueMap[issueArray[i]].userId] +
+										userMap.get(issueMap.get(issueArray[i]).userId).username +
 										"<small>" +
-										issueMap[issueArray[i]].creationDate +
+										issueMap.get(issueArray[i]).creationDate +
 										"</small></h4>" +
 										"<h5>" +
-										issueMap[issueArray[i]].title +
-										"</h5></div></div>"));
+										issueMap.get(issueArray[i]).title +
+										"</h5></div>" +
+										"<span class=\"badge\" id=\"upvoteCount" +
+										issueArray[i] + "\"></span></div>"));
 						
+			$.ajax({
+				type: 'GET',
+				url: '/api/upvoteCount/' + issueArray[i],
+				datatype: 'json',
+				success: function (responseData, textStatus, jqXHR) {
+					$("#upvoteCount" + issueArray[i]).html(responseData);
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					console.log(errorThrown);
+				}
+			});
+				
 		}
 	},
 
 	fillGeneralTopics: function() {
 
+		var generalArray= Array.from(generalMap.keys());
+		generalArray.sort(function(a,b) {
+			return (generalMap.get(b)).creationDate 
+								- (generalMap.get(a)).creationDate;
+		});
+		
+		for (let i = 0; i < generalArray.length; i++) {
+
 			$("#general").append($("<a></a>")
 									.attr({'class': 'topic topic-general',
-									'id': issueArray[i]})
+									'href': './forum/' + generalArray[i]})
 									.html("<div class=\"media\">" +
 										"<div class=\"media-body\">" +	
 										"<h4 class=\"media-heading\">" +
-										userMap[issueMap[issueArray[i]].userId] +
+										userMap.get(generalMap.get(generalArray[i]).userId).username +
 										"<small>" +
-										issueMap[issueArray[i]].creationDate +
+										generalMap.get(generalArray[i]).creationDate +
 										"</small></h4>" +
 										"<h5>" +
-										issueMap[issueArray[i]].title +
-										"</h5></div></div>"));
+										generalMap.get(generalArray[i]).title +
+										"</h5></div>" +
+										"<span class=\"badge\" id=\"upvoteCount" +
+										generalArray[i] + "\"></span></div>"));
 
-	},
-
-	fillComments: function() {
-		
-		$(".topic").on("click", function () {
-			var $id = $(this).id();	
-			
 			$.ajax({
 				type: 'GET',
-				url: '/api/topic/' + $id + '/comments',
+				url: '/api/upvoteCount/' + generalArray[i],
 				datatype: 'json',
-				async: 'false',
 				success: function (responseData, textStatus, jqXHR) {
-
-
-					responseData.sort(function(a, b) {
-						return a.creationDate - b.creationDate;
-					});
-					let _userId, _date, _title, _content;
-					if ($(this).hasClass('topic-update')) {
-						_userId = updateMap[$id].userId;
-						_date = updateMap[$id].creationDate;
-						_title = updateMap[$id].title;
-						_content = updateMap[$id].content;
-					}
-					else if ($(this).hasClass('topic-issue')) {
-						_userId = issueMap[$id].userId;
-						_date = issueMap[$id].creationDate;
-						_title = issueMap[$id].title;
-						_content = issueMap[$id].content;
-					}
-					else if ($(this).hasClass('topic-general')) {
-						_userId = generalMap[$id].userId;
-						_date = generalMap[$id].creationDate;
-						_title = generalMap[$id].title;
-						_content = generalMap[$id].content;
-					} 
-				
-					$("#mainSection").html($("<div></div>")
-														.attr({'id': $id,
-																	'class': 'topicHeader'}));
-					$("#mainSection").append($("<div></div>")
-														.attr('class', 'comments'));
-					$(".topicHeader").append($("<div></div>")
-											.attr('class', 'media')
-											.html("<div class=\"media-body\">" +
-											"<h4 class=\"media-heading\">" +
-											userMap[_userId].username +
-											"<small>" + _date +
-											"</small></h4>" +
-											"<h5>" + _title +"</h5>" +
-											"<p>" + _content + "</p></div>"));
-											 
-												
-					
-					for (var i = 0; i < reponseData.lentgh ; i++) {
-							
-						$(".comments").append($("<div></div>")
-									.attr('class', 'media')
-									.html("<div class=\"media-body\">" +
-										"<h5 class=\"media-heading\">" +
-										userMap[responseData[i].userId].username +
-										"<small><i> posted at </i>" +
-										responseData[i].creationDate +
-										"</small></h5>" +
-										"<p>" +
-										responseData[i].content +
-										"</p></div>"));
-					}
-
-					$("#mainSection").append($("<div></div>")
-													.attr('class', 'form-inline')
-													.html("<div class=\"form-group\">" +
-													"<input class=\"form-control\"" +
-													"type=\"text\" id=\"commentContent\"" +
-													"placeholder=\"Make Comment\"></input></div>" +
-													"<div class=\"form-group\"" +
-													"<button class=\"btn btn-default\" id=\"makeComment\">" + 
-													"Add</button></div>"));
-													
-											
+					$("#upvoteCount" + generalArray[i]).html(responseData);
 				},
-				error: 	function(jqXHR, textStatus, errorThrown) {
-					console.log(textStatus);
-				} 
-			});
-		});
-	},
-	
-	makeComment: function() {
-		
-		$("#makeComment").on("click", function () {
-			
-			var $topicId = $(".topicHeader").id();
-			var $commentContent = $("#commentContent");
-
-			$.ajax({
-				type: 'POST',
-				url: '/api/comments',
-				datatype: 'json',
-				data: {
-					userId: user.id,
-					topicId: $topicId,
-					creationDate: Date.now(),
-					content: $commentContent	
-				},
-				success: function(responseData, textStatus, jqXHR) {
-					$(".comments").append($("<div></div>")
-									.attr('class', 'media')
-									.html("<div class=\"media-body\">" +
-									"<h5 class=\"media-heading\">" +
-									userMap[responseData.userId].username +
-									"<small><i> posted at </i>" +
-									responseData.creationDate +
-									"</small></h5>" +
-									"<p>" +
-									responseData.content +
-									"</p></div>"));
-				},
-				error: function(jqXHR, textStatus, errorThrown) {
-					console.log(textStatus);
+				error: function (jqXHR, textStatus, errorThrown) {
+					console.log(errorThrown);
 				}
 			});
-		});
-	}
+		}
+	},
 };
 
 window.addEventListener('load', function() {

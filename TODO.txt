@@ -1,1 +1,3 @@
 check that times add up (milliseconds)
+check that all members in contract get initialized correctly
+

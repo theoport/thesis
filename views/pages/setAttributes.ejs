@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Creating your own token</title>
+	<script> var token = <%JSON.stringify(token) -%></script> 
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="/build/methods.bundle.js"></script>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="col-sm-6 col-sm-offset-3">
+	<div class="jumbotron text-center">
+		<h1>Set Token Attributes</h1>
+		<h4>Note: For now, only the creator of the token can set these attributes.</h4>
+		<br>
+	
+		<label for="exchangeRate">Set Exchange rate:</label>
+		<div id="exchangeRate" class="input-inline">
+			<input type="text" id="rateAttr" class="form-control" placeholder="e.g. 800"></input>
+			<select class="form-control" id="largerAttr">
+				<option value="true">Token/ETH</option>
+				<option value="false">ETH/Token</option> 
+			</select>
+			<button class="btn btn-default blockchain" onClick="App.setExchangeRate()">Set</button>
+		</div>
+
+		<label for="insectHunt">Time given to find bugs in update:</label>
+		<div class="input-inline" id="insectHunt>
+			<div class="input-group">
+			<input type="text" id="insectAttr" class="form-control" placeholder="e.g. 3"></input>
+			<span class="input-group-addon">Days</span>
+			</div>
+			<button class="btn btn-default blockchain" onClick="App.setInsectHunt()">Set</button>
+		</div>
+
+		<label for="bugExtension">Additional days for developer after bug was found:</label>
+		<div class="input-inline" id="bugExtension>
+			<div class="input-group">
+			<input type="text" id="bugAttr" class="form-control" placeholder="e.g. 3"></input>
+			<span class="input-group-addon">Days</span>
+			</div>
+			<button class="btn btn-default blockchain" onClick="App.setBugExtension()">Set</button>
+		</div>
+
+		<label for="bountyHunt">Length of Bounty Hunt:</label>
+		<div class="input-inline" id="bountyHunt>
+			<div class="input-group">
+			<input type="text" id="bountyAttr" class="form-control" placeholder="e.g. 3"></input>
+			<span class="input-group-addon">Days</span>
+			</div>
+			<button class="btn btn-default blockchain" onClick="App.setBugExtension()">Set</button>
+		</div>
+
+		<label for="updatetrues">Number of tries developer receives to create bug-free update:</label>
+		<div class="input-inline" id="updateTries>
+			<input type="text" id="triesAttr" class="form-control" placeholder="e.g. 3"></input>
+			<button class="btn btn-default blockchain" onClick="App.setUpdateTries()">Set</button>
+		</div>
+
+		<label for="hourPriceRatio">Hours given to developer per price unit</label>
+		<div class="input-inline" id="hourPriceRatio">
+			<div class="input-group">
+			<input type="text" id="ratioAttr" class="form-control" placeholder="e.g. 3"></input>
+			<span class="input-group-addon">Hours/Token</span>
+			</div>
+			<button class="btn btn-default blockchain" onClick="App.setHourPriceRatio()">Set</button>
+		</div>
+
+		<label for="voteDuration">Length of Vote</label>
+		<div class="input-inline" id="voteDuration">
+			<div class="input-group">
+			<input type="text" id="voteAttr" class="form-control" placeholder="e.g. 3"></input>
+			<span class="input-group-addon">Hours</span>
+			</div>
+			<button class="btn btn-default blockchain" onClick="App.setVoteDuration()">Set</button>
+		</div>
+	
+		<label for="auctionDuration">Length of Token Refuelling Auction:</label>
+		<div class="input-inline" id="auctionDuration">
+			<div class="input-group">
+			<input type="text" id="auctionAttr" class="form-control" placeholder="e.g. 3"></input>
+			<span class="input-group-addon">Days</span>
+			</div>
+			<button class="btn btn-default blockchain" onClick="App.setAuctionDuration()">Set</button>
+		</div>
+
+		<label for="refund">Should the Contract refund?</label>
+		<div id="refund" class="input-inline">
+			<select class="form-control" id="refundAttr">
+				<option value="true">Yes</option>
+				<option value="false">No</option> 
+			</select>
+			<button class="btn btn-default blockchain" onClick="App.setContractRefunds()">Set</button>
+		</div>
+	</div>
+</div>
+

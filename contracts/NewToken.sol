@@ -15,9 +15,9 @@ contract NewToken is BaseToken{
 		uint256 _creationTime
 		) {
 		manager = msg.sender;
-		balances[address(this)] = _initialAmount;
-		creationTime = _creationTime;
+		balances[address(msg.sender)] = _initialAmount;
 		totalSupply = _initialAmount;
+		creationTime = _creationTime;
 		name = _name;
 		issuanceRate = _issuanceRate;
 		upperCap = _upperCap;

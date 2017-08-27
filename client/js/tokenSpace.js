@@ -2,9 +2,11 @@ import {default as Web3} from 'web3';
 import {default as SHA256} from 'crypto-js/sha256';
 
 import createTokenObject from '../../build/contracts/TokenCreator.json';
+import tokenManagerObject from '../../build/contracts/TokenManager.json';
 
-let CreateToken;
+let CreateToken, TokenManager;
 let ctAddress, ctInstance, netId;
+let tmAddress, tmInstance;
 let tokens = [];
 
 window.App = {
@@ -12,6 +14,7 @@ window.App = {
 	
 		self=this;	
 		CreateToken = web3.eth.contract(createTokenObject.abi);
+		TokenManager = web3.eth.contract(tokenManagerObject.abi);
 
 		web3.version.getNetwork((err,result) => {
 		
@@ -39,10 +42,16 @@ window.App = {
 					console.log(logs);
 
 					for (var i = 0; i < logs.length ; i++) {
-						console.log(logs[i].args.creationTime.toNumber());
-						var id = SHA256((logs[i].args.creationTime).toNumber() + logs[i].args.tokenAddress + logs[i].args.tokenManagerAddress);
-						console.log(id.toString());
-						tokens.push(id.toString()); 
+						tmInstance = TokenManager.at(logs[i].args.tokenManagerAddress);
+						tmInstance.getTokenAddress((err, result) => {
+							var tokenAddress = result;
+							if (err) {
+								console.log(err);
+							} else {	
+								var id = SHA256((logs[i].args.creationTime).toNumber() + tokenAddress + logs[i].args.tokenManagerAddress);
+								tokens.push(id.toString()); 
+							}
+						});
 					}
 
 					self.makeList();
@@ -64,7 +73,9 @@ window.App = {
 				var tempDesc;
 
 				for (var i = 0; i < responseData.length; i++) {
+					console.log(responseData[i]);
 					tempId = '' + responseData[i].id;	
+					console.log("temp id " + tempId);
 					tempAddr = '' + responseData[i].address;
 					tempName = '' + responseData[i].name;
 					tempDesc = '' + responseData[i].description;
@@ -104,6 +115,7 @@ $(document).ready(function(){
 		$("#descriptionList").toggle();
 	});
 	$("#enterToken").click(function() {
+		console.log("made it to the click");
 		window.location.href='/tokenHome/' + $("#tokenList").val();
 	});
 });

@@ -5,8 +5,8 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="/build/tokenForum.bundle.js"></script>
-	<script><% var user = user %></script>
-	<script><% var token = token %></script>
+	<script> var user = <%- JSON.stringify(user) %></script>
+	<script> var token = <%- JSON.stringify(token) %></script>
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/css/app.css">
@@ -24,7 +24,9 @@
 				<li><a href="<%= '/tokenHome/' + token.id + '/contact'-%>">Contact</a></li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
-				<li><%= user.name %></li>
+				<% if (typeof(user) != 'undefined') {%>
+				<li><%= user.username %></li>
+				<%}%>
 				<li><a href="/tokenSpace"><span class="fa fa-sign-out"></span>Sign out</a></li>
 			</ul>
 		</div>
@@ -62,19 +64,19 @@
 				</div>
 
 			</div>
-			<a href="/updateTopic" class="btn btn-success">Create new thread</a> 
+			<a href="./forum/submitTopic" class="btn btn-success">Create new thread</a> 
 
 		</div>
 		<!-- ISSUES //////////////////////////////// -->
 		<div id="issuesCat" class="tab-pane fade in">
 			<div id="issues"></div>
-			<a href="/issueTopic" class="btn btn-success">Create new thread</a> 
+			<a href="./forum/submitTopic" class="btn btn-success">Create new thread</a> 
 		</div>
 
 		<!-- GENERAL //////////////////////////////// -->
 		<div id="generalCat" class="tab-pane fade in">
 			<div id="general"></div>
-			<a href='/generalTopic' class="btn btn-success">Create new thread</a> 
+			<a href='./forum/submitTopic' class="btn btn-success">Create new thread</a> 
 		</div>
 		</div>
 	</div>
