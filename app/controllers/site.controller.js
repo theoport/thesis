@@ -19,6 +19,7 @@ module.exports = {
 	showThread: showThread,
 	showSetAttributes: showSetAttributes,
 	showMethods: showMethods,
+	showInfo: showInfo,
 
 	//STILL TO DO:
 	showBidForBounty: showBidForBounty,
@@ -164,6 +165,120 @@ function showSetAttributes(res,req){
 			res.status(404).json({message: "Token Not found"});
 		} else {
 			res.render('/pages/setAttributes', {token: token});
+		}
+	});
+}
+
+function showInfo(req,res){
+	const $tokenId = req.params.tokenId;
+	Token.findOne({id: $tokenId}, (err, token) => {
+		if (err){
+			res.status(400).json(err);
+		} else if (!token) {
+			res.status(404).json({message: "Token Not found"});
+		} else {
+			res.render('/pages/tokenInfo', {token: token});
+		}
+	});
+}
+
+function showBidForBounty(req,res){
+	const $tokenId = req.params.tokenId;
+	const $topicId= req.params.updateId;
+	Token.findOne({id: $tokenId}, (err, token) => {
+		if (err){
+			res.status(400).json(err);
+		} else if (!token) {
+			res.status(404).json({message: "Token Not found"});
+		} else {
+			Topic.findOne({_id: $topicId}, (err, topic) => {
+				if (err){
+					res.status(400).json(err);
+				} else if (!token) {
+					res.status(404).json({message: "Topic Not found"});
+				} else {
+					res.render('/pages/bidForBounty', {token: token, topic: topic});
+				}
+			});
+		}
+	});
+
+}
+function showSubmitUpdate(req,res){
+	const $tokenId = req.params.tokenId;
+	const $topicId= req.params.updateId;
+	Token.findOne({id: $tokenId}, (err, token) => {
+		if (err){
+			res.status(400).json(err);
+		} else if (!token) {
+			res.status(404).json({message: "Token Not found"});
+		} else {
+			Topic.findOne({_id: $topicId}, (err, topic) => {
+				if (err){
+					res.status(400).json(err);
+				} else if (!token) {
+					res.status(404).json({message: "Topic Not found"});
+				} else {
+					res.render('/pages/submitUpdate', {token: token, topic: topic});
+				}
+			});
+		}
+	});
+
+}
+function showAuctionHouse(req,res){
+	const $tokenId = req.params.tokenId;
+	Token.findOne({id: $tokenId}, (err, token) => {
+		if (err){
+			res.status(400).json(err);
+		} else if (!token) {
+			res.status(404).json({message: "Token Not found"});
+		} else {
+			res.render('/pages/auctionHouse', {token: token});
+		}
+	});
+
+}
+function showSubmitBug(req,res){
+	const $tokenId = req.params.tokenId;
+	const $topicId= req.params.updateId;
+	Token.findOne({id: $tokenId}, (err, token) => {
+		if (err){
+			res.status(400).json(err);
+		} else if (!token) {
+			res.status(404).json({message: "Token Not found"});
+		} else {
+			Topic.findOne({_id: $topicId}, (err, topic) => {
+				if (err){
+					res.status(400).json(err);
+				} else if (!token) {
+					res.status(404).json({message: "Topic Not found"});
+				} else {
+					res.render('/pages/submitBug', {token: token, topic: topic});
+				}
+			});
+		}
+	});
+}
+
+function showStartBounty(req,res){
+	const $tokenId = req.params.tokenId;
+	const $topicId= req.params.updateId;
+	Token.findOne({id: $tokenId}, (err, token) => {
+		if (err){
+			res.status(400).json(err);
+		} else if (!token) {
+			res.status(404).json({message: "Token Not found"});
+		} else {
+			Topic.findOne({_id: $topicId}, (err, topic) => {
+				if (err){
+					res.status(400).json(err);
+				} else if (!token) {
+					res.status(404).json({message: "Topic Not found"});
+				} else {
+					res.render('/pages/startBounty', {token: token, topic: topic});
+				}
+			});
 		}
 	});
 }

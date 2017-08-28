@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Submit Update</title>
+
+	<script> const token=<%- JSON.stringify(token) -%></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="/build/submitUpdate.bundle.js"></script>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<% if (data.length > 0 && data[0].hasOwnProperty('error')) { %>
+	<div class="alert alert-danger"><%= data[0].message %></div>
+<% } %>
+<div class="col-sm-6 col-sm-offset-3">
+	<div class="jumbotron text-center">
+		<h1>Want some <%= token.name %>?</h1>
+		<br>
+		<p>This is auction #<span id="auctionId"></span></p>
+		<p>Selling <span id=amountOfToken></span> <%= token.name %>.</p>
+		<p>Current highest bid is: <span id="highestBid"></span> wei.</p>
+		<p>Auction ends: <span id="auctionEndTime"></span></p>
+		<label for="bid">Bid:</label>
+		<div class="input-group">		
+			<span class="input-group-btn">
+				<button class="btn btn-secondary" type="button" id="ABIInfo">
+					<span class="fa fa-info"></span>
+				</button>
+			</span>	
+			<input type="text" id="bid" class="form-control"></input>
+			<span class="input-group-addon" id="basic-addon1">wei</span>
+		</div>
+		<button class="btn btn-default blockchain" id="submitBid" onclick="App.submitBid()">Submit Bid</button>
+
+		<p>Note: Bidding will deduct the amount of wei from your account,<br>which you can then withdraw here, in case it gets beaten:</p>	
+		<span>
+			<button class="btn btn-default blockchain" id="withdraw" onclick="App.withdraw()">Submit Bid</button>
+			<p>(You have <span id="pastBets"></span> withdrawable wei)</p>
+		</span>
+
+		<div id="status"></div>
+		<hr>
+		<a class="btn btn-default" href="<%= '/tokenHome/' + token.id %>"><span class="fa fa-home"></span> Go Back to tokenHome</a>
+	</div>
+</div>

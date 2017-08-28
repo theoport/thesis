@@ -842,7 +842,8 @@ window.App = {
 
 			$("#latestEvents").prepend(html);	
 
-			$("#auction").html("<h4>No active auctions</h4");
+			$("#auction").html("<h4>No active auctions</h4" +
+			"<button class=\"btn btn-default blockchain\" onclick=\"App.withdrawBets()\">Withdraw past bets</button>");
 		});
 
 		auctionStart.get((err,auctionStart) => {

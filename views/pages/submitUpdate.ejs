@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Submit Update</title>
+
+	<script> const token=<%- JSON.stringify(token) -%></script>
+	<script> const topic=<%- JSON.stringify(topic) -%></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="/build/submitUpdate.bundle.js"></script>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<% if (data.length > 0 && data[0].hasOwnProperty('error')) { %>
+	<div class="alert alert-danger"><%= data[0].message %></div>
+<% } %>
+<div class="col-sm-6 col-sm-offset-3">
+	<div class="jumbotron text-center">
+		<h1>Submit Code</h1>
+		<h4>For Update: <a href="<%= '/tokenHome/' + token.id + '/forum/' + topic.id %>"><%= '#' + topic.name %></a>
+		<br>
+
+		<p>Please submit the contract ABI and the contract source code.</p>
+		<p>The contract will be deployed on the blockchain and a <br>bugHunt will be started.</p>
+	
+		<label for="ABI">ABI</label>
+		<div class="input-group">		
+			<span class="input-group-btn">
+				<button class="btn btn-secondary" type="button" id="ABIInfo">
+					<span class="fa fa-info"></span>
+				</button>
+			</span>	
+			<input type="file" id="ABI" class="form-control"></input>
+			<span class="input-group-addon" id="basic-addon1">.json</span>
+		</div>
+
+		<label for="sourceCode">Source Code</label>
+		<div class="input-group">		
+			<span class="input-group-btn">
+				<button class="btn btn-secondary" type="button" id="sourceCodeInfo">
+					<span class="fa fa-info"></span>
+				</button>
+			</span>	
+			<input type="file" id="sourceCode" class="form-control"></input>
+			<span class="input-group-addon" id="basic-addon1">.txt</span>
+		</div>
+
+		<button class="btn btn-default blockchain" id="submitBug" onclick="App.submitUpdate()">Submit Update</button>
+		<div id="status"></div>
+		<hr>
+		<a class="btn btn-default" href="<%= '/tokenHome/' + token.id %>"><span class="fa fa-home"></span> Go Back to tokenHome</a>
+	</div>
+</div>

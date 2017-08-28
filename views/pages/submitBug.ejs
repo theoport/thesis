@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Submit Bug</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="/build/submitBug.bundle.js"></script>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<% if (data.length > 0 && data[0].hasOwnProperty('error')) { %>
+	<div class="alert alert-danger"><%= data[0].message %></div>
+<% } %>
+<div class="col-sm-6 col-sm-offset-3">
+	<div class="jumbotron text-center">
+		<h1>Submit Bug</h1>
+		<h4>For Update: <a href="<%= '/tokenHome/' + token.id + '/forum/' + topic.id %>"><%= '#' + topic.name %></a>
+		<br>
+
+		<p>Please give a detailed description of the bug you found.</p>
+		<p>The TokenCommunity will then vote on whether they think <br>you indeed found a bug. People can ask questions on the update thread<br> that you can then answer</p>
+	
+		<label for="description">Description</label>
+		<div class="input-group">		
+			<span class="input-group-btn">
+				<button class="btn btn-secondary" type="button" id="descriptionInfo">
+					<span class="fa fa-info"></span>
+				</button>
+			</span>	
+		</div>
+		<textarea rows="5" id="description" class="form-control"></textarea>
+		<button class="btn btn-default blockchain" id="submitBug" onclick="App.submitBug()">Submit Bug</button>
+		<div id="status"></div>
+		<hr>
+		<a class="btn btn-default" href="<%= '/tokenHome/' + token.id %>"><span class="fa fa-home"></span> Go Back to tokenHome</a>
+	</div>
+</div>

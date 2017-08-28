@@ -10,18 +10,16 @@ contract TokenManager {
 	would have to require further voting, as otherwise too much 
 	trust is put in the hands of the creator.*/
 
-	uint256 constant PARAMETERS = 4;
-	uint256 constant INFOS = 3;
 	uint256 constant LOWESTETHER = 1 ether;
 
-		uint256 AUCTIONDURATION;
-		uint256 BUGEXTENSION;
-		uint256 BUGHUNT;
-		uint256 BOUNTYHUNT;
-		uint256 UPDATETRIES;
-		uint256 HOURPRICERATIO;
-		uint256 VOTEDURATION;
-		uint256 ETHERBALANCE;
+		uint256 public AUCTIONDURATION;
+		uint256 public BUGEXTENSION;
+		uint256 public BUGHUNT;
+		uint256 public BOUNTYHUNT;
+		uint256 public UPDATETRIES;
+		uint256 public HOURPRICERATIO;
+		uint256 public VOTEDURATION;
+		uint256 public ETHERBALANCE;
 
 	enum subject{UPDATE, BUG} 
 	address creator;
@@ -30,7 +28,7 @@ contract TokenManager {
 	NewToken token;
 	uint256 private consensusPercent;	// percentage required for any vote to succeed
 	uint256 private initialAmount;	// initial amount of token
-	bool private contractRefunds;	// does the contract refund, can be updated
+	bool public contractRefunds;	// does the contract refund, can be updated
 	uint256 public version;	// version number of token
 	Vote vote;
 	Auction auction;
@@ -351,6 +349,10 @@ contract TokenManager {
 			}
 			return true;
 		}
+	}
+
+	function getWithdrawable(owner) constant returns (uint256) {
+		return auction.returnBids[owner];
 	}
 		
 	function endAuction(){

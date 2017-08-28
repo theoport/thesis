@@ -34,9 +34,9 @@
 		<div id="topicHeader">
 		</div>
 		<button class="btn btn-default" onclick="App.upvote()">Upvote</button> 
-		<button class="btn btn-default blockchain" onclick="App.startBounty()">
+		<a class="btn btn-default blockchain" href="<%= '/tokenHome/' + token.id + '/startBounty/' + topic.id %>"> 
 			Start Bounty
-		</button>
+		</a>
 	</div>
 	<div id="comments"></div>
 	<div class="form-inline">
