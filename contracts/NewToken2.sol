@@ -2,16 +2,15 @@ import "./BaseToken.sol";
 
 pragma solidity ^0.4.8;
 
-contract NewToken is BaseToken{
+contract NewToken2 is BaseToken{
 
 
-	function NewToken(
-		uint256 _initialAmount,
-		bytes32 _name,
-		uint256[2] _issuanceRate,
-		uint256 _upperCap
+	function NewToken2(
+			
+		
 		) {
 		daysSinceFirstCreation = 0;
+		creator = _creator;
 		manager = msg.sender;
 		balances[address(msg.sender)] = _initialAmount;
 		totalSupply = _initialAmount;
@@ -21,5 +20,14 @@ contract NewToken is BaseToken{
 		upperCap = _upperCap;
 		hasBeenInitialised = true;
 	}
+
+	function redistributeWealth() byCreator {
+		
+	}
+
+	function borrow() {
+
+	}
 }
+
 		

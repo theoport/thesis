@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+<!--
 <head>
 	<title>TokenHome</title>
 	<script> const token=<%- JSON.stringify(token) -%></script>
@@ -40,9 +41,8 @@
 	</div>
 	<div class="col-sm-6 jumbotron">
 		<h1><%= token.name %></h1> 
-		<h3>Your account balance is: <span id="accountBalance"><i>undefined</i> </span>  <%= token.name -%></h3>
-		<a class="btn btn-default" href="<%= '/tokenHome/' + token.id + '/setAttributes' -%>">Set Attributes of Manager contract</a><small>(Will only work of you are the creator of this token)</small>
-	</div>
+		<h3>Your account balance is: <span id="accountBalance"><i>undefined</i></span><%= token.name -%></h3>
+		<a class="btn btn-default" href="<%= '/tokenHome/' + token.id + /setAttributes' -%>">Set Attributes of Manager contract<small>Will only work of you are the creator of this token</small></a>
 
 	<div class="col-sm-3 noticeboard">
 		<div id="update"></div>
@@ -51,4 +51,6 @@
 	</div>
 		
 </div>
+
+	-->	
 

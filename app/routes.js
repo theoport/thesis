@@ -5,39 +5,37 @@ const express = require('express'),
 			forumController = require('./controllers/forum.controller.js'),
 			tokenController = require('./controllers/token.controller.js'),
 			userController = require('./controllers/user.controller.js'),
-			auth = require('./middleware/auth.js')
+			auth = require('./middleware/auth.js');
 			
 
 module.exports = function(passport) {
 
 
 //Site routes
-
-router.get('/', 										siteController.showHome);
-router.get('/about', 								siteController.showAbout);
+router.get('/', 	siteController.showHome);
 router.get('/tokenFactory', 				siteController.showTokenFactory);
 router.get('/tokenSpace', 					siteController.showTokenSpace);
-router.get('/tokenHome/:id', auth.isLoggedIn,			siteController.showTokenHome);
-router.get('/tokenHome/:id/forum',  	siteController.showTokenForum);
-router.get('/tokenHome/:id/forum/submitTopic', auth.isLoggedIn, siteController.showSubmit);
+router.get('/tokenHome/:id', siteController.showTokenHome);
+router.get('/tokenHome/:id/forum', siteController.showTokenForum);
+router.get('/tokenHome/:id/forum/submitTopic', siteController.showSubmit);
 router.get('/login', 								siteController.showLogin);
 router.get('/signup', 							siteController.showSignup);
 router.get('/logout', 							siteController.logout);
-router.get('/tokenHome/:tokenId/forum/:topicId', 	siteController.showThread);
-router.get('/tokenHome/:tokenId/methos', siteController.showMethods);
+router.get('/tokenHome/:tokenId/forum/:topicId', siteController.showThread);
+router.get('/tokenHome/:tokenId/methods', siteController.showMethods);
 router.get('/tokenHome/:tokenId/info', siteController.showInfo);
 router.get('/tokenHome/:tokenId/setAttributes', siteController.showSetAttributes);
 router.get('/tokenHome/:tokenId/bidForBounty/:updateId', siteController.showBidForBounty);
-router.get('/tokenHome/:tokenId/submitUpdate/:updateId', sitecontroller.showSubmitUpdate);
+router.get('/tokenHome/:tokenId/submitUpdate/:updateId', siteController.showSubmitUpdate);
 router.get('/tokenHome/:tokenid/auctionHouse/:auctionId', siteController.showAuctionHouse);
-router.get('/tokenHome/:tokenId/submitBug/:updatId', siteController.showSubmitBug);
-router.get('/tokenHome/:tokenId/startBounty/:updatId', siteController.showStartBounty);
-
+router.get('/tokenHome/:tokenId/submitBug/:updateId', siteController.showSubmitBug);
+router.get('/tokenHome/:tokenId/startBounty/:updateId', siteController.showStartBounty);
 router.post('/signup', passport.authenticate('local-signup', {
 	successRedirect: '/tokenSpace',
 	failureRedirect: '/signup',
 	failureFlash: true
 }));
+
 router.post('/login', passport.authenticate('local-login', {
 	successRedirect: '/tokenSpace',
 	failureRedirect: '/tokenSpace',
@@ -59,7 +57,10 @@ router.get('/api/topics/:tokenId/comments/:topicId', forumController.getComments
 router.post('/api/comments', forumController.addComment);
 router.post('/api/upvotes', 							forumController.addUpvote);
 router.get('/api/upvoteCount/:topicId', 							forumController.getUpvoteCount);
-
+router.get('/api/bounty/:bountyId', forumController.getBountyDescription);
+router.post('/api/bounty', forumController.addBountyDescription);
+router.get('/api/bugs/:bugId', forumController.getBug);
+router.post('/api/bugs', forumController.addBug);
 return router;
 
 }

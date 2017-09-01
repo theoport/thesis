@@ -6,7 +6,7 @@
 	<script> const token=<%- JSON.stringify(token) -%></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<script src="/build/submitUpdate.bundle.js"></script>
+	<script src="/build/auctionHouse.bundle.js"></script>
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/css/app.css">
@@ -23,6 +23,7 @@
 		<p>Selling <span id=amountOfToken></span> <%= token.name %>.</p>
 		<p>Current highest bid is: <span id="highestBid"></span> wei.</p>
 		<p>Auction ends: <span id="auctionEndTime"></span></p>
+		<p id="youWin"></p>
 		<label for="bid">Bid:</label>
 		<div class="input-group">		
 			<span class="input-group-btn">

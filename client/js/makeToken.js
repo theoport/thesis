@@ -13,6 +13,7 @@ let ctAddress;
 let ctInstance;
 let account;
 let netId;
+let blockNumber;
 
 window.App = {
 	start: function() {
@@ -86,7 +87,10 @@ window.App = {
 
 			ctAddress = obj;
 			$("#networkInfo").html("Connected to " + network + " network.<br>ID: " + netId);	
-			self.startWatch();
+			web3.eth.getBlockNumber((err, result) => {
+				blockNumber = result;
+				self.startWatch();
+			});
 		});
 	},
 
@@ -94,20 +98,8 @@ window.App = {
 		let self = this;
 		ctInstance = CreateToken.at(ctAddress);
 
-		var timeEvent = ctInstance.TellTheTime({}, {fromBlock: 0, toBlock: 'latest'});
-		timeEvent.watch( function(err, res) {
-			console.log("tick");
-			if (err) {
-			console.log(err);
-			}
-			else {
-				console.log((res.args.time).toNumber());
-			}
-		});
-
-			
 		//start watching contract 
-		var anEvent = ctInstance.TokenManagerCreated({}, {fromBlock: 'latest'});
+		var anEvent = ctInstance.TokenManagerCreated({}, {fromBlock: blockNumber +1});
 		anEvent.watch( function(err, result) {
 			
 			if (err) {
@@ -117,7 +109,6 @@ window.App = {
 				+ "<br> with manager at " + result.args.tokenManagerAddress);
 				let _description = $("#description").val();	
 				let _sourceCode = ERC20Standardtxt + BaseTokentxt + NewTokentxt;
-				console.log(_sourceCode);
 				let _date = new Date(result.args.creationTime.toNumber() * 1000);
 				let _id = SHA256(result.args.creationTime + result.args.tokenAddress + result.args.tokenManagerAddress);
 				$.ajax({
@@ -147,6 +138,7 @@ window.App = {
 			}	
 		});
 	},
+
 	setDefault: function() {
 		$("#accountInfo").html("...Loading account information.");
 		$("#networkInfo").html("...Loading network information.");
@@ -156,14 +148,16 @@ window.App = {
 		let self = this;
 		self.setStatus("Please wait while the token contract is deployed to the blockchain. <br> Don't close the window.");
 		let name = $("#name").val();
+		let _value = $("#value").val() + '000000000000000000';
+		console.log(_value);
 		let amount = $("#initialAmount").val();
 		let consensusPercent = $("#consensusPercent").val();
 		let str = $("#issuanceRate").val();
 		let issuanceRate = str.split(",");
 		let upperCap = $("#upperCap").val();
-		let contractRefunds = $("#contractRefunds").val();
+		let contractRefunds = ($("#contractRefunds").val() == 'true')?true:false;
 		
-		ctInstance.makeTokenManager(amount, name, consensusPercent, issuanceRate, upperCap, contractRefunds, {from: account, gas: 4000000}, (err, result) => {
+		ctInstance.makeTokenManager(amount, name, consensusPercent, issuanceRate, upperCap, contractRefunds, {from: account, gas: 4000000, value: parseInt(_value)}, (err, result) => {
 			if (err) {
 				console.log(err);
 				self.setStatus("Error creating new Coin");
@@ -211,6 +205,9 @@ $(document).ready(function() {
 	});
 	$("#descriptionInfo").hover(function() {
 		$(this).css('cursor', 'pointer').attr('title', "Please give a short description of what you intend to achieve with this new token. New users will be able to see this description and join your effort in making it a success.");
+	});
+	$("#valueInfo").hover(function() {
+		$(this).css('cursor', 'pointer').attr('title', "This amount of ether will be sent to the contract and deducted from your account. The contract will use this ether to refund transactions. If you want the contract to refund, it will need some ether!");
 	});
 });
 	

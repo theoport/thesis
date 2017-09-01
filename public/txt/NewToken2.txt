@@ -1,3 +1,20 @@
+pragma solidity ^0.4.8;
+
+/*ERC20 standard:*/
+
+contract ERC20Standard{
+	
+	uint256 public totalSupply;
+
+	function balanceOf(address owner) constant returns (uint256 balance);
+	function transfer(address to, uint256 value) returns (bool success);
+	function approve(address spender, uint256 value) returns (bool success);
+	function allow(address owner, address spender) constant returns (uint256 remaining);
+	event Transfer(address indexed from, address indexed to, uint256 value);
+	event Approval(address indexed owner, address indexed spender, uint256 value);
+
+}
+
 import "./ERC20Standard.sol";
 
 pragma solidity ^0.4.8;
@@ -152,3 +169,40 @@ contract BaseToken is ERC20Standard{
 		return allowance[owner][spender];
 	}
 }
+
+import "./BaseToken.sol";
+
+pragma solidity ^0.4.8;
+
+contract NewToken is BaseToken{
+
+
+	function NewToken(
+		uint256 _initialAmount,
+		bytes32 _name,
+		uint256[2] _issuanceRate,
+		uint256 _upperCap,
+		address _creator
+		) {
+		daysSinceFirstCreation = 0;
+		creator = _creator;
+		manager = msg.sender;
+		balances[address(msg.sender)] = _initialAmount;
+		totalSupply = _initialAmount;
+		creationTime = now;
+		name = _name;
+		issuanceRate = _issuanceRate;
+		upperCap = _upperCap;
+		hasBeenInitialised = true;
+	}
+
+	function redistributeWealth() byCreator {
+		
+	}
+
+	function borrow() {
+
+	}
+}
+
+		

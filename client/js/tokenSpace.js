@@ -39,60 +39,52 @@ window.App = {
 				if (err) {
 					console.log(err);	
 				} else {
-					console.log(logs);
 
 					for (var i = 0; i < logs.length ; i++) {
-						tmInstance = TokenManager.at(logs[i].args.tokenManagerAddress);
-						tmInstance.getTokenAddress((err, result) => {
-							var tokenAddress = result;
-							if (err) {
-								console.log(err);
-							} else {	
-								var id = SHA256((logs[i].args.creationTime).toNumber() + tokenAddress + logs[i].args.tokenManagerAddress);
-								tokens.push(id.toString()); 
-							}
-						});
+						self.pushToken(logs[i].args.tokenManagerAddress, logs[i].args.creationTime.toNumber());
 					}
 
-					self.makeList();
 				}
 			});
 		});
 	},
-	
-	makeList: function() {
-		$.ajax({
-			type: 'GET',
-			url: '/api/tokens',
-			datatype: 'json',
-			success: function(responseData, textStatus, jqXHR) {
 
-				var tempId;
-				var tempAddr;
-				var tempName;
-				var tempDesc;
+	pushToken: function(_tmAddress, _time) {
+		tmInstance = TokenManager.at(_tmAddress);
+		tmInstance.getTokenAddress((err, result) => {
+			var tokenAddress = result;
+			if (err) {
+				console.log(err);
+			} else {	
+				var id = SHA256(_time + tokenAddress + _tmAddress);
+				$.ajax({
+					type: 'GET',
+					url: '/api/tokens/' + id,
+					datatype: 'json',
+					success: function(responseData, textStatus, jqXHR) {
 
-				for (var i = 0; i < responseData.length; i++) {
-					console.log(responseData[i]);
-					tempId = '' + responseData[i].id;	
-					console.log("temp id " + tempId);
-					tempAddr = '' + responseData[i].address;
-					tempName = '' + responseData[i].name;
-					tempDesc = '' + responseData[i].description;
-					if (($.inArray(tempId,tokens)) >= 0) {
+						var tempId;
+						var tempAddr;
+						var tempName;
+						var tempDesc;
+
+						tempId = '' + responseData.id;	
+						tempAddr = '' + responseData.address;
+						tempName = '' + responseData.name;
+						tempDesc = '' + responseData.description;
 						$("#tokenList").append($("<option></option>")
 															.attr('value', tempId)
 															.text(tempName + ", " + tempAddr)); 
 						$("#descriptionList").append($("<tr></tr>")
 															.html("<td>" + tempName + "</td><td>" + tempDesc + "</td>")); 
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						console.log(textStatus);			
 					}
-				}
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				console.log(textStatus);			
+				});
 			}
 		});
-	}	
+	}
 };
 
 window.addEventListener('load', function() {
@@ -115,7 +107,6 @@ $(document).ready(function(){
 		$("#descriptionList").toggle();
 	});
 	$("#enterToken").click(function() {
-		console.log("made it to the click");
 		window.location.href='/tokenHome/' + $("#tokenList").val();
 	});
 });

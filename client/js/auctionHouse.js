@@ -2,14 +2,29 @@ import { default as Web3 } from 'web3';
 import { default as SHA256} from 'crypto-js/sha256';
 import { default as tokenManagerObject } from '../../build/contracts/TokenManager.json';
 
-let activeAuction, highestBid;
-
+let activeAuction, highestBid, highestBidder, account;
+let finishedAuctions;
+let newHighestBid, auctionStart, auctionFinish;
+let TokenManager, tmInstance;
 window.App = {
 	start: function() {
 
 		self = this;
 		self.checkData();
-		self.fillPage();
+		
+		TokenManager=web3.eth.contract(tokenManagerObject.abi);	
+		tmInstance = TokenManager.at(token.managerAddress);
+
+		web3.eth.getAccounts((err,accs) => {
+			if (err != null) {
+				alert(err);
+			} else if (accs.length == 0) {
+				alert("No accounts detected");
+			} else {
+				account = accs[0];
+			}
+			self.fillPage();
+		});
 	},
 
 	fillPage: function() {
@@ -26,7 +41,7 @@ window.App = {
 			auctionStart.get((err,auctionStarts) => {
 				for (var i = 0; i <auctionStarts.length; i++) {
 					if ($.inArray(auctionStarts[i].args.auctionId, finishedAuctions) < 0) {
-						activeAuction = auctionStarts[i].args.auctionId);
+						activeAuction = auctionStarts[i].args.auctionId;
 						$("#auctionId").html(auctionStarts[i].args.auctionId);
 						$("#amountOfToken").html(auctionStarts[i].args.amount);
 						var finishDate = new Date(auctionStarts[i].args.finishTime * 1000);
@@ -37,11 +52,14 @@ window.App = {
 							for (var i = 0; i < bids.length ; i++){
 								if (bids[i].args.amount > highestBid) {
 									highestBid = bids[i].args.amount;
+									highestBidder = bids[i].args.sender;
 								}
 							}
+							if (highestBidder == account) {
+								$("#youWin").html("Congrats! You hold the highest bid.");
+							}
+							$("#highestBid").html(highestBid);
 						});
-
-						$("#highesBid").html(highestBid);
 						tmInstance.getWithdrawable(account, (err, withdrawable) => {
 							if (typeof(withdrawable) == 'undefined') {
 								withdrawable = 0;
@@ -57,23 +75,50 @@ window.App = {
 		});
 	},
 	
-	startWatch(): function() {	
-						newHighestBid.get((err, bids) =>{
-							for (var i = 0; i < bids.length ; i++){
-								if (bids[i].args.amount > highestBid) {
-									highestBid = bids[i].args.amount;
-								}
-							}
-						});
+	startWatch: function() {	
+		newHighestBid.watch((err, bid) =>{
+			if (bid.args.amount > highestBid) {
+				highestBid = bid.args.amount;
+				$("#highestBid").html(highestBid);
 
-						$("#highesBid").html(highestBid);
-						tmInstance.getWithdrawable(account, (err, withdrawable) => {
-							if (typeof(withdrawable) == 'undefined') {
-								withdrawable = 0;
-							}
-							$("#pastBets").html(withdrawable);
-							self.startWatch();
-						});
+				if (bid.args.sender == account) {
+					$("#youWin").html("Congrats! You hold the highest bid");
+				}
+				else {
+					$("#youWin").html("");
+				}
+					
+				tmInstance.getWithdrawable(account, (err, withdrawable) => {
+					if (typeof(withdrawable) == 'undefined') {
+						withdrawable = 0;
+					}
+					$("#pastBets").html(withdrawable);
+				});
+			}
+		});
+	},
+
+	withdraw: function() {
+		tmInstance.withdrawReturnedBid({from: account, gas: 4000000}, (err, result) => {
+			if (err) {
+				alert(err);
+			} else {
+				alert(result);
+			}
+		});
+	},
+			
+	submitBid: function() {
+		var _value = $("#bid").val();
+		tmInstance.bid({from: account, gas: 4000000, value:	_value}, (err,result) => {
+			if (err) {
+				alert(err);
+			} else {
+				alert(result);
+			}
+		});
+	},
+			
 
 	checkData: function() {
 		console.log(token);

@@ -9,7 +9,14 @@ module.exports = {
 		tokenForum: './client/js/tokenForum.js',
 		thread: 	'./client/js/thread.js',
 		methods: './client/js/methods.js',
-		updateThread: 	'./client/js/updateThread.js'
+		updateThread: 	'./client/js/updateThread.js',
+		setAttributes: 	'./client/js/setAttributes.js',
+		tokenInfo:	 	'./client/js/tokenInfo.js',
+		submitBug: 	'./client/js/submitBug.js',
+		submitUpdate: 	'./client/js/submitUpdate.js',
+		bidForBounty: 	'./client/js/bidForBounty.js',
+		startBounty: 	'./client/js/startBounty.js',
+		auctionHouse: 	'./client/js/auctionHouse.js'
 	},
 	output: {
 		path: path.resolve(__dirname, './client/build'),

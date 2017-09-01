@@ -31,9 +31,13 @@
 </nav>
 <div class="container-fluid">
 	<div class ="form-inline">
-		<div id="topicHeader">
+		<div class="form-group">
+			<div id="topicHeader" class="form-control">
+			</div>
 		</div>
-		<button class="btn btn-default" onclick="App.upvote()">Upvote</button> 
+		<div class="form-group">
+			<button class="btn btn-default" onclick="App.upvote()">Upvote</button> 
+		</div>
 		<a class="btn btn-default blockchain" href="<%= '/tokenHome/' + token.id + '/startBounty/' + topic.id %>"> 
 			Start Bounty
 		</a>

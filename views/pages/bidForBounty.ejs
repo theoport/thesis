@@ -13,16 +13,15 @@
 	<link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
-<% if (data.length > 0 && data[0].hasOwnProperty('error')) { %>
-	<div class="alert alert-danger"><%= data[0].message %></div>
-<% } %>
 <div class="col-sm-6 col-sm-offset-3">
 	<div class="jumbotron text-center">
 		<h1>Bid For Bounty</h1>
 		<h4>For Update: <a href="<%= '/tokenHome/' + token.id + '/forum/' + topic.id %>"><%= '#' + topic.name %></a></h4>
 		<br>
-		<p>Best Bid is currently: <span id="bestbid"></span></p>
+		<p>Best Bid is currently: <span id="bestBounty"></span> (<span id="currentHours"></span> hours)</p>
 		<p>Please submit a bid that's better than this.</p>
+		<p>BountyHunt finishes on <span id="#bountyEndTime"></span</p>
+		<p id="youWin"></p>
 	
 		<label for="bid">Bid</label>
 		<div class="input-group">		
@@ -31,12 +30,12 @@
 					<span class="fa fa-info"></span>
 				</button>
 			</span>	
-			<input type="text" id="bid" class="form-control"></input>
+			<input oninput="App.updateHours(this.value)" type="text" id="bid" class="form-control"></input>
 			<span class="input-group-addon" id="basic-addon1"><%= token.name %></span>
 		</div>
-		<p>This bid gives you <span id="hours"></span> hours to complete the code.</p>
+		<p>This bid gives you <span id="hours">0</span> hours to complete the code.</p>
 
-		<button class="btn btn-default blockchain" id="submitBug" onclick="App.submitBid()">Submit Bid</button>
+		<button class="btn btn-default blockchain" id="submitBid" onclick="App.submitBid()">Submit Bid</button>
 		<div id="status"></div>
 		<hr>
 		<a class="btn btn-default" href="<%= '/tokenHome/' + token.id %>"><span class="fa fa-home"></span> Go Back to tokenHome</a>

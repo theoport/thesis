@@ -7,7 +7,6 @@ const Topic = require('../models/Topic.js');
 
 module.exports = {
 	showHome: showHome,
-	showAbout: showAbout,
 	showTokenFactory: showTokenFactory,
 	showTokenSpace: showTokenSpace,
 	showTokenHome: showTokenHome,
@@ -20,21 +19,16 @@ module.exports = {
 	showSetAttributes: showSetAttributes,
 	showMethods: showMethods,
 	showInfo: showInfo,
-
-	//STILL TO DO:
 	showBidForBounty: showBidForBounty,
 	showSubmitUpdate: showSubmitUpdate,
 	showAuctionHouse: showAuctionHouse,
-	showSubmitBug: showSubmitBug
+	showSubmitBug: showSubmitBug,
+	showStartBounty: showStartBounty
 	
 };
 
 function showHome(req,res){
 	res.render('pages/home');	
-}
-
-function showAbout(req,res){
-	res.render('pages/about');
 }
 
 function showTokenFactory(req,res){
@@ -70,7 +64,15 @@ function showTokenHome(req,res) {
 			if (!token) { 
 				res.json({message: "NO TOKEN"});
 			} else {
-				res.render('pages/tokenHome', {token: token, user: req.user});
+				Topic.find({categoryId: '0', tokenId: _id}, (err,updateTopics) => {
+					if (err) {
+						res.status(400).json(err);
+					} else if(!updateTopics) {
+						res.render('pages/tokenHome', {updateTopics: [], token: token, user: req.user});
+					} else {
+						res.render('pages/tokenHome', {updateTopics: updateTopics, token: token, user: req.user});
+					}
+				});
 			}
 		}
 	});
@@ -130,7 +132,9 @@ function showThread(req,res){
 						if (err) {
 							res.status(400).json(err);
 						}
-						if (topic.categoryId == '0') {
+						if (!topic) {
+							res.status(404).json({message: "no topic found"});	
+						}else if (topic.categoryId == '0') {
 							res.render('pages/updateThread', {comments: comments, user: req.user, topic: topic, token: token});
 						} else {
 							res.render('pages/thread', {comments: comments, user: req.user, topic: topic,token: token});
@@ -142,7 +146,7 @@ function showThread(req,res){
 	});
 }		 
 
-function showMethods(res,req){
+function showMethods(req,res){
 	const $tokenId = req.params.tokenId;
 	Token.findOne({id: $tokenId}, (err, token) => {
 		if (err){
@@ -150,13 +154,13 @@ function showMethods(res,req){
 		} else if (!token) {
 			res.status(404).json({message: "Token Not found"});
 		} else {
-			res.render('/pages/tokenMethods', {token: token});
+			res.render('pages/tokenMethods', {token: token});
 		}
 	});
 
 }
 
-function showSetAttributes(res,req){
+function showSetAttributes(req,res){
 	const $tokenId = req.params.tokenId;
 	Token.findOne({id: $tokenId}, (err, token) => {
 		if (err){
@@ -164,7 +168,7 @@ function showSetAttributes(res,req){
 		} else if (!token) {
 			res.status(404).json({message: "Token Not found"});
 		} else {
-			res.render('/pages/setAttributes', {token: token});
+			res.render('pages/setAttributes', {token: token});
 		}
 	});
 }
@@ -177,7 +181,7 @@ function showInfo(req,res){
 		} else if (!token) {
 			res.status(404).json({message: "Token Not found"});
 		} else {
-			res.render('/pages/tokenInfo', {token: token});
+			res.render('pages/tokenInfo', {token: token, user: req.user});
 		}
 	});
 }
@@ -197,7 +201,7 @@ function showBidForBounty(req,res){
 				} else if (!token) {
 					res.status(404).json({message: "Topic Not found"});
 				} else {
-					res.render('/pages/bidForBounty', {token: token, topic: topic});
+					res.render('pages/bidForBounty', {token: token, topic: topic});
 				}
 			});
 		}
@@ -219,7 +223,7 @@ function showSubmitUpdate(req,res){
 				} else if (!token) {
 					res.status(404).json({message: "Topic Not found"});
 				} else {
-					res.render('/pages/submitUpdate', {token: token, topic: topic});
+					res.render('pages/submitUpdate', {token: token, topic: topic});
 				}
 			});
 		}
@@ -234,7 +238,7 @@ function showAuctionHouse(req,res){
 		} else if (!token) {
 			res.status(404).json({message: "Token Not found"});
 		} else {
-			res.render('/pages/auctionHouse', {token: token});
+			res.render('pages/auctionHouse', {token: token});
 		}
 	});
 
@@ -254,7 +258,7 @@ function showSubmitBug(req,res){
 				} else if (!token) {
 					res.status(404).json({message: "Topic Not found"});
 				} else {
-					res.render('/pages/submitBug', {token: token, topic: topic});
+					res.render('pages/submitBug', {token: token, topic: topic});
 				}
 			});
 		}
@@ -276,7 +280,7 @@ function showStartBounty(req,res){
 				} else if (!token) {
 					res.status(404).json({message: "Topic Not found"});
 				} else {
-					res.render('/pages/startBounty', {token: token, topic: topic});
+					res.render('pages/startBounty', {token: token, topic: topic});
 				}
 			});
 		}

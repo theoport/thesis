@@ -2,6 +2,8 @@ import { default as Web3 } from 'web3';
 import { default as SHA256} from 'crypto-js/sha256';
 import { default as tokenManagerObject } from '../../build/contracts/TokenManager.json';
 
+let TokenManager, tmInstance;
+let account;
 
 window.App = {
 	start: function() {
@@ -10,8 +12,18 @@ window.App = {
 	
 		self.checkData();
 
-		TokenManager = (web3.eth.contract(tokenManagerObject.abi);
+		TokenManager = web3.eth.contract(tokenManagerObject.abi);
 		tmInstance = TokenManager.at(token.managerAddress);
+
+		web3.eth.getAccounts((err,accs) => {
+			if (err != null) {
+				alert(err);
+			} else if (accs.length == 0) {
+				alert("No accounts detected");
+			} else {
+				account = accs[0];
+			}
+		});
 	},
 	setContractRefunds: function() {
 	
@@ -23,7 +35,6 @@ window.App = {
 		});
 	},
 	setExchangeRate: function () {
-
 		tmInstance.setExchangeRate($("#rateAttr").val(), $("#largerAttr"), {from: account, gas: 400000}, (err,result) => {
 			if (err)
 				alert(err);
@@ -32,9 +43,9 @@ window.App = {
 		});
 
 	},
-	setInsectHunt: function () {
-
-		tmInstance.setInsectHunt($("#insectAttr").val(), {from: account, gas: 400000}, (err,result) => {
+	setBugHunt: function () {
+		console.log($("#insectAttr").val());
+		tmInstance.setBugHunt($("#insectAttr").val(), {from: account, gas: 400000}, (err,result) => {
 			if (err)
 				alert(err);
 			else 
@@ -42,7 +53,33 @@ window.App = {
 		});
 
 	},
+
+	setChangeOverTime: function () {
+
+		console.log($("#changeAttr").val());
+		tmInstance.setChangeOverTime($("#changeAttr").val(), {from: account, gas: 400000}, (err,result) => {
+			if (err)
+				alert(err);
+			else 
+				alert(result);
+		});
+
+	},
+
+	setEtherBalance: function () {
+		console.log($("#etherAttr").val());
+		let _value = $("#etherAttr").val();
+		tmInstance.setEtherBalance(_value, {from: account, gas: 400000}, (err,result) => {
+			if (err)
+				alert(err);
+			else 
+				alert(result);
+		});
+
+	},
+
 	setBugExtension: function () {
+		console.log($("#bugAttr").val());
 
 		tmInstance.setBugExtension($("#bugAttr").val(), {from: account, gas: 400000}, (err,result) => {
 			if (err)
@@ -53,6 +90,7 @@ window.App = {
 
 	},
 	setBountyHunt: function () {
+		console.log($("#bountyAttr").val());
 
 		tmInstance.setBountyHunt($("#bountyAttr").val(), {from: account, gas: 400000}, (err,result) => {
 			if (err)
@@ -63,6 +101,7 @@ window.App = {
 
 	},
 	setUpdateTries: function () {
+		console.log($("#triesAttr").val());
 
 		tmInstance.setUpdateTries($("#triesAttr").val(), {from: account, gas: 400000}, (err,result) => {
 			if (err)
@@ -72,9 +111,10 @@ window.App = {
 		});
 
 	},
-	setHourPriceRatio: function () {
+	setPriceHourRatio: function () {
+		console.log($("#ratioAttr").val());
 
-		tmInstance.setHourPriceRatio($("#ratioAttr").val(), {from: account, gas: 400000}, (err,result) => {
+		tmInstance.setPriceHourRatio($("#ratioAttr").val(), {from: account, gas: 400000}, (err,result) => {
 			if (err)
 				alert(err);
 			else 
@@ -84,6 +124,7 @@ window.App = {
 	},
 	setVoteDuration: function () {
 
+		console.log($("#voteAttr").val());
 		tmInstance.setVoteDuration($("#voteAttr").val(), {from: account, gas: 400000}, (err,result) => {
 			if (err)
 				alert(err);
@@ -94,6 +135,7 @@ window.App = {
 	},
 	setAuctionDuration: function () {
 
+		console.log($("#auctionAttr").val());
 		tmInstance.setAuctionDuration($("#auctionAttr").val(), {from: account, gas: 400000}, (err,result) => {
 			if (err)
 				alert(err);

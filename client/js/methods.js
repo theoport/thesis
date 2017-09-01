@@ -1,5 +1,6 @@
 import { default as Web3 } from 'web3';
 import { default as SHA256} from 'crypto-js/sha256';
+import { default as Web3EthABI} from 'web3-eth-abi';
 
 let Token;
 let account;
@@ -15,44 +16,64 @@ window.App = {
 		
 		Token = web3.eth.contract(token.abi);
 
+		web3.eth.getAccounts((err,accs) => {
+			if (err != null) {
+				alert(err);
+			} else if (accs.length == 0) {
+				alert("No accounts detected");
+			} else {
+				account = accs[0];
+			}
+		});
 		self.fillFunctionArray();
 		self.fillMethods();
 	},
 
 	fillFunctionArray: function() {
-		
+		console.log("abi: " + token.abi);	
+		console.log("abi length: " + token.abi.length);	
 		for (var i = 0; i < token.abi.length ; i++) {
-			if (token.abi[i].type == 'function' && self.isPublic(token.abi[i])) {
-				publicFunctions.push([token.abi[i].name, token.abi[i].inputs, token.abi[i].payable]);	
+			console.log(token.abi[i].constant);
+			if (token.abi[i].type == 'function' && token.abi[i].constant == 'false') {
+				var publicAndCreator = self.isPublicAndCreator(token.abi[i]);
+				if (publicAndCreator[0]){
+					publicFunctions.push([token.abi[i].name, token.abi[i].inputs, token.abi[i].payable, publicAndCreator[1]]);	
+				}
 			}
 		}
 	},
 
-	isPublic: function(functionObject) {
+	isPublicAndCreator: function(functionObject) {
 	
 		self = this;
-
+		console.log("function " + functionObject.name);
 		var position = token.sourceCode.indexOf("function " + functionObject.name);
+		console.log(position);
 		var parameterStart = token.sourceCode.indexOf("(", position);
 		var parameterEnd = token.sourceCode.indexOf(")", parameterStart + 1);
 		var declarationStart = token.sourceCode.indexOf("{", parameterEnd);
 		var parameterString, parameters, identifiers;
-		while(position >=0 ) {
-			parameterString = token.sourceCode.substring(parameterStart, parameterEnd);
+		while(position >= 0 ) {
+			parameterString = token.sourceCode.substring(parameterStart + 1, parameterEnd);
 			identifiers = token.sourceCode.substring(parameterEnd + 1, declarationStart);
 			parameters = parameterString.split(",");
-	
 			console.log(parameters);
-		
+			if (parameters[0] == "") {
+				parameters = [];
+			}	
 			if (self.parametersMatch(parameters, functionObject)) {
-				if (indentifiers.includes("private") || identifiers.includes("internal")) {
-					return false;
+				if (identifiers.includes("byManager") || identifiers.includes("private") || identifiers.includes("internal")) {
+					return [false, false];
 				} else { 
-					return true;
+					if (identifiers.includes("byCreator")){
+						return [true,true];
+					} else {
+						return [true,false];
+					}
 				}
 			}
 
-			position = token.sourceCode.indexOf("function " + functionObject.name);
+			position = token.sourceCode.indexOf("function " + functionObject.name, position + 1);
 			parameterStart = token.sourceCode.indexOf("(", position);
 			parameterEnd = token.sourceCode.indexOf(")", parameterStart + 1);
 			declarationStart = token.sourceCode.indexOf("{", parameterEnd);
@@ -62,13 +83,20 @@ window.App = {
 	},
 
 	parametersMatch: function(parameters, functionObject) {
-		
+	
 		if (parameters.length != functionObject.inputs.length){
 			return false;
 		}
 
 		for (var i = 0; i < parameters.length; i++) {
-			var res=parameters[i].split(" ");
+			var res;
+			if (parameters[i][0] == ' ') {
+				res = (parameters[i].substring(1)).split(" ");
+			} else {
+				res=parameters[i].split(" ");
+			}
+			console.log(res);
+			functionObject.inputs[i].type;
 			if (res[0] != functionObject.inputs[i].type) {
 				return false;
 			}
@@ -82,56 +110,70 @@ window.App = {
 		
 		for (var i = 0; i < publicFunctions.length ; i++) {
 
+			var functionString = '' + publicFunctions[i][0] + '(';
+			for (var j = 0; j < publicFunctions[i][1].length - 1 ; j++) {
+				functionString += publicFunctions[i][1][j].type + ',';
+			}
+			functionString += publicFunctions[i][1][publicFunctions[i][1].length - 1].type + ')';
+			var methodId = Web3EthABI.encodeFunctionSignature(functionString);
+
 			$("#methods").append('<br>');
 			html = "";
 			html += "<div class=\"form-group\" id=\"" + methodId + "\">";
-			html += "<label>" + publicFunction[i][0] + "</label>";
-			if (publicFunctions[i][2]) {
+			html += "<label>" + publicFunctions[i][0]; 
+			if (publicFunctions[i][3]){
+				html += "<small> <i>by creator only</i></small>";
+			}
+			html += "</label>";
+			if (publicFunctions[i][2] == 'true') {
 				html += "<div class=\"form-control\">Is payable: ";
 				html += "<input placeholder=\"Amount in gwei\" class=\"value\">";
 				html += "</div>";
 			}	
 
-			var functionString = '' + publicFunctions[i][0] + '(';
-			for (var j = 0; j < publicfunctions[i][1].length ; j++) {
-				functionString += publicFunctions[i][1][j].type + ',';
-			}
-			functionString += ')';
-			var methodId = web3.eth.abi.encodeFunctionSignature(functionString);
 			html += "<div class=\"form-inline\">";
-			for (var j = 0; j < publicfunctions[i][1].length ; j++) {
+			for (var j = 0; j < publicFunctions[i][1].length ; j++) {
 				html += "<div class=\"form-group\"><label>";
 				html += publicFunctions[i][1][j].name;
 				html += "</label>";
 				html += "<input type=\"text\" class=\"form-control\""; 
-				html += " class=\"" + publicFunctions[i][1][j].type + "\" ";
-				html += " placeholder=\"" + publicFunctions[i][1][j].type + "\"></div>";
+				html += " placeholder=\"" + publicFunctions[i][1][j].type + "\" /></div>";
 			}
 
-			html += "<button class=\"btn btn-default blockchain\" onclick=\"App.sendTransaction(" + methodId + ")\">Send Method</button>";
 			html += "</div></div>";
+			html += "<button class=\"btn btn-default blockchain\" onclick=\"App.sendTransaction(" + methodId + ")\">Send Method</button>";
 			$("#methods").append(html);
+			console.log(html);
 		}
 	},
 
-	sendTransaction: function(methodId) {
-		
-		$inputs = $("#" + methodId + " :input");
+	sendTransaction: function(_methodId) {
+		var methodId = '0x' + _methodId.toString(16);
+		let $inputs = $("#" + methodId);
+		//.find(":input");
+		console.log($inputs);	
 		var _value;	
-		var _data = '' + methoId;
-		$.each($inputs, (index, value) => {
-			console.log($(this).val());
-			var _type = $(this).attr('class'); 
-			var _val = $(this).val();
+		var _data = '' + methodId;
+		console.log(_data);	
+		$.each($("#" + methodId + " :input"), (index,value) => {
+			var _type = $(value).attr('placeholder'); 
+			console.log(_type);
+			var _val = $(value).val();
+			console.log(_val);
 			if (_type == 'value'){
+				console.log("it is a value");
 				_value = _val;
 			} else {
-				_data += web3.eth.abi.encodeParameter( ''+_type, ''+_val);
+				console.log("it is not a value");
+				_data += (Web3EthABI.encodeParameter( ''+_type, ''+_val)).substring(2);
+				console.log(_data);
 			}
 		});
+		console.log("each finished");
+		console.log(_data);
 		
-		if (typeof(value) == 'undefined') {
-			
+		if (typeof(_value) == 'undefined') {
+			console.log(_data);
 			web3.eth.sendTransaction({from: account, to: token.address, gas: '400000', data: _data}, (err, result) => {
 				if (err) {
 					alert(err);

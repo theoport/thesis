@@ -32,7 +32,8 @@
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "truffle-contract": "^1.1.11",
-    "web3": "^0.18.4"
+    "web3": "^0.18.4",
+    "web3-eth-abi": "^1.0.0-beta.18"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",

@@ -47,7 +47,18 @@
 			<span class="input-group-addon" id="basic-addon1">.txt</span>
 		</div>
 
-		<button class="btn btn-default blockchain" id="submitBug" onclick="App.submitUpdate()">Submit Update</button>
+		<label for="sourceCode">Contract Address</label>
+		<div class="input-group">		
+			<span class="input-group-btn">
+				<button class="btn btn-secondary" type="button" id="sourceCodeInfo">
+					<span class="fa fa-info"></span>
+				</button>
+			</span>	
+			<input type="text" id="address" class="form-control"></input>
+		</div>
+	
+
+		<button class="btn btn-default blockchain" id="submitUpdate" onclick="App.submitUpdate()">Submit Update</button>
 		<div id="status"></div>
 		<hr>
 		<a class="btn btn-default" href="<%= '/tokenHome/' + token.id %>"><span class="fa fa-home"></span> Go Back to tokenHome</a>

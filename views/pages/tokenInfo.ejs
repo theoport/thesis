@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>Submit Bug</title>
+	<script> const token=<%- JSON.stringify(token) -%></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="/build/tokenInfo.bundle.js"></script>
@@ -10,9 +11,6 @@
 	<link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
-<% if (data.length > 0 && data[0].hasOwnProperty('error')) { %>
-	<div class="alert alert-danger"><%= data[0].message %></div>
-<% } %>
 <nav class="navbar navbar-inverse">
 	<div class="container-fluid">
 		<div class="collapse navbar-collapse">
@@ -41,7 +39,7 @@
 		<p>Duration of BugHunts: <span id="bugHuntDuration"></span></p>
 		<p>Duration of BountyHunts: <span id="bountyHuntDuration"></span></p>
 		<p>Number of tries developer gets to submit bug-free code: <span id="updateTries"></span></p>
-		<p>Price developer gets paid per hour: <span id="auctionDuration"></span> <%= token.name %></p>
+		<p>Price developer gets paid per hour: <span id="priceHourRatio"></span> <%= token.name %></p>
 		<p>Duration of votes: <span id="voteDuration"></span></p>
 		<p>Creator of token: <%= token.creator %></p>
 		<p>Token lives at: <%= token.address %></p>
@@ -56,6 +54,7 @@
 		<p>Ether balance of TokenManager: <span id="etherBalance"></span> wei</p>
 		<p>TokenManager will try to refuel to <span id="topEther"></span> wei once balance is below <span id="lowEther"><span> wei</p>
 		<p>Token Source Code: <a href="<%= '/api/tokens/' + token.id + '/sourceCode' -%>" target="_blank" class="btn btn-default"><span class="fa fa-file-text-o"></span></a></p>
+		<p>Time to transfer funds from old contract to new contract:<span id="changeOverTime"></span></p>
 	
 		<hr>
 		<a class="btn btn-default" href="<%= '/tokenHome/' + token.id %>"><span class="fa fa-home"></span> Go Back to tokenHome</a>

@@ -66,6 +66,7 @@ window.App = {
 							break;
 					}
 				}
+				console.log(updateMap);
 				for (var key of updateMap.keys()) {
 					updateStatus.push([key,[true,false]]); 
 				}
@@ -85,8 +86,10 @@ window.App = {
 				console.log(err);
 				return;
 			} else {
+				console.log("update starts logs are" + logs);
 				for (let i = 0; i < logs.length ; i++) { 
-					updateStatusMap.set(logs[i].args.id, [true, true]);	
+
+					updateStatusMap.set(logs[i].args.updateId.toString(16), [true, true]);	
 				}
 			}
 			var updateFinish = tmInstance.UpdateOutcome();
@@ -95,18 +98,23 @@ window.App = {
 					console.log(err);	
 					return;
 				} else {
+					console.log("update finish logs are: " + logs);
 					for (let i = 0; i < logs.length ; i++) {
-						if (logs.args.success == true) {
-							updateStatusMap.set(logs[i].args.id, [false, true]);
+						if (logs[i].args.success == true) {
+							updateStatusMap.set(logs[i].args.updateId.toString(16), [false, true]);
 						} else { 
-							updateStatusMap.set(logs[i].args.id, [false, false]);
+							updateStatusMap.set(logs[i].args.updateId.toString(16), [false, false]);
 						}
 					}
 					updateStatus= Array.from(updateStatusMap);
-					updateStatus.sort(function(a,b) {
-						return (updateMap.get(b[0])).creationDate 
-											- (updateMap.get(a[0])).creationDate;
-					});
+					if (updateStatus.length > 1) {
+						console.log("SOrting");
+						console.log(updateMap.get(updateStatus[0][0]));
+						updateStatus.sort(function(a,b) {
+							return (updateMap.get(b[0])).creationDate 
+												- (updateMap.get(a[0])).creationDate;
+						});
+					}
 					for (let i = 0; i < updateStatus.length ; i++) {
 						
 						// If update is still active
@@ -119,8 +127,8 @@ window.App = {
 													.attr({'class': 'topic topic-update',
 													'href': './forum/' + updateStatus[i][0]})
 													.html("<div style=\"background-color:yellow;\" class=\" form-inline media\">" +
-														"<div class=\"media-body\">" +	
-														"<h4 class=\"media-heading\">" +
+														"<div class=\"form-group\"><div class=\"media-body\">" +	
+														"<h4 class=\"media-heading form-control\">" +
 														userMap.get(updateMap.get(updateStatus[i][0]).userId).username +
 														"<small>" +
 														updateMap.get(updateStatus[i][0]).creationDate +
@@ -128,8 +136,8 @@ window.App = {
 														"<h5>" +
 														updateMap.get(updateStatus[i][0]).title +
 														"</h5></div></div>" +
-														"<span class=\"badge\" id=\"upvoteCount" +
-														updateStatus[i][0] + "\"></span>"));
+														"<div class=\"form-group\"><span class=\"badge\" id=\"upvoteCount" +
+														updateStatus[i][0] + "\"></span></div></div>"));
 									
 							} 
 
@@ -139,9 +147,8 @@ window.App = {
 							$("#active").append($("<a></a>")
 													.attr({'class': 'topic topic-update',
 													'href': './forum/' + updateStatus[i][0]})
-													.html("<div class=\"media\">" +
-														"<div class=\"media-body\">" +	
-														"<h4 class=\"media-heading\">" +
+													.html("<div class=\"form-inline media\">" +
+														"<div class=\"form-group\"><div class=\"media-body\">" +	
 														userMap.get(updateMap.get(updateStatus[i][0]).userId).username +
 														"<small>" +
 														updateMap.get(updateStatus[i][0]).creationDate +
@@ -149,8 +156,8 @@ window.App = {
 														"<h5>" +
 														updateMap.get(updateStatus[i][0]).title +
 														"</h5></div></div>" +
-														"<span class=\"badge\" id=\"upvoteCount" +
-														updateStatus[i][0] + "\"></span>"));
+														"<div class=\"form-group\"><span class=\"badge\" id=\"upvoteCount" +
+														updateStatus[i][0] + "\"></span></div></div>"));
 				
 							}
 						}
@@ -163,8 +170,8 @@ window.App = {
 							$("#archived").append($("<a></a>")
 													.attr({'class': 'topic topic-update',
 													'href': './forum/' + updateStatus[i][0]})
-													.html("<div style=\"background-volor:green;\"class=\"media\">" +
-														"<div class=\"media-body\">" +	
+													.html("<div style=\"background-color:green;\"class=\" form-inline media\">" +
+														"<div class=\"form-group\"><div class=\"media-body\">" +	
 														"<h4 class=\"media-heading\">" +
 														userMap.get(updateMap.get(updateStatus[i][0]).userId).username +
 														"<small>" +
@@ -172,9 +179,9 @@ window.App = {
 														"</small></h4>" +
 														"<h5>" +
 														updateMap.get(updateStatus[i][0]).title +
-														"</h5></div>" +
-														"<span class=\"badge\" id=\"upvoteCount" +
-														updateStatus[i][0] + "\"></span></div>"));
+														"</h5></div></div>" +
+														"<div class=\"form-group\"><span class=\"badge\" id=\"upvoteCount" +
+														updateStatus[i][0] + "\"></span></div></div>"));
 				
 							} 
 		
@@ -184,8 +191,8 @@ window.App = {
 							$("#archived").append($("<a></a>")
 													.attr({'class': 'topic topic-update',
 													'href': './forum/' + updateStatus[i][0]})
-													.html("<div style=\"background-volor:red;\"class=\"media\">" +
-														"<div class=\"media-body\">" +	
+													.html("<div style=\"background-color:red;\"class=\"form-inline media\">" +
+														"<div class=\"form-group\"><div class=\"media-body\">" +	
 														"<h4 class=\"media-heading\">" +
 														userMap.get(updateMap.get(updateStatus[i][0]).userId).username +
 														"<small>" +
@@ -193,9 +200,9 @@ window.App = {
 														"</small></h4>" +
 														"<h5>" +
 														updateMap.get(updateStatus[i][0]).title +
-														"</h5></div>" +
-														"<span class=\"badge\" id=\"upvoteCount" +
-														updateStatus[i][0] + "\"></span></div>"));
+														"</h5></div></div>" +
+														"<div class=\"form-group\"><span class=\"badge\" id=\"upvoteCount" +
+														updateStatus[i][0] + "\"></span></div></div>"));
 				
 			
 							}
@@ -219,18 +226,20 @@ window.App = {
 	fillIssueTopics: function() {
 
 		var issueArray= Array.from(issueMap.keys());
-		issueArray.sort(function(a,b) {
-			return (issueMap.get(b)).creationDate 
-								- (issueMap.get(a)).creationDate;
-		});
+		if (issueArray.length > 1) {
+			issueArray.sort(function(a,b) {
+				return (issueMap.get(b)).creationDate 
+									- (issueMap.get(a)).creationDate;
+			});
+		}
 		
 		for (let i = 0; i < issueArray.length; i++) {
 
 			$("#issues").append($("<a></a>")
 									.attr({'class': 'topic topic-issue',
 									'href': './forum/' + issueArray[i]})
-									.html("<div class=\"media\">" +
-										"<div class=\"media-body\">" +	
+									.html("<div class=\"media form-inline\">" +
+										"<div class=\"form-group\"><div class=\"media-body\">" +	
 										"<h4 class=\"media-heading\">" +
 										userMap.get(issueMap.get(issueArray[i]).userId).username +
 										"<small>" +
@@ -238,9 +247,9 @@ window.App = {
 										"</small></h4>" +
 										"<h5>" +
 										issueMap.get(issueArray[i]).title +
-										"</h5></div>" +
-										"<span class=\"badge\" id=\"upvoteCount" +
-										issueArray[i] + "\"></span></div>"));
+										"</h5></div></div>" +
+										"<div class=\"form-group\"><span class=\"badge\" id=\"upvoteCount" +
+										issueArray[i] + "\"></span></div></div>"));
 						
 			$.ajax({
 				type: 'GET',
@@ -260,18 +269,20 @@ window.App = {
 	fillGeneralTopics: function() {
 
 		var generalArray= Array.from(generalMap.keys());
-		generalArray.sort(function(a,b) {
-			return (generalMap.get(b)).creationDate 
-								- (generalMap.get(a)).creationDate;
-		});
+		if (generalArray.length > 1) {
+			generalArray.sort(function(a,b) {
+				return (generalMap.get(b)).creationDate 
+									- (generalMap.get(a)).creationDate;
+			});
+		}
 		
 		for (let i = 0; i < generalArray.length; i++) {
 
 			$("#general").append($("<a></a>")
 									.attr({'class': 'topic topic-general',
 									'href': './forum/' + generalArray[i]})
-									.html("<div class=\"media\">" +
-										"<div class=\"media-body\">" +	
+									.html("<div class=\"media form-inline\">" +
+										"<div class\"form-group\"><div class=\"media-body\">" +	
 										"<h4 class=\"media-heading\">" +
 										userMap.get(generalMap.get(generalArray[i]).userId).username +
 										"<small>" +
@@ -279,9 +290,9 @@ window.App = {
 										"</small></h4>" +
 										"<h5>" +
 										generalMap.get(generalArray[i]).title +
-										"</h5></div>" +
-										"<span class=\"badge\" id=\"upvoteCount" +
-										generalArray[i] + "\"></span></div>"));
+										"</h5></div></div>" +
+										"<div class=\"form-group\"><span class=\"badge\" id=\"upvoteCount" +
+										generalArray[i] + "\"></span></div></div>"));
 
 			$.ajax({
 				type: 'GET',

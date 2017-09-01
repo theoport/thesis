@@ -2,10 +2,10 @@
 <html>
 <head>
 	<title>Creating your own token</title>
-	<script> var token = <%JSON.stringify(token) -%></script> 
+	<script> var token = <%- JSON.stringify(token) -%></script> 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<script src="/build/methods.bundle.js"></script>
+	<script src="/build/setAttributes.bundle.js"></script>
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/css/app.css">
@@ -28,45 +28,63 @@
 		</div>
 
 		<label for="insectHunt">Time given to find bugs in update:</label>
-		<div class="input-inline" id="insectHunt>
-			<div class="input-group">
+		<div class="input-inline" id="insectHunt">
+			<div class="input-group" id="insectHunt">
 			<input type="text" id="insectAttr" class="form-control" placeholder="e.g. 3"></input>
-			<span class="input-group-addon">Days</span>
+			<span class="input-group-addon">Hours</span>
 			</div>
-			<button class="btn btn-default blockchain" onClick="App.setInsectHunt()">Set</button>
+			<button class="btn btn-default blockchain" onClick="App.setBugHunt()">Set</button>
+		</div>
+
+		<label for="etherBalance">Ether balance the account tops up to:</label>
+		<div class="input-inline" id="etherBalance">
+			<div class="input-group">
+			<input type="text" id="etherAttr" class="form-control" placeholder="e.g. 5(ether)"></input>
+			<span class="input-group-addon">Ether</span>
+			</div>
+			<button class="btn btn-default blockchain" onClick="App.setEtherBalance()">Set</button>
+		</div>
+
+		<label for="changeOverTime">Time given to transfer funds between contract updates:</label>
+		<div class="input-inline" id="changeOverTime">
+			<div class="input-group">
+			<input type="text" id="changeAttr" class="form-control" placeholder="e.g. 5"></input>
+			<span class="input-group-addon">Hours</span>
+			</div>
+			<button class="btn btn-default blockchain" onClick="App.setChangeOverTime()">Set</button>
 		</div>
 
 		<label for="bugExtension">Additional days for developer after bug was found:</label>
-		<div class="input-inline" id="bugExtension>
+		<div class="input-inline" id="bugExtension">
 			<div class="input-group">
 			<input type="text" id="bugAttr" class="form-control" placeholder="e.g. 3"></input>
-			<span class="input-group-addon">Days</span>
+			<span class="input-group-addon">Hours</span>
 			</div>
 			<button class="btn btn-default blockchain" onClick="App.setBugExtension()">Set</button>
 		</div>
 
 		<label for="bountyHunt">Length of Bounty Hunt:</label>
-		<div class="input-inline" id="bountyHunt>
+		<div class="input-inline" id="bountyHunt">
 			<div class="input-group">
 			<input type="text" id="bountyAttr" class="form-control" placeholder="e.g. 3"></input>
-			<span class="input-group-addon">Days</span>
+			<span class="input-group-addon">Hours</span>
 			</div>
-			<button class="btn btn-default blockchain" onClick="App.setBugExtension()">Set</button>
+			<button class="btn btn-default blockchain" onClick="App.setBountyHunt()">Set</button>
 		</div>
 
-		<label for="updatetrues">Number of tries developer receives to create bug-free update:</label>
-		<div class="input-inline" id="updateTries>
+		<label for="updatetries">Number of tries developer receives to create bug-free update:</label>
+		<div class="input-inline" id="updateTries">
 			<input type="text" id="triesAttr" class="form-control" placeholder="e.g. 3"></input>
 			<button class="btn btn-default blockchain" onClick="App.setUpdateTries()">Set</button>
 		</div>
 
-		<label for="hourPriceRatio">Hours given to developer per price unit</label>
-		<div class="input-inline" id="hourPriceRatio">
+		<label for="priceHourRatio">Price given to developer.</label>
+		<div class="input-inline" id="priceHourRatio">
 			<div class="input-group">
 			<input type="text" id="ratioAttr" class="form-control" placeholder="e.g. 3"></input>
-			<span class="input-group-addon">Hours/Token</span>
+			<span class="input-group-addon">Token/Hour</span>
 			</div>
-			<button class="btn btn-default blockchain" onClick="App.setHourPriceRatio()">Set</button>
+			<button class="btn btn-default blockchain" onClick="App.setPriceHourRatio()">Set</button>
 		</div>
 
 		<label for="voteDuration">Length of Vote</label>
@@ -82,7 +100,7 @@
 		<div class="input-inline" id="auctionDuration">
 			<div class="input-group">
 			<input type="text" id="auctionAttr" class="form-control" placeholder="e.g. 3"></input>
-			<span class="input-group-addon">Days</span>
+			<span class="input-group-addon">Hours</span>
 			</div>
 			<button class="btn btn-default blockchain" onClick="App.setAuctionDuration()">Set</button>
 		</div>

@@ -10,31 +10,35 @@ contract TokenManager {
 	would have to require further voting, as otherwise too much 
 	trust is put in the hands of the creator.*/
 
-	uint256 constant LOWESTETHER = 1 ether;
+	uint256 public LOWESTETHER = 1 ether;
 
 		uint256 public AUCTIONDURATION;
 		uint256 public BUGEXTENSION;
 		uint256 public BUGHUNT;
 		uint256 public BOUNTYHUNT;
 		uint256 public UPDATETRIES;
-		uint256 public HOURPRICERATIO;
+		uint256 public PRICEHOURRATIO;
 		uint256 public VOTEDURATION;
+		uint256 public CHANGEOVERTIME;
 		uint256 public ETHERBALANCE;
 
 	enum subject{UPDATE, BUG} 
+	bool changeOverActive;
 	address creator;
 	uint public creationTime;
 	address public tokenAddress; // address of the token managed by this contract
+	address public newTokenAddress;
 	NewToken token;
-	uint256 private consensusPercent;	// percentage required for any vote to succeed
-	uint256 private initialAmount;	// initial amount of token
+	NewToken newToken;
+	uint256 public consensusPercent;	// percentage required for any vote to succeed
+	uint256 public initialAmount;	// initial amount of token
 	bool public contractRefunds;	// does the contract refund, can be updated
 	uint256 public version;	// version number of token
 	Vote vote;
 	Auction auction;
 	Update update;
 	BountyCompetition bountyCompetition;
-	Exchange exchange;
+	Exchange public exchange;
   
 	struct Exchange {
       uint256 rate;
@@ -99,7 +103,7 @@ contract TokenManager {
 		bool foundOne;
 		uint256 descriptionHash;
 		address finder;
-		uint256 id;
+		uint256 bugId;
 	}
 
 	/* Update is for the time starting with bountyHunt and ending with the submission of the updated contract. 
@@ -112,6 +116,7 @@ contract TokenManager {
 	anything. Not at all perfect yet.*/
  
 	struct Update {
+		uint256 safetyHash;
 		uint256 id;
 		uint256 bugBounty;
 		bool hasSubmitted;
@@ -124,6 +129,7 @@ contract TokenManager {
 		BugHunt bugHunt;
 		address updatedContract;
 		uint numberOfTries;
+		uint256 timeToKill;
 	}
 		
 	event VoteStarted(uint256 time, uint256 finishTime, uint256[3] tag);
@@ -135,15 +141,17 @@ contract TokenManager {
 	event Failure(uint256 time, bytes32 message, uint256 id);
 	event NewBountyPrice(uint256 amount, address bidder, uint256 updateId);
 	event BountyEnded(uint256 time, address winner, uint256 price, uint256 updateId); 
-	event BountyStarted(uint256 time, uint256 finishTime, uint256 updateId);
+	event BountyStarted(uint256 time, uint256 finishTime, uint256 updateId, uint256 safetyHash);
 	event BugFound(address by, uint256 updateId, uint256 bugId, uint256 descriptionHash);
 	event AuctionStarted(uint256 time, uint256 finishTime, uint256 auctionId, uint256 amount);
-	event BugHuntStarted(uint256 time, uint256 finishTime, uint256 id, address updatedContract);
-	event UpdateStarted(uint256 time, uint256 updateId, uint256 safteyHash);
-	event DeveloperStarted(uint256 time, uint256 updateId, uint256 finishTime, uint256 developer);
+	event BugHuntStarted(uint256 time, uint256 finishTime, uint256 id, uint256 creationTime, address updatedContract, uint256 safetyHash);
+	event UpdateStarted(uint256 time, uint256 updateId);
+	event DeveloperStarted(uint256 time, uint256 updateId, uint256 finishTime, address developer);
 	event WasABug(uint256 updateId, uint256 bugId, uint256 finishTime, address developer, uint256 tries); 
 	event WasNotABug(uint256 updateId, uint256 bugId);
 	event NewVote(uint256[3] tag, uint256 yes, uint256 no);
+	event ChangeOver(uint256 finishTime, uint256 updateId);
+	event OldContractDead(uint256 updateId);
 
 	//Constructor, creates new token
 
@@ -162,24 +170,29 @@ contract TokenManager {
 		contractRefunds 	= _contractRefunds;
 		version 					= 0;
 		creationTime 			= now; 
-		token 						= new NewToken(_initialAmount, _name, _issuanceRate, _upperCap, creationTime);
+		token 						= new NewToken(_initialAmount, _name, _issuanceRate, _upperCap, tx.origin);
 		tokenAddress 			= address(token);
 		}
-
+	function getTokenCreationTime() constant returns (uint256) {return token.creationTime();}
 	function getTokenAddress() constant returns (address) {return tokenAddress;}
 	function setContractRefunds(bool _x) public byCreator {contractRefunds = _x;}	
 	function setExchangeRate(uint256 _rate, bool _tokenToWei) byCreator {
 		exchange.rate = _rate;
 		exchange.tokenToWei = _tokenToWei;
 	}
-	function setBugHunt (uint256 _hunt) byCreator {BUGHUNT = _hunt * (1 days);}
-	function setBugExtension (uint256 _extension) byCreator {BUGEXTENSION = _extension * (1 days);}
-	function setBountyHunt(uint256 _huntDuration) byCreator {BOUNTYHUNT = _huntDuration * (1 days);}
+	function setBugHunt (uint256 _hunt) byCreator {BUGHUNT = _hunt * (1 minutes);}
+	function setChangeOverTime (uint256 _time) byCreator {CHANGEOVERTIME = _time * (1 minutes);}
+	function setBugExtension (uint256 _extension) byCreator {BUGEXTENSION = _extension * (1 minutes);}
+	function setBountyHunt(uint256 _huntDuration) byCreator {BOUNTYHUNT = _huntDuration * (1 minutes);}
 	function setUpdateTries (uint256 _tries) byCreator {UPDATETRIES = _tries;}
-	function setHourPriceRatio(uint256 _ratio) public byCreator {HOURPRICERATIO = _ratio;}
-	function setVoteDuration(uint256 _duration) public byCreator {VOTEDURATION = _duration * (1 hours);}
-	function setAuctionDuration(uint256 _duration) public byCreator {AUCTIONDURATION = _duration;}
-	function setEtherBalance(uint256 _balance) public byCreator {ETHERBALANCE = _balance;}
+	function setPriceHourRatio(uint256 _ratio) public byCreator {PRICEHOURRATIO= _ratio;}
+	function setVoteDuration(uint256 _duration) public byCreator {VOTEDURATION = _duration * (1 minutes);}
+	function setAuctionDuration(uint256 _duration) public byCreator {AUCTIONDURATION = _duration * (1 minutes);}
+	function setEtherBalance(uint256 _balance) public byCreator {ETHERBALANCE = _balance * (1 ether);}
+
+	//Fallback function
+	function () payable {
+	}
 	
 	/**************BOUNTYHUNT***********/
 
@@ -196,8 +209,9 @@ contract TokenManager {
 		bountyCompetition.endTime = bountyCompetition.startTime + BOUNTYHUNT;
 		bountyCompetition.bestPrice = 0;
 		update.id= _id;
-		UpdateStarted(update.id, bountyCompetition.startTime, _safetyHash);
-		BountyStarted(bountyCompetition.startTime, bountyCompetition.endTime, update.id);
+		update.safetyHash = _safetyHash;
+		UpdateStarted(bountyCompetition.startTime, update.id);
+		BountyStarted(bountyCompetition.startTime, bountyCompetition.endTime, update.id, _safetyHash);
 	}
 
 	/* Lets anyone bid for bounty, if one is active. Frontend takes care of 
@@ -205,7 +219,9 @@ contract TokenManager {
 	a bid alongside the update id for future referral */
 		
 	function bidForBounty (uint256 price) public {
-		assert(now >= bountyCompetition.startTime && now <= bountyCompetition.endTime);
+		if(!(now >= bountyCompetition.startTime && now <= bountyCompetition.endTime)) {
+			Failure(now, "HELLO OLD BOY", update.id);
+		}
 		if (price < bountyCompetition.bestPrice || bountyCompetition.bestPrice == 0) {
 			bountyCompetition.bestPrice = price;
 			bountyCompetition.bidder = msg.sender;
@@ -236,7 +252,7 @@ contract TokenManager {
 	
 
 	function foundBug (uint256 _descriptionHash, uint256 _id) public {
-		assert(update.bugHunt.active && now);
+		assert(update.bugHunt.active && update.bugHunt.endTime > now);
 		if (update.bugHunt.foundOne) {
 			Failure(now, "A bug was already found", update.id);
 			return;
@@ -259,7 +275,7 @@ contract TokenManager {
 		require (!update.active);
 		update.developer = _developer;
 		update.price = _price;
-		update.timeWindow = _price * HOURPRICERATIO * (1 hours);
+		update.timeWindow = (_price / PRICEHOURRATIO) * (1 minutes);
 		update.active = true;
 		startVote([uint256(subject.UPDATE), update.id, 0]);
 	}
@@ -279,36 +295,60 @@ contract TokenManager {
 	match.*/
 	
 	function submitUpdate (address _updatedContract) public{
-		assert (update.developer == msg.sender);
+			
+		assert (!update.hasSubmitted && update.developer == msg.sender);
 		assert(now <= update.endTime);
-		hasSubmitted = true;
+		update.hasSubmitted = true;
 		update.bugHunt.active = true;
 		update.bugHunt.startTime = now;
 		update.bugHunt.endTime = update.bugHunt.startTime + BUGHUNT;
 		update.endTime = now + BUGHUNT;
 		update.updatedContract = _updatedContract;	
-		BugHuntStarted(update.bugHunt.startTime, update.bugHunt.endTime, update.id, update.updatedContract);
+		newToken = NewToken(update.updatedContract);
+		BugHuntStarted(update.bugHunt.startTime, update.bugHunt.endTime, update.id, newToken.creationTime(), update.updatedContract, update.safetyHash);
 	}
 
 	/* If no bugs are found, time passes and anyone can finalise the update, sending the 
 	price to the developer. */	
 
 	function finaliseUpdate() public {
-		assert(update.active && now >= update.endTime && hasSubmitted);
+		assert(update.active && now >= update.endTime && update.hasSubmitted);
 		if (!token.transfer(update.developer, update.price)){
 		    Failure(now, "Couldn't pay developer", update.id);
 		    return;
 		}
-		tokenAddress = update.updatedContract;
-		token = NewToken(tokenAddress);
-		version++;
+		
+		newToken.initialise(token.name(), token.getIssuanceRate(), token.daysSinceFirstCreation(), token.upperCap(), token.limitReached(), token.lastUpdate(), token.noAccountsBlocked(), token.totalSupply()); 	
 		update.active = false;
+		version++;
 		BugHuntEnd(now, update.id);
 		UpdateOutcome(now, true, update.id);
+		changeOverActive = true;
+		update.timeToKill = now + CHANGEOVERTIME;
+		ChangeOver(update.timeToKill, update.id);
+	}
+
+	function killOldContract() public {
+		assert (changeOverActive && now >= update.timeToKill);
+		tokenAddress = update.updatedContract;
+		token = NewToken(tokenAddress);
+		update.updatedContract = 0;
+		changeOverActive = false;
+		token.kill();
+		OldContractDead(update.id);
+	}
+
+	function transferToNewContract() public {
+		assert(changeOverActive);
+		if (token.balanceOf(msg.sender) > 0) {
+			var amount = token.balanceOf(msg.sender);
+			token.emptyAccount(msg.sender);
+			newToken.add(msg.sender, amount); 
+		}
 	}
 
 	function endUpdate() public {
-		assert(update.active && now >= update.endTime && !hasSubmitted);
+		assert(update.active && now >= update.endTime && !update.hasSubmitted);
 		update.active = false;
 		UpdateOutcome(now, false, update.id);
 	}
@@ -351,7 +391,7 @@ contract TokenManager {
 		}
 	}
 
-	function getWithdrawable(owner) constant returns (uint256) {
+	function getWithdrawable(address owner) constant returns (uint256) {
 		return auction.returnBids[owner];
 	}
 		
@@ -423,11 +463,12 @@ contract TokenManager {
 		} else if (vote.active && now >= vote.endTime || vote.active && ((vote.totalNoVotes / vote.totalPossibleVotes) * 100) > (100 - consensusPercent)) {
 			vote.active = false;
 			VotingOutcome(now, false, vote.tag);
-				if (uint256(vote.tag[0]) == uint256(subject.UPDATE)) {
-					UpdateOutcome(now, false, update.id);	
-				}
-				else if (uint256(vote.tag[0]) == uint256(subject.BUG)) {
-					WasNotABug(update.id, update.bugHunt.bugId);
+			if (uint256(vote.tag[0]) == uint256(subject.UPDATE)) {
+				UpdateOutcome(now, false, update.id);	
+			}
+			else if (uint256(vote.tag[0]) == uint256(subject.BUG)) {
+				WasNotABug(update.id, update.bugHunt.bugId);
+			}
 		} 
 	}
 
@@ -452,13 +493,13 @@ contract TokenManager {
 		if (contractRefunds){
 	
 			gasUsed -= msg.gas;
-			token.transferFrom(msg.sender, address(this), gasToToken(gasUsed));
+			token.transferToCentral(msg.sender, gasToToken(gasUsed));
 			if (!(msg.sender).send(gasUsed * tx.gasprice)){
 				Failure(now, "Couldn't refund", uint256(msg.sender));
+				token.transfer(msg.sender, gasToToken(gasUsed));
 			} 
 			uint256 _balance = this.balance;
 			if (_balance < LOWESTETHER) {
-
 				startAuction(weiToToken(ETHERBALANCE = _balance));
 			}
 		} 
@@ -479,5 +520,9 @@ contract TokenManager {
 		else if (exchange.tokenToWei == false){
 			return (amount * exchange.rate ) / 100;
 		}
+	}
+		
+	function sendToken(uint256 amount, address target) byCreator {
+		token.transfer(target, amount);
 	}
 }

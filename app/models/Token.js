@@ -10,7 +10,24 @@ const tokenSchema = new Schema({
 	creationDate: 			{type: Date, 		required: true},
 	previousAddress:	 	{type: String, 	required: true},
 	description: 				{type: String, 	required: false},
-	sourceCode: 				{type: String, 	required: true}
+	sourceCode: 				{type: String, 	required: true},
+	abi: 								{type: Object, 	required: true}
+});
+tokenSchema.pre('save', function(next) {
+
+	for (var i = 0 ; i < this.abi.length ; i++) {
+		if (this.abi[i].type == 'function') { 
+
+			if (this.abi[i].outputs == undefined) {
+				this.abi[i].outputs = [];
+			}
+			if (this.abi[i].inputs == undefined) {
+				this.abi[i].inputs = [];
+			}
+		}
+	}
+	next();
+
 });
 
 module.exports = mongoose.model('Token', tokenSchema);
