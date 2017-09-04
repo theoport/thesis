@@ -17,7 +17,18 @@ tokenSchema.pre('save', function(next) {
 
 	for (var i = 0 ; i < this.abi.length ; i++) {
 		if (this.abi[i].type == 'function') { 
-
+			if (this.abi[i].payable == 'true') {
+				this.abi[i].payable = true;
+			}
+			if (this.abi[i].payable == 'false') {
+				this.abi[i].payable= false;
+			}
+			if (this.abi[i].constant == 'true') {
+				this.abi[i].constant= true;
+			}
+			if (this.abi[i].constant == 'false') {
+				this.abi[i].constant = false;
+			}
 			if (this.abi[i].outputs == undefined) {
 				this.abi[i].outputs = [];
 			}

@@ -13,17 +13,14 @@
 	<link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
-<% if (data.length > 0 && data[0].hasOwnProperty('error')) { %>
-	<div class="alert alert-danger"><%= data[0].message %></div>
-<% } %>
 <div class="col-sm-6 col-sm-offset-3">
 	<div class="jumbotron text-center">
 		<h1>Submit Code</h1>
 		<h4>For Update: <a href="<%= '/tokenHome/' + token.id + '/forum/' + topic.id %>"><%= '#' + topic.name %></a>
 		<br>
 
-		<p>Please submit the contract ABI and the contract source code.</p>
-		<p>The contract will be deployed on the blockchain and a <br>bugHunt will be started.</p>
+		<p>Please submit the contract ABI, the contract source code and the address at which you have deployed it.</p>
+		<p>A bugHunt will be started.</p>
 	
 		<label for="ABI">ABI</label>
 		<div class="input-group">		
@@ -47,10 +44,10 @@
 			<span class="input-group-addon" id="basic-addon1">.txt</span>
 		</div>
 
-		<label for="sourceCode">Contract Address</label>
+		<label for="address">Contract Address</label>
 		<div class="input-group">		
 			<span class="input-group-btn">
-				<button class="btn btn-secondary" type="button" id="sourceCodeInfo">
+				<button class="btn btn-secondary" type="button" id="addressInfo">
 					<span class="fa fa-info"></span>
 				</button>
 			</span>	

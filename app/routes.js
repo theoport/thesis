@@ -30,6 +30,7 @@ router.get('/tokenHome/:tokenId/submitUpdate/:updateId', siteController.showSubm
 router.get('/tokenHome/:tokenid/auctionHouse/:auctionId', siteController.showAuctionHouse);
 router.get('/tokenHome/:tokenId/submitBug/:updateId', siteController.showSubmitBug);
 router.get('/tokenHome/:tokenId/startBounty/:updateId', siteController.showStartBounty);
+router.get('/tokenHome/:tokenId/vote', siteController.showVote);
 router.post('/signup', passport.authenticate('local-signup', {
 	successRedirect: '/tokenSpace',
 	failureRedirect: '/signup',

@@ -16,7 +16,8 @@ module.exports = {
 		submitUpdate: 	'./client/js/submitUpdate.js',
 		bidForBounty: 	'./client/js/bidForBounty.js',
 		startBounty: 	'./client/js/startBounty.js',
-		auctionHouse: 	'./client/js/auctionHouse.js'
+		auctionHouse: 	'./client/js/auctionHouse.js',
+		submitVote: './client/js/submitVote.js'
 	},
 	output: {
 		path: path.resolve(__dirname, './client/build'),

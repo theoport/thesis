@@ -1,6 +1,7 @@
 import { default as Web3 } from 'web3';
 import { default as SHA256} from 'crypto-js/sha256';
 import { default as tokenManagerObject } from '../../build/contracts/TokenManager.json';
+import { default as tokenObject } from '../../build/contracts/NewToken.json';
 
 let TokenManager, tmInstance;
 let Token, tokenInstance;
@@ -16,6 +17,10 @@ window.App = {
 		tmInstance = TokenManager.at(token.managerAddress);
 		Token = web3.eth.contract(token.abi);
 		tokenInstance = Token.at(token.address);
+
+		console.log(token.abi);	
+		console.log(token.address);
+		console.log(token.managerAddress);
 		
 		web3.eth.getAccounts((err,accs) => {
 			if (err != null) {
@@ -25,8 +30,33 @@ window.App = {
 			} else {
 				account = accs[0];
 			}
+			console.log(account);
+			self.fillPage();
 		});
-		self.fillPage();
+
+		let debug = tokenInstance.Debug({}, {fromBlock: 0});
+
+		debug.get((err, result) => {
+			console.log(result);
+			for (let i = 0; i < result.length; i++){
+				console.log("DEBUG");
+				console.log(result[i].args.numberOne);
+				console.log(result[i].args.numberTwo);
+				console.log(result[i].args.stringOne);
+				console.log(result[i].args.stringTwo);
+			}
+		});
+		debug.watch((err, result) => {
+			console.log("GOT DEBUG" + result);
+			for (let i = 0; i < result.length; i++){
+				console.log("DEBUG WATCH");
+				console.log(result[i].args.numberOne);
+				console.log(result[i].args.numberTwo);
+				console.log(result[i].args.stringOne);
+				console.log(result[i].args.stringTwo);
+			}
+		});
+		
 	},
 			
 	fillPage: function() {
@@ -51,17 +81,13 @@ window.App = {
 		});
 
 		tmInstance.ETHERBALANCE((err, result) => {
-			console.log(result);
-			$("#topEther").text(result/1000000000000000000);
-		});
+			$("#topEther").text(result/1000000000000000000); });
 
 		tmInstance.LOWESTETHER((err, result) => {
-			console.log(result);
 			$("#lowEther").text(result/1000000000000000000);
 		});
 
 		web3.eth.getBalance(token.managerAddress, (err,result) => {
-			console.log(result);
 			$("#etherBalance").text(result);
 		});
 
@@ -84,12 +110,14 @@ window.App = {
 		tmInstance.VOTEDURATION((err,result) => {
 			$("#voteDuration").text(result);
 		});
-
 		tmInstance.consensusPercent((err,result) => {
 			$("#consensusPercent").text(result);
 		});
 
-		tokenInstance.totalSupply((err,result) => {
+		tokenInstance.getTotalSupply({from: account, gas: 4000000},(err,result) => {
+			console.log("HELOY");	
+			console.log(result);
+			console.log(err);
 			$("#totalToken").text(result);
 		});
 
@@ -98,7 +126,6 @@ window.App = {
 		});
 
 		tmInstance.contractRefunds((err, result) => {
-			console.log(result);
 			if (result == true){
 				$("#refund").html("Yes");
 			} else if (result == false){
@@ -119,9 +146,7 @@ window.App = {
 		});
 	},
 
-
 	checkData: function() {
-		console.log(token);
 		var _date = new Date(token.creationDate);
 		if (SHA256((_date.getTime() / 1000) + token.address + token.managerAddress) != token.id) {
 			alert("DANGER, DATA HAS BEEN ALTERED");

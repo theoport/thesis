@@ -8,12 +8,14 @@ import ERC20Standardtxt from '../../public/txt/ERC20Standard.txt';
 import createTokenObject from '../../build/contracts/TokenCreator.json';
 import tokenObject from '../../build/contracts/NewToken.json';
 
-let CreateToken; //= contract(createtokenobject.abi);
+let ropstenStartBlock = 1590000;
+
+let CreateToken; 
 let ctAddress;
 let ctInstance;
 let account;
 let netId;
-let blockNumber;
+let loadBlock;
 
 window.App = {
 	start: function() {
@@ -88,7 +90,7 @@ window.App = {
 			ctAddress = obj;
 			$("#networkInfo").html("Connected to " + network + " network.<br>ID: " + netId);	
 			web3.eth.getBlockNumber((err, result) => {
-				blockNumber = result;
+				loadBlock = result;
 				self.startWatch();
 			});
 		});
@@ -99,18 +101,22 @@ window.App = {
 		ctInstance = CreateToken.at(ctAddress);
 
 		//start watching contract 
-		var anEvent = ctInstance.TokenManagerCreated({}, {fromBlock: blockNumber +1});
+		var anEvent = ctInstance.TokenManagerCreated();
 		anEvent.watch( function(err, result) {
-			
+		console.log(result.blockNumber);
+		console.log(loadBlock);
 			if (err) {
 				console.log(err);
-			} else {
+			} else if (result.blockNumber != loadBlock){
+
 				self.setStatus("Success: " + web3.toAscii(result.args.tokenName) + " created at " + result.args.tokenAddress
 				+ "<br> with manager at " + result.args.tokenManagerAddress);
+
 				let _description = $("#description").val();	
 				let _sourceCode = ERC20Standardtxt + BaseTokentxt + NewTokentxt;
 				let _date = new Date(result.args.creationTime.toNumber() * 1000);
 				let _id = SHA256(result.args.creationTime + result.args.tokenAddress + result.args.tokenManagerAddress);
+				console.log("HERE");
 				$.ajax({
 					type: 'POST',
 					url: '/api/tokens',
@@ -124,7 +130,7 @@ window.App = {
 						previousAddress: "0",
 						description: _description,
 						abi: tokenObject.abi,
-						sourceCode: _sourceCode, 
+						sourceCode: _sourceCode 
 					},
 					datatype: 'json',
 					success: function(responseData, textStatus, jqXHR) {
@@ -133,6 +139,7 @@ window.App = {
 						
 					error: function(jqXHR, textStatus, errorThrown) {	
 						console.log(errorThrown);
+						console.log("token not saved");
 					}
 				});
 			}	
@@ -149,11 +156,11 @@ window.App = {
 		self.setStatus("Please wait while the token contract is deployed to the blockchain. <br> Don't close the window.");
 		let name = $("#name").val();
 		let _value = $("#value").val() + '000000000000000000';
-		console.log(_value);
 		let amount = $("#initialAmount").val();
 		let consensusPercent = $("#consensusPercent").val();
 		let str = $("#issuanceRate").val();
 		let issuanceRate = str.split(",");
+		issuanceRate.reverse();
 		let upperCap = $("#upperCap").val();
 		let contractRefunds = ($("#contractRefunds").val() == 'true')?true:false;
 		
@@ -163,7 +170,8 @@ window.App = {
 				self.setStatus("Error creating new Coin");
 			}
 			else {
-				alert(result);
+				
+				alert("success: " + result);
 			}
 		});
 	}

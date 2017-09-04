@@ -28,8 +28,9 @@ function getToken(req,res){
 		}
 		if (!token) {
 			res.status(404).json({message: "token not found."});
-		}
+		} else {
 		res.json(token);
+		}
 	});
 }
 

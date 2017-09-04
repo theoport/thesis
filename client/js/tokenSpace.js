@@ -34,13 +34,13 @@ window.App = {
 			
 			ctAddress = obj;
 			ctInstance = CreateToken.at(ctAddress);
-			var anEvent = ctInstance.TokenManagerCreated({},{fromBlock: 0, toBlock: 'latest'});
+			let anEvent = ctInstance.TokenManagerCreated({}, {fromBlock: 0, toBlock: 'latest'});
 			anEvent.get(function(err,logs) {
 				if (err) {
 					console.log(err);	
 				} else {
 
-					for (var i = 0; i < logs.length ; i++) {
+					for (let i = 0; i < logs.length ; i++) {
 						self.pushToken(logs[i].args.tokenManagerAddress, logs[i].args.creationTime.toNumber());
 					}
 
@@ -51,22 +51,26 @@ window.App = {
 
 	pushToken: function(_tmAddress, _time) {
 		tmInstance = TokenManager.at(_tmAddress);
+
 		tmInstance.getTokenAddress((err, result) => {
 			var tokenAddress = result;
 			if (err) {
 				console.log(err);
 			} else {	
-				var id = SHA256(_time + tokenAddress + _tmAddress);
+
+				let id = SHA256(_time + tokenAddress + _tmAddress).toString();
+				console.log(id);
+
 				$.ajax({
 					type: 'GET',
 					url: '/api/tokens/' + id,
 					datatype: 'json',
 					success: function(responseData, textStatus, jqXHR) {
 
-						var tempId;
-						var tempAddr;
-						var tempName;
-						var tempDesc;
+						let tempId;
+						let tempAddr;
+						let tempName;
+						let tempDesc;
 
 						tempId = '' + responseData.id;	
 						tempAddr = '' + responseData.address;

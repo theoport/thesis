@@ -7,6 +7,7 @@ let finishedBounties;
 let newBestBounty, bountyStart, bountyFinish;
 let priceHourRatio;
 let TokenManager, tmInstance;
+let loadBlock;
 
 window.App = {
 	start: function() {
@@ -29,46 +30,53 @@ window.App = {
 				if (err) {
 					alert(err); 
 				} else {
-					alert(result);
 					priceHourRatio = result;
 				}
-				self.fillPage();
+				web3.eth.getBlockNumber((err, result) => {
+					loadBlock = result;	
+					self.fillPage();
+				});
 			});
 		});
 	},
 
 	fillPage: function() {
-		
+	
+		self = this;	
+	
 		finishedBounties= [];
 	
-		bountyStart = tmInstance.BountyStarted();	
-		bountyFinish = tmInstance.BountyEnded();
+		bountyStart = tmInstance.BountyStarted({}, {fromBlock: 0, toBlock: 'latest'});	
+		bountyFinish = tmInstance.BountyEnded({}, {fromBlock: 0, toBlock: 'latest'});
 
 		bountyFinish.get((err, bountyEnds) => {
-			for (var i = 0; i < bountyEnds.length ; i++) {
-				finishedBounties.push(bountyEnds[i].args.updateId);	
+			for (let i = 0; i < bountyEnds.length ; i++) {
+				finishedBounties.push(bountyEnds[i].args.updateId.toString(16));	
 			}
 			bountyStart.get((err,bountyStarts) => {
-				for (var i = 0; i <bountyStarts.length; i++) {
-					if ($.inArray(bountyStarts[i].args.updateId, finishedBounties) < 0) {
-						activeBounty= bountyStarts[i].args.updateId;
-						var finishDate = new Date(bountyStarts[i].args.finishTime * 1000);
-						$("#bountyEndTime").html(finishDate);	
-						newBestBounty = tmInstance.NewBountyPrice({updateId: activeBounty});
+				for (let i = 0; i < bountyStarts.length; i++) {
+					if ($.inArray(bountyStarts[i].args.updateId.toString(16), finishedBounties) < 0) {
+						activeBounty= bountyStarts[i].args.updateId.toString(16);
+						let finishDate = new Date(bountyStarts[i].args.finishTime * 1000);
+						console.log(finishDate);
+						$("#bountyEndTime").text(finishDate);	
+						newBestBounty = tmInstance.NewBountyPrice({updateId: bountyStarts[i].args.updateId},{fromBlock: 0, toBlock: 'latest'});
 						bestBounty = Number.MAX_VALUE;
 						newBestBounty.get((err, bids) =>{
-							for (var i = 0; i < bids.length ; i++){
+							for (let i = 0; i < bids.length ; i++){
 								if (bids[i].args.amount < bestBounty) {
 									bestBounty = bids[i].args.amount;
 									bountyHunter= bids[i].args.bidder;
 								}
 							}
 							if (bountyHunter== account) {
-								$("#youWin").html("Congrats! You hold the best bounty.");
+								$("#youWin").text("Congrats! You hold the best bounty.");
 							}
-							$("#bestBounty").html(bestBounty);
-							var hours = bestBounty / priceHourRatio;
+							console.log(bestBounty);
+							$("#bestBounty").text(bestBounty);
+							let hours = bestBounty / priceHourRatio;
 							$("#currentHours").html(hours);
+							self.startWatch();
 						});
 						return;
 					}
@@ -79,31 +87,34 @@ window.App = {
 	},
 	
 	startWatch: function() {	
-		newBestBounty.get((err, bounty) =>{
-			for (var i = 0; i < bounty.length ; i++){
-				if (bounty.args.amount < bestBounty) {
-					bestBounty = bounty.args.amount;
-					bountyHunter= bounty.args.bidder;
+		newBestBounty.watch((err, bounty) =>{
+			if (bounty.blockNumber != loadBlock) {
+				let bestBounty, bountyHunter;
+				for (let i = 0; i < bounty.length ; i++){
+					if (bounty.args.amount < bestBounty) {
+						bestBounty = bounty.args.amount;
+						bountyHunter= bounty.args.bidder;
+					}
 				}
+				if (bountyHunter == account) {
+					$("#youWin").html("Congrats! You hold the best bounty.");
+				} else {
+					$("#youWin").html("");
+				}
+				$("#bestBounty").text(bestBounty);
+				let hours = bestBounty / priceHourRatio;
+				$("#currentHours").html(hours);
 			}
-			if (bountyHunter== account) {
-				$("#youWin").html("Congrats! You hold the best bounty.");
-			} else {
-				$("#youWin").html("");
-			}
-			$("#bestBounty").html(bestBounty);
-			var hours = bestBounty / priceHourRatio;
-			$("#currentHours").html(hours);
 		});
 	},
 
 	updateHours: function(price) {
-		var hours = price / priceHourRatio; 
+		let hours = price / priceHourRatio; 
 		$("#hours").html(hours);	
 	},
 			
 	submitBid: function() {
-		var _value = $("#bid").val();
+		let _value = $("#bid").val();
 		tmInstance.bidForBounty(_value, {from: account, gas: 4000000}, (err,result) => {
 			if (err) {
 				alert(err);
@@ -116,7 +127,7 @@ window.App = {
 
 	checkData: function() {
 		console.log(token);
-		var _date = new Date(token.creationDate);
+		let _date = new Date(token.creationDate);
 		if (SHA256((_date.getTime() / 1000) + token.address + token.managerAddress) != token.id) {
 			alert("DANGER, DATA HAS BEEN ALTERED");
 		}

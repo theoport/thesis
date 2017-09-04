@@ -80,7 +80,7 @@ window.App = {
 	fillUpdateTopics: function() {
 
 		var updateStatusMap = new Map(updateStatus);	
-		var updateStart = tmInstance.UpdateStarted();
+		var updateStart = tmInstance.UpdateStarted({}, {fromBlock: 0, toBlock: 'latest'});
 		updateStart.get(function (err, logs) {
 			if (err) {
 				console.log(err);
@@ -92,7 +92,7 @@ window.App = {
 					updateStatusMap.set(logs[i].args.updateId.toString(16), [true, true]);	
 				}
 			}
-			var updateFinish = tmInstance.UpdateOutcome();
+			var updateFinish = tmInstance.UpdateOutcome({}, {fromBlock: 0, toBlock: 'latest'});
 			updateFinish.get(function (err, logs) {
 				if (err) {
 					console.log(err);	
@@ -107,9 +107,8 @@ window.App = {
 						}
 					}
 					updateStatus= Array.from(updateStatusMap);
+					console.log(updateStatus);
 					if (updateStatus.length > 1) {
-						console.log("SOrting");
-						console.log(updateMap.get(updateStatus[0][0]));
 						updateStatus.sort(function(a,b) {
 							return (updateMap.get(b[0])).creationDate 
 												- (updateMap.get(a[0])).creationDate;

@@ -34,7 +34,7 @@ window.App = {
 		console.log("abi length: " + token.abi.length);	
 		for (var i = 0; i < token.abi.length ; i++) {
 			console.log(token.abi[i].constant);
-			if (token.abi[i].type == 'function' && token.abi[i].constant == 'false') {
+			if (token.abi[i].type == 'function' && !(token.abi[i].constant)) {
 				var publicAndCreator = self.isPublicAndCreator(token.abi[i]);
 				if (publicAndCreator[0]){
 					publicFunctions.push([token.abi[i].name, token.abi[i].inputs, token.abi[i].payable, publicAndCreator[1]]);	

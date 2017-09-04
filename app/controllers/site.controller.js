@@ -23,7 +23,8 @@ module.exports = {
 	showSubmitUpdate: showSubmitUpdate,
 	showAuctionHouse: showAuctionHouse,
 	showSubmitBug: showSubmitBug,
-	showStartBounty: showStartBounty
+	showStartBounty: showStartBounty,
+	showVote: showVote,
 	
 };
 
@@ -34,12 +35,10 @@ function showHome(req,res){
 function showTokenFactory(req,res){
 	Token.find({}, (err, tokens) => {
 		if (err){
-			var data = [{message: err}];
-			res.render('pages/tokenFactory', {data: data});
+			res.render('pages/tokenFactory', {data: [{message: err}]});
 		}
 		else {
-			var data = tokens; 
-			res.render('pages/tokenFactory', {data: data});
+			res.render('pages/tokenFactory', {data: tokens});
 		}
 	});
 }
@@ -283,6 +282,19 @@ function showStartBounty(req,res){
 					res.render('pages/startBounty', {token: token, topic: topic});
 				}
 			});
+		}
+	});
+}
+
+function showVote(req,res) {
+	const $tokenId = req.params.tokenId;
+	Token.findOne({id: $tokenId}, (err, token) => {
+		if (err){
+			res.status(400).json(err);
+		} else if (!token) {
+			res.status(404).json({message: "Token Not found"});
+		} else {
+			res.render('pages/submitVote', {token: token, user: req.user});
 		}
 	});
 }

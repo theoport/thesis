@@ -20,12 +20,18 @@ contract BaseToken is ERC20Standard{
 	mapping (address  => mapping (address => uint256)) allowance;
 	mapping (address => bool) blocked;
 	mapping (uint256 => address) accountsBlocked;
+
+	event Debug(uint256 numberOne, uint256 numberTwo, bytes32 stringOne, bytes32 stringTwo);
 	
 	function getIssuanceRate() constant public returns(uint256[2]){
 		return issuanceRate;
 	}
 
-	function mint(uint256 amount, address to) byCreator {
+	function setSupply(uint256 amount) {
+		totalSupply = amount;
+	}
+
+	function mint(uint256 amount, address to) byCreator updateSupply {
 		if (balances[manager] >= amount) {
 			balances[manager] -= amount;
 			balances[to] += amount;
@@ -44,11 +50,10 @@ contract BaseToken is ERC20Standard{
 
 	modifier updateSupply() {
 		if(!limitReached) {
-			var daysPassed = (now - creationTime + daysSinceFirstCreation)/ (1 days); 
-
+			uint256 daysPassed = (now - creationTime + daysSinceFirstCreation)/ (1 minutes); 
 			if (daysPassed > lastUpdate) {
 
-				for (uint i = lastUpdate + 1; i > daysPassed; i++) {
+				for (uint i = lastUpdate; i < daysPassed; i++) {
 
 					uint temp = issuanceRate[1] * i + issuanceRate[0];	
 
@@ -65,6 +70,7 @@ contract BaseToken is ERC20Standard{
 						totalSupply = upperCap;
 						balances[manager] -= (previous - totalSupply);
 						limitReached = true;
+						break;
 					}
 				}
 				lastUpdate = daysPassed;
@@ -89,13 +95,43 @@ contract BaseToken is ERC20Standard{
 	function kill () byManager {
 		selfdestruct(manager);
 	}
+
+	function getTotalSupply() constant public returns (uint256) {
+		uint256 _totalSupply = totalSupply;
+
+		if(!limitReached) {
+			
+			uint256 daysPassed = (now - creationTime + daysSinceFirstCreation)/ (1 minutes); 
+	
+			if (daysPassed > lastUpdate) {
+				uint256 temp;
+				for (uint256 i = lastUpdate; i < daysPassed; i++) {
+
+					temp = issuanceRate[1] * i + issuanceRate[0];	
+
+					if (temp < 0) {
+						break;
+					}
+
+					_totalSupply += temp;
+
+					if (_totalSupply >= upperCap) {
+						_totalSupply = upperCap;
+						break;
+					}
+				}
+				lastUpdate = daysPassed;
+			}
+		}
+		return _totalSupply;
+	}
 	
 	function balanceOf(address owner) constant returns (uint256 balance){
 		balance = balances[owner];
 	}
 
 	function transfer(address to, uint256 value) updateSupply returns (bool success){
-		if (balances[msg.sender] < value){
+		if (balances[msg.sender] < value || blocked[msg.sender] || blocked[to]){
 			return false;
 		}
 		balances[to]+=value;
@@ -142,6 +178,15 @@ contract BaseToken is ERC20Standard{
 		}
 		noAccountsBlocked = 0;
 	}
+	
+	function isBlocked(address account) returns (bool) {
+		if (blocked[account] == true) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+			
 
 	function approve(address spender, uint256 value) returns (bool success){
 		allowance[msg.sender][spender]=value;

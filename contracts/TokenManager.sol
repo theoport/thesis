@@ -140,16 +140,16 @@ contract TokenManager {
 	event AuctionEnd(uint256 time, uint256 auctionId, address winner, uint256 price, uint256 amount);
 	event Failure(uint256 time, bytes32 message, uint256 id);
 	event NewBountyPrice(uint256 amount, address bidder, uint256 updateId);
-	event BountyEnded(uint256 time, address winner, uint256 price, uint256 updateId); 
-	event BountyStarted(uint256 time, uint256 finishTime, uint256 updateId, uint256 safetyHash);
-	event BugFound(address by, uint256 updateId, uint256 bugId, uint256 descriptionHash);
+	event BountyEnded(uint256 time, address winner, uint256 price, uint256 indexed updateId); 
+	event BountyStarted(uint256 time, uint256 finishTime, uint256 indexed updateId, uint256 safetyHash);
+	event BugFound(address by, uint256 indexed updateId, uint256 indexed bugId, uint256 descriptionHash);
 	event AuctionStarted(uint256 time, uint256 finishTime, uint256 auctionId, uint256 amount);
 	event BugHuntStarted(uint256 time, uint256 finishTime, uint256 id, uint256 creationTime, address updatedContract, uint256 safetyHash);
 	event UpdateStarted(uint256 time, uint256 updateId);
 	event DeveloperStarted(uint256 time, uint256 updateId, uint256 finishTime, address developer);
 	event WasABug(uint256 updateId, uint256 bugId, uint256 finishTime, address developer, uint256 tries); 
 	event WasNotABug(uint256 updateId, uint256 bugId);
-	event NewVote(uint256[3] tag, uint256 yes, uint256 no);
+	event NewVote(uint256[3] indexed tag, uint256 yes, uint256 no, address from);
 	event ChangeOver(uint256 finishTime, uint256 updateId);
 	event OldContractDead(uint256 updateId);
 
@@ -419,19 +419,23 @@ contract TokenManager {
 		vote.startTime = now;
 		vote.endTime = vote.startTime + VOTEDURATION;
 		vote.tag = _tag;
+		token.block(address(this));
 		VoteStarted(vote.startTime, vote.endTime, _tag); 
 	}
 	
 	function submitVote (bool yes) {
-		if (now >= vote.startTime && now <= vote.endTime ) {
+		if (!(token.isBlocked(msg.sender)) && now >= vote.startTime && now <= vote.endTime ) {
+			token.block(msg.sender);
 			if (yes) {
 				vote.totalYesVotes += token.balanceOf(msg.sender);
 			}
 			else {
 				vote.totalNoVotes += token.balanceOf(msg.sender);
 			}
-			token.block(msg.sender);
-			NewVote(vote.tag, (vote.totalYesVotes * 100) / vote.totalPossibleVotes, (vote.totalNoVotes * 100) / vote.totalPossibleVotes);
+			NewVote(vote.tag, (vote.totalYesVotes * 100) / vote.totalPossibleVotes, (vote.totalNoVotes * 100) / vote.totalPossibleVotes, msg.sender);
+			if (((vote.totalYesVotes / vote.totalPossibleVotes) * 100) > consensusPercent || ((vote.totalNoVotes / vote.totalPossibleVotes) * 100) > (100 - consensusPercent)) {
+				endVote();
+			}
 		}
 	}
 
@@ -447,6 +451,7 @@ contract TokenManager {
 
 				if (--update.numberOfTries <= 0) {
 					update.endTime = now;
+					update.active = false;
 					BugHuntEnd(now, update.id);
 					UpdateOutcome(now, false, update.id);
 					return;
@@ -464,6 +469,7 @@ contract TokenManager {
 			vote.active = false;
 			VotingOutcome(now, false, vote.tag);
 			if (uint256(vote.tag[0]) == uint256(subject.UPDATE)) {
+				update.active = false;
 				UpdateOutcome(now, false, update.id);	
 			}
 			else if (uint256(vote.tag[0]) == uint256(subject.BUG)) {
