@@ -15,6 +15,7 @@ module.exports = {
 	addUpvote: addUpvote,
 	getBountyDescription: getBountyDescription,
 	addBountyDescription: addBountyDescription,
+	getBounty: getBounty,
 	getBug: getBug,
 	addBug: addBug,
 	getUpvoteCount: getUpvoteCount
@@ -151,3 +152,15 @@ function addBug(req,res) {
 	});
 }
 
+function getBounty(req,res) {
+	const $bountyId = req.params.bountyId;
+	BountyDescription.findOne({bountyId: $bountyId}, (err, bounty) => {
+		if (err) {
+			res.status(400).json(err);
+		} else if (!bounty) {
+			res.status(404).json({message: "description not found"});
+		} else {
+			res.send(bounty);
+		}
+	});
+}

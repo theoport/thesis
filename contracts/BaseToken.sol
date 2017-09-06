@@ -4,6 +4,8 @@ pragma solidity ^0.4.8;
 
 contract BaseToken is ERC20Standard{
 
+	uint256 blockNumber = 0;
+
 	uint256 public noAccountsBlocked = 0;
 	uint256[2] public issuanceRate;
 	uint256  public lastUpdate = 0;
@@ -32,7 +34,7 @@ contract BaseToken is ERC20Standard{
 	}
 
 	function mint(uint256 amount, address to) byCreator updateSupply {
-		if (balances[manager] >= amount) {
+		if (balances[manager] >= amount && !blocked[manager]) {
 			balances[manager] -= amount;
 			balances[to] += amount;
 		}
@@ -50,7 +52,7 @@ contract BaseToken is ERC20Standard{
 
 	modifier updateSupply() {
 		if(!limitReached) {
-			uint256 daysPassed = (now - creationTime + daysSinceFirstCreation)/ (1 minutes); 
+			uint256 daysPassed = (now - creationTime + daysSinceFirstCreation); 
 			if (daysPassed > lastUpdate) {
 
 				for (uint i = lastUpdate; i < daysPassed; i++) {
@@ -58,19 +60,22 @@ contract BaseToken is ERC20Standard{
 					uint temp = issuanceRate[1] * i + issuanceRate[0];	
 
 					if (temp <= 0) {
-						limitReached = true;
-						break;
-					}
+						if (issuanceRate[1] <= 0) {
+							limitReached = true;
+							break;
+						}
+					} else {
 
-					balances[manager] += temp;
-					totalSupply += temp;
+						balances[manager] += temp;
+						totalSupply += temp;
 
-					if (totalSupply >= upperCap) {
-						uint previous = totalSupply;
-						totalSupply = upperCap;
-						balances[manager] -= (previous - totalSupply);
-						limitReached = true;
-						break;
+						if (totalSupply >= upperCap) {
+							uint previous = totalSupply;
+							totalSupply = upperCap;
+							balances[manager] -= (previous - totalSupply);
+							limitReached = true;
+							break;
+						}
 					}
 				}
 				lastUpdate = daysPassed;
@@ -79,11 +84,11 @@ contract BaseToken is ERC20Standard{
 		_;
 	}
 
-	function initialise(bytes32 _name, uint256[2] _issuanceRate, uint256 _daysSinceFirstCreation, uint256 _upperCap, bool _limitReached, uint256 _lastUpdate, uint256 _noAccountsBlocked, uint256 _totalSupply) byManager {
+	function initialise(address _creator, bytes32 _name, uint256[2] _issuanceRate, uint256 _upperCap, bool _limitReached, uint256 _lastUpdate, uint256 _noAccountsBlocked, uint256 _totalSupply) byManager {
 		assert(!hasBeenInitialised);
+		creator = _creator;
 		name = _name;
 		issuanceRate = _issuanceRate;
-		daysSinceFirstCreation = _daysSinceFirstCreation;
 		upperCap = _upperCap;
 		limitReached = _limitReached;
 		lastUpdate = _lastUpdate;
@@ -101,7 +106,7 @@ contract BaseToken is ERC20Standard{
 
 		if(!limitReached) {
 			
-			uint256 daysPassed = (now - creationTime + daysSinceFirstCreation)/ (1 minutes); 
+			uint256 daysPassed = (now - creationTime + daysSinceFirstCreation); 
 	
 			if (daysPassed > lastUpdate) {
 				uint256 temp;
@@ -110,20 +115,30 @@ contract BaseToken is ERC20Standard{
 					temp = issuanceRate[1] * i + issuanceRate[0];	
 
 					if (temp < 0) {
-						break;
-					}
+						if (issuanceRate[1] <= 0) {
+							break;
+						}
+					} else {
 
-					_totalSupply += temp;
+						_totalSupply += temp;
 
-					if (_totalSupply >= upperCap) {
-						_totalSupply = upperCap;
-						break;
+						if (_totalSupply >= upperCap) {
+							_totalSupply = upperCap;
+							break;
+						}
 					}
 				}
-				lastUpdate = daysPassed;
 			}
 		}
 		return _totalSupply;
+	}
+
+	function blockCreator() {
+		blockNumber++;
+	}
+	
+	function getDays() constant returns (uint256) {
+		return (now - creationTime + daysSinceFirstCreation);
 	}
 	
 	function balanceOf(address owner) constant returns (uint256 balance){

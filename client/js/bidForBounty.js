@@ -72,10 +72,14 @@ window.App = {
 							if (bountyHunter== account) {
 								$("#youWin").text("Congrats! You hold the best bounty.");
 							}
-							console.log(bestBounty);
-							$("#bestBounty").text(bestBounty);
-							let hours = bestBounty / priceHourRatio;
-							$("#currentHours").html(hours);
+							if (bids.length == 0) {
+								$("#bestBounty").text("NO BIDS");
+								$("#currentHours").html("<i>undefined</i>");
+							} else {	
+								$("#bestBounty").text(bestBounty);
+								let hours = bestBounty / priceHourRatio;
+								$("#currentHours").html(hours);
+							}
 							self.startWatch();
 						});
 						return;
@@ -88,14 +92,18 @@ window.App = {
 	
 	startWatch: function() {	
 		newBestBounty.watch((err, bounty) =>{
+			console.log("loadBlock is " + loadBlock);
+			console.log("bounty block is " + bounty.blockNumber);
+			console.log("best bounty is " + bestBounty);
+			console.log("hunter is " + bountyHunter);
+			console.log("pricehourratio is " + priceHourRatio);
 			if (bounty.blockNumber != loadBlock) {
-				let bestBounty, bountyHunter;
-				for (let i = 0; i < bounty.length ; i++){
-					if (bounty.args.amount < bestBounty) {
-						bestBounty = bounty.args.amount;
-						bountyHunter= bounty.args.bidder;
-					}
+				if (bounty.args.amount < bestBounty) {
+					bestBounty = bounty.args.amount;
+					bountyHunter= bounty.args.bidder;
 				}
+				console.log("best bounty is " + bestBounty);
+				console.log("hunter is " + bountyHunter);
 				if (bountyHunter == account) {
 					$("#youWin").html("Congrats! You hold the best bounty.");
 				} else {

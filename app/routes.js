@@ -58,7 +58,8 @@ router.get('/api/topics/:tokenId/comments/:topicId', forumController.getComments
 router.post('/api/comments', forumController.addComment);
 router.post('/api/upvotes', 							forumController.addUpvote);
 router.get('/api/upvoteCount/:topicId', 							forumController.getUpvoteCount);
-router.get('/api/bounty/:bountyId', forumController.getBountyDescription);
+router.get('/api/bountydesc/:bountyId', forumController.getBountyDescription);
+router.get('/api/bounty/:bountyId', forumController.getBounty);
 router.post('/api/bounty', forumController.addBountyDescription);
 router.get('/api/bugs/:bugId', forumController.getBug);
 router.post('/api/bugs', forumController.addBug);

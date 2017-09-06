@@ -161,6 +161,7 @@ window.App = {
 		let str = $("#issuanceRate").val();
 		let issuanceRate = str.split(",");
 		issuanceRate.reverse();
+		console.log(issuanceRate);
 		let upperCap = $("#upperCap").val();
 		let contractRefunds = ($("#contractRefunds").val() == 'true')?true:false;
 		

@@ -61,8 +61,8 @@ window.App = {
 							"<h6>Description:</h6>" +	
 							"<div id=\"description\"></div>" +
 							"<p>Vote Count:<br>" +
-							"<span id=\"yesVotes\"></span>% are in favour update <br>" +
-							"<span id=\"noVotes\"></span>% are against the update <br>" +
+							"<span id=\"yesVotes\">0</span>% are in favour update <br>" +
+							"<span id=\"noVotes\">0</span>% are against the update <br>" +
 							"<span id=\"consensus\"></span>% required to pass<br>" +
 							"Vote finished on: " + finishDate + "</p>");
 						
@@ -82,7 +82,9 @@ window.App = {
 										url: '/api/bounty/' + bountyId,
 										datatype: 'json',
 										success: function(responseData, textStatus, jqXHR) {
-											if (SHA256(responseData.description + responseData.updateId).toString() != responseData.bountyId) {
+											console.log("response data is");
+											console.log(responseData);
+											if (SHA256(SHA256(responseData.description).toString() + responseData.updateId).toString() != responseData.bountyId) {
 												alert("Data ain't safe");		
 											} else {
 												$("#description").text(responseData.description);
@@ -135,8 +137,8 @@ window.App = {
 							"<h6>Description:</h6>" +	
 							"<div id=\"description\"></div>" +
 							"<p>Vote Count:<br>" +
-							"<span id=\"yesVotes\"></span>% are in favour update <br>" +
-							"<span id=\"noVotes\"></span>% are against the update <br>" +
+							"<span id=\"yesVotes\">0</span>% think it is a bug<br>" +
+							"<span id=\"noVotes\">0</span>% don't think it's a bug<br>" +
 							"<span id=\"consensus\"></span>% required to pass<br>" +
 							"Vote finishes on: " + finishDate + "</p>");
 

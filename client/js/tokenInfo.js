@@ -34,34 +34,12 @@ window.App = {
 			self.fillPage();
 		});
 
-		let debug = tokenInstance.Debug({}, {fromBlock: 0});
-
-		debug.get((err, result) => {
-			console.log(result);
-			for (let i = 0; i < result.length; i++){
-				console.log("DEBUG");
-				console.log(result[i].args.numberOne);
-				console.log(result[i].args.numberTwo);
-				console.log(result[i].args.stringOne);
-				console.log(result[i].args.stringTwo);
-			}
-		});
-		debug.watch((err, result) => {
-			console.log("GOT DEBUG" + result);
-			for (let i = 0; i < result.length; i++){
-				console.log("DEBUG WATCH");
-				console.log(result[i].args.numberOne);
-				console.log(result[i].args.numberTwo);
-				console.log(result[i].args.stringOne);
-				console.log(result[i].args.stringTwo);
-			}
-		});
-		
 	},
 			
 	fillPage: function() {
 	
 		let date = new Date();
+		console.log(date);
 		$("#date").html(date);
 		
 		tmInstance.AUCTIONDURATION((err,result) => {
@@ -147,7 +125,24 @@ window.App = {
 	},
 
 	checkData: function() {
-		var _date = new Date(token.creationDate);
+		console.log(token.creationDate);
+		let _date = new Date(token.creationDate);
+		let _dateNow = new Date();
+		let _testDate = new Date(_date.getTime());
+		let _testDate2 = new Date(_dateNow.getTime());
+			
+		console.log(_testDate);
+		console.log(_testDate2);
+	
+		console.log(_date);
+		console.log(_date.getTime()/1000);
+		console.log(_date.getTime());
+
+		console.log(_dateNow);
+		console.log(_dateNow.getTime()/1000);
+		console.log(_dateNow.getTime());
+	
+
 		if (SHA256((_date.getTime() / 1000) + token.address + token.managerAddress) != token.id) {
 			alert("DANGER, DATA HAS BEEN ALTERED");
 		}

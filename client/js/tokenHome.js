@@ -98,6 +98,7 @@ window.App = {
 		events = [];
 
 		let d = new Date();
+		console.log(d);
 		let nowInSeconds = d.getTime() / 1000;
 		
 
@@ -145,6 +146,7 @@ window.App = {
 						activeUpdate = updateStarts[i].args.updateId.toString(16);
 						console.log(activeUpdate);
 					}
+					console.log("active update is" + activeUpdate);
 				}
 				bountyFinish.get((err,bountyEnds) => {
 
@@ -168,6 +170,8 @@ window.App = {
 						}
 						events.push([bountyEnds[i].args.time, html]);	
 						finishedBounties.push(bountyEnds[i].args.updateId.toString(16));
+						console.log("bounty ends");
+						console.log(bountyEnds[i]);
 						if (bountyEnds[i].args.updateId.toString(16) == activeUpdate) {
 							$("#update").html("<h4>Update is pending.</h4>"+
 							"<a href=\"/tokenHome/" + token.id + "/forum/" +
@@ -179,6 +183,7 @@ window.App = {
 					}
 					bountyStart.get((err, bountyStarts) => {
 						console.log("I AM HERE");
+						console.log("bounty starts");
 						console.log(bountyStarts);
 						for (let i = 0; i < bountyStarts.length ; i++) { 
 
@@ -189,7 +194,8 @@ window.App = {
 							"<h4 class=\"media-heading\">BountyHunt Started" +
 							"<small> at " + date + 
 							"</small></h4>" +
-							"<p> for update :" + bountyStarts[i].args.updateId.toString(16); 
+							"<p> for update: " + bountyStarts[i].args.updateId.toString(16); 
+							console.log(bountyStarts[i]);
 							if($.inArray(bountyStarts[i].args.updateId.toString(16), finishedBounties) < 0) {
 			
 								$("#update").html("<h4>Update is pending.</h4>"+
@@ -204,7 +210,7 @@ window.App = {
 									"<a href=\"/tokenHome/" + token.id + "/bidForBounty/" +
 									bountyStarts[i].args.updateId.toString(16) + "\">" +
 									"Bid for Bounty</a>" +
-									"<a href=\"/api/bounty/" + SHA256((bountyStarts[i].args.safetyHash).toString(16) + bountyStarts[i].args.updateId.toString(16)).toString() + "\">Description</a>" +
+									"<a target=\"_blank\" href=\"/api/bountydesc/" + SHA256((bountyStarts[i].args.safetyHash).toString(16) + bountyStarts[i].args.updateId.toString(16)).toString() + "\">Description</a>" +
 									"<p>BountyHunt finishes on " + 
 									finishDate + "</p>");
 								} else if (bountyStarts[i].args.finishTime < nowInSeconds) {
@@ -312,8 +318,8 @@ window.App = {
 												"<a href=\"/tokenHome/" + token.id + "/forum/" +
 												voteStarts[i].args.tag[1].toString(16) + "\">" +
 												voteStarts[i].args.tag[1].toString(16) + "</a></p>" +
-												"<p>Vote Count: <br><span id =\"voteYes\"></span>% for update" +
-												"<span id=\"voteNo\"></span> against udpate</p>");
+												"<p>Vote Count: <br><span id =\"voteYes\">0</span>% for update" +
+												"<span id=\"voteNo\">0</span>% against udpate</p>");
 												if (voteStarts[i].args.finishTime > nowInSeconds) {
 													$("#vote").append("<div id=\"youVoted\">" +
 													"<p>You haven't voted yet</p>" +
@@ -353,8 +359,8 @@ window.App = {
 												"<a href=\"/tokenHome/" + token.id + "/forum/" +
 												voteStarts[i].args.tag[1].toString(16) + "\">" +
 												"Go to thread.</a>" +
-												"<p>Vote Count: <br><span id =\"voteYes\"></span>% think it's a bug." +
-												"<span id=\"voteNo\"></span> don't think it's a bug.</p>");
+												"<p>Vote Count: <br><span id =\"voteYes\">0</span>% think it's a bug." +
+												"<span id=\"voteNo\">0</span>% don't think it's a bug.</p>");
 												if (voteStarts[i].args.finishTime > nowInSeconds) {
 													$("#vote").append("<div id=\"youVoted\">" +
 													"<p>You haven't voted yet.</p>" +
@@ -478,7 +484,7 @@ window.App = {
 																"class=\"btn btn-default\"><span class=\"fa fa-file-text-o\"></span></a></h4>" +
 																"Contract is deployed at address:<br>" +
 																newTokenAddress + "<br>Description of update is:<br>" +
-																"<a target=\"_blank\" href=\"/api/bounty/" + SHA256((bugHuntStarts[i].args.safetyHash).toString(16) + bugHuntStarts[i].args.updateId.toString(16)).toString() + "\">Description</a></p>");
+																"<a target=\"_blank\" href=\"/api/bountydesc/" + SHA256((bugHuntStarts[i].args.safetyHash).toString(16) + bugHuntStarts[i].args.updateId.toString(16)).toString() + "\">Description</a></p>");
 																if (bugHuntFinishTime > nowInSeconds) {
 																	$("#update").append("<p>BugHunt is active.<br>" +
 																	"Have you found a bug?<br>" +
@@ -660,44 +666,44 @@ window.App = {
 		console.log("E");
 
 		//CHANGEOVER
-		let changeOverStart = tmInstance.ChangeOver();
-		let changeOverFinish = tmInstance.OldContractDead();
+		let changeOverStart = tmInstance.ChangeOver({},{fromBlock: 'latest'});
+		let changeOverFinish = tmInstance.OldContractDead({},{fromBlock: 'latest'});
 
 		//UPDATE
-		let updateStart = tmInstance.UpdateStarted();
-		let updateFinish = tmInstance.UpdateOutcome();
+		let updateStart = tmInstance.UpdateStarted({},{fromBlock: 'latest'});
+		let updateFinish = tmInstance.UpdateOutcome({},{fromBlock: 'latest'});
 
 		//VOTE
-		let voteStart = tmInstance.VoteStarted();
-		let voteFinish = tmInstance.VotingOutcome();
+		let voteStart = tmInstance.VoteStarted({},{fromBlock: 'latest'});
+		let voteFinish = tmInstance.VotingOutcome({},{fromBlock: 'latest'});
 
 		//AUCTION
-		let auctionStart = tmInstance.AuctionStarted();
-		let auctionFinish = tmInstance.AuctionEnd();
+		let auctionStart = tmInstance.AuctionStarted({},{fromBlock: 'latest'});
+		let auctionFinish = tmInstance.AuctionEnd({},{fromBlock: 'latest'});
 
-		let failure = tmInstance.Failure();
+		let failure = tmInstance.Failure({},{fromBlock: 'latest'});
 
 		//BOUNTY
-		let bountyStart = 	tmInstance.BountyStarted();
-		let bountyFinish = tmInstance.BountyEnded();
+		let bountyStart = 	tmInstance.BountyStarted({},{fromBlock: 'latest'});
+		let bountyFinish = tmInstance.BountyEnded({},{fromBlock: 'latest'});
 
-		let bugFound = tmInstance.BugFound();
+		let bugFound = tmInstance.BugFound({},{fromBlock: 'latest'});
 
 		//BUGHUNT
-		let bugHuntStart = tmInstance.BugHuntStarted();
-		let bugHuntFinish = tmInstance.BugHuntEnd();
-		let wasABug = tmInstance.WasABug();
-		let wasNotABug = tmInstance.WasNotABug();
+		let bugHuntStart = tmInstance.BugHuntStarted({},{fromBlock: 'latest'});
+		let bugHuntFinish = tmInstance.BugHuntEnd({},{fromBlock: 'latest'});
+		let wasABug = tmInstance.WasABug({},{fromBlock: 'latest'});
+		let wasNotABug = tmInstance.WasNotABug({},{fromBlock: 'latest'});
 
-		let newVote = tmInstance.NewVote();
+		let newVote = tmInstance.NewVote({},{fromBlock: 'latest'});
 
-		let developerStart = tmInstance.DeveloperStarted();
+		let developerStart = tmInstance.DeveloperStarted({},{fromBlock: 'latest'});
 
 		failure.watch((err,result) => {
 			if (err){ 
 				alert(err);
 			} else {
-				alert("failure: " + result.args.message);
+				alert("failure: " + web3.toAscii(result.args.message));
 			}
 		});
 	
@@ -746,11 +752,11 @@ window.App = {
 		});
 
 		updateStart.watch((err,updateStart) => {
-
+			console.log(updateStart.blockNumber + " " + loadBlock);
 			if (updateStart.blockNumber != loadBlock) {
 
 				let date = new Date(updateStart.args.time * 1000);
-				activeUpdate = updateStart.args.updateId(16);
+				activeUpdate = updateStart.args.updateId.toString(16);
 			
 				let html = "<div class=\"media-body\">" +
 				"<h4 class=\"media-heading\">Update Started" +
@@ -792,7 +798,7 @@ window.App = {
 					bountyEnd.args.updateId.toString(16) + "\">" +
 					"Go to thread.</a>" +
 					"<p>Vote is active.</p>" +
-					"<p>Please vote if you haven'done so already.</p>");
+					"<p>Please vote if you havenii'done so already.</p>");
 				} else {
 					$("#update").html("<h4>No active updates</h4>");
 				}
@@ -921,12 +927,11 @@ window.App = {
 					"<a href=\"/tokenHome/" + token.id + "/forum/" +
 					_voteStart.args.tag[1].toString(16) + "\">" +
 					_voteStart.args.tag[1].toString(16) + "</a></p>" +
-					"<p>Vote Count: <br><span id =\"voteYes\"></span>% for update" +
-					"<span id=\"voteNo\"></span> against udpate</p>" +
+					"<p>Vote Count: <br><span id =\"voteYes\">0</span>% for update" +
+					"<span id=\"voteNo\">0</span>% against udpate</p>" +
 					"<p>If you haven't done so already:</p>" +
 					"<a href=\"/tokenHome/" + token.id + 
-					"/forum/" + _voteStart.args.tag[1].toString(16) +
-					"/vote\" class=\"btn btn-default\">" +
+					"/vote\" class=\"btn btn-default blockchain\">" +
 					"Vote</a>" +
 					"<p>Vote finishes on " + 
 					finishDate + "</p>");
@@ -953,13 +958,11 @@ window.App = {
 					"<a href=\"/tokenHome/" + token.id + "/forum/" +
 					_voteStart.args.tag[1].toString(16) + "\">" +
 					"Go to thread.</a>" +
-					"<p>Vote Count: <br><span id =\"voteYes\"></span>% think it's a bug." +
-					"<span id=\"voteNo\"></span> don't think it's a bug.</p>" +
+					"<p>Vote Count: <br><span id =\"voteYes\">0</span>% think it's a bug." +
+					"<span id=\"voteNo\">0</span>% don't think it's a bug.</p>" +
 					"<p>If you haven't done so already:</p>" +
-					"<a href=\"/tokenHome/" + token.id + 
-					"/forum/" + _voteStart.args.tag[1] +
-					"/voteForBug/" + _voteStart.args.tag[2].toString(16) +
-					"Vote</a>" +
+					"<a class \"btn btn-default blockchain\" href=\"/tokenHome/" + token.id + 
+					"/vote>Vote</a>" +
 					"<p>Vote finishes on " + 
 					finishDate + "</p>");
 				}

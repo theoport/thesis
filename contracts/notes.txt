@@ -1,0 +1,131 @@
+
+
+
+
+0. updating:
+
+bountyCompetition INACTIVE
+update INACTIVE
+
+1. startBounty -> bountyCompetition ACTIVE, 
+
+	set update parameters: ID and safetyHash
+	set bountyCompetition end time
+
+2. endBounty -> bountyCompetition INACTIVE
+
+ 		if (bountyCompetition found someone) 
+
+			Set developer, price and time window	
+			
+			-> Go to 3
+
+		else 
+	
+			-> Go to 0
+
+3. voteOnUpdate -> update ACTIVE
+
+		Set update parameters: developer, price, and time window	
+
+4. startVote -> vote ACTIVE
+	
+	Set all votes to zero	
+	Freeze funds of central bank
+	Set vote end time	
+
+5. endVote -> vote INACTIVE
+
+	if (vote successful)
+
+		if (vote was on update)
+	
+			-> Go to 6
+
+		else if (vote was on bug)
+
+			Set bugHunt INACIVE
+			Pay finder from salary of developer	
+	
+			if (developer exhausted his attempts)
+		
+				Set update INACTIVE
+	
+				-> Go to 0
+
+			else if (developer still has attempts left)
+	
+				Reset update end time by a preset extension
+		
+				-> Go to 7
+
+	else if (vote was unsuccessful)
+
+		if (vote was on update) 
+
+			set update INACTIVE
+
+			-> Go to 0
+
+		else if (vote was on bug)
+
+			Continue bugHunt started at 9
+			
+
+6. startUpdate	
+		
+	Set update parameters: end time
+
+7.
+
+	if (developer submits udpate before deadline)
+
+		-> Go to 8
+
+	else 
+		
+		-> Go to 7
+
+8. endUpdate -> update INACTIVE	
+
+	-> Go to 0
+
+8. submitUpdate -> bugHunt ACTIVE 
+
+	Set update parameters: address of new contract,
+	new end time that coincides with end time of bugHunt,
+	hasSubmitted to true
+		
+	Set bugHunt deadline
+
+	if (bug was found) 
+	
+		-> Go to 11
+
+	else 
+		-> Go to 9
+
+9. finaliseUpdate -> update INACTIVE, bugHunt INACTIVE, changeOver ACTIVE
+
+	Pay developer, initialise new token to values of old contract
+	Set end time of changeOver 
+
+10. killOldContract -> changeOver INACTIVE
+
+	Set address on Token object of old token to new token
+	Kill old contract
+
+	-> Go to 0
+
+11. foundBug 
+	
+	Reset end time of update to include upcoming vote
+	Set finder and description hash of found bug
+
+	-> Go to 4
+	
+			
+	
+
+	 
+
