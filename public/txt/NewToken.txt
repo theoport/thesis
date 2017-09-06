@@ -22,7 +22,6 @@ contract NewToken is BaseToken{
 		issuanceRate = _issuanceRate;
 		upperCap = _upperCap;
 		hasBeenInitialised = true;
-		lastUpdate = creationTime;
 	}
 }
 		

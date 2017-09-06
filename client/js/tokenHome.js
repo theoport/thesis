@@ -82,7 +82,7 @@ window.App = {
 
 		//BOUNTY
 		let bountyStart = 	tmInstance.BountyStarted({},{fromBlock: startBlock});
-		let bountyFinish = tmInstance.BountyEnded({},{fromBlock: startBlock});
+		let bountyFinish = tmInstance.BountyEnd({},{fromBlock: startBlock});
 
 		let bugFound = tmInstance.BugFound({},{fromBlock: startBlock});
 
@@ -685,7 +685,7 @@ window.App = {
 
 		//BOUNTY
 		let bountyStart = 	tmInstance.BountyStarted({},{fromBlock: 'latest'});
-		let bountyFinish = tmInstance.BountyEnded({},{fromBlock: 'latest'});
+		let bountyFinish = tmInstance.BountyEnd({},{fromBlock: 'latest'});
 
 		let bugFound = tmInstance.BugFound({},{fromBlock: 'latest'});
 

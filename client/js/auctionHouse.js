@@ -31,8 +31,8 @@ window.App = {
 		
 		finishedAuctions = [];
 	
-		auctionStart = tmInstance.AuctionStarted();	
-		auctionFinish = tmInstance.AuctionFinished();
+		auctionStart = tmInstance.AuctionStarted({},{fromBlock: 0});	
+		auctionFinish = tmInstance.AuctionEnd({}, {fromBlock: 0});
 
 		auctionFinish.get((err, auctionEnds) => {
 			for (var i = 0; i < auctionEnds.length ; i++) {

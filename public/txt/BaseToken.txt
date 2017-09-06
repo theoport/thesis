@@ -13,78 +13,38 @@ contract BaseToken is ERC20Standard{
 	bytes32 public name;
 	address public manager;
 	address public creator;
-	bool public hasBeenInitialised;
-	uint256 public daysSinceFirstCreation;
+
+	
+	bool hasBeenInitialised; 
+	uint256 daysSinceFirstCreation;
 	
 	mapping (address => uint256) balances;
 	mapping (address  => mapping (address => uint256)) allowance;
 	mapping (address => bool) blocked;
 	mapping (uint256 => address) accountsBlocked;
 
-	event Debug(uint256 numberOne, uint256 numberTwo, bytes32 stringOne, bytes32 stringTwo);
 	
 	function getIssuanceRate() constant public returns(uint256[2]){
 		return issuanceRate;
 	}
 
-	function setSupply(uint256 amount) {
-		totalSupply = amount;
-	}
+	/*Let's the creator mint tokens from the tokenmanager contract.*/
 
-	function mint(uint256 amount, address to) byCreator {
-		if (balances[manager] >= amount) {
+	function mint(uint256 amount, address to) byCreator updateSupply {
+		if (balances[manager] >= amount && !blocked[manager]) {
 			balances[manager] -= amount;
 			balances[to] += amount;
 		}
 	}
-	
-	modifier byCreator() {
-		assert(msg.sender == creator);
-		_;
-	}
 
-	modifier byManager() {
-		assert(msg.sender == manager);
-		_;
-	}
+	/*Function to intialise state after update has been submitted,
+	which must inherit from this contract.*/
 
-	modifier updateSupply() {
-		if(!limitReached) {
-			uint daysPassed = (now - creationTime + daysSinceFirstCreation)/ (1 minutes); 
-
-			if (daysPassed > lastUpdate) {
-
-				for (uint i = lastUpdate; i < daysPassed; i++) {
-
-					uint temp = issuanceRate[1] * i + issuanceRate[0];	
-
-					if (temp <= 0) {
-						limitReached = true;
-						break;
-					}
-
-					balances[manager] += temp;
-					totalSupply += temp;
-
-					if (totalSupply >= upperCap) {
-						uint previous = totalSupply;
-						totalSupply = upperCap;
-						balances[manager] -= (previous - totalSupply);
-						limitReached = true;
-						break;
-					}
-				}
-				lastUpdate = daysPassed;
-			}
-		}
-		_;
-	}
-
-	function initialise(bytes32 _name, uint256[2] _issuanceRate, uint256 _daysSinceFirstCreation, uint256 _upperCap, bool _limitReached, uint256 _lastUpdate, uint256 _noAccountsBlocked, uint256 _totalSupply) byManager {
+	function initialise(address _creator, bytes32 _name, uint256[2] _issuanceRate, uint256 _upperCap, bool _limitReached, uint256 _lastUpdate, uint256 _noAccountsBlocked, uint256 _totalSupply) byManager {
 		assert(!hasBeenInitialised);
+		creator = _creator;
 		name = _name;
 		issuanceRate = _issuanceRate;
-		daysSinceFirstCreation = _daysSinceFirstCreation;
 		upperCap = _upperCap;
 		limitReached = _limitReached;
 		lastUpdate = _lastUpdate;
@@ -93,39 +53,43 @@ contract BaseToken is ERC20Standard{
 		hasBeenInitialised = true;
 	}
 		
+	/*Function to kill contract after new contract was submitted.
+	Can only be done by manager*/
+
 	function kill () byManager {
 		selfdestruct(manager);
 	}
 
-	function getTotalSupply() public returns (uint256) {
+	/*Returns the total supply of token, without updating balances.*/
+
+	function getTotalSupply() constant public returns (uint256) {
+
 		uint256 _totalSupply = totalSupply;
-		Debug(_totalSupply, totalSupply, "A", "");
-		_totalSupply = 1000;
-		totalSupply += 1;
+
 		if(!limitReached) {
-			uint256 daysPassed = (now - creationTime + daysSinceFirstCreation)/ (1 minutes); 
-			Debug(daysPassed, now, "ab", "");
-
+			
+			uint256 daysPassed = (now - creationTime + daysSinceFirstCreation); 
+	
 			if (daysPassed > lastUpdate) {
+				uint256 temp;
+				for (uint256 i = lastUpdate; i < daysPassed; i++) {
 
-				for (uint i = lastUpdate; i < daysPassed; i++) {
-
-					uint256 temp = issuanceRate[1] * i + issuanceRate[0];	
-					Debug(temp, issuanceRate[1], "B", "");
+					temp = issuanceRate[1] * i + issuanceRate[0];	
 
 					if (temp < 0) {
-						break;
-					}
+						if (issuanceRate[1] <= 0) {
+							break;
+						}
+					} else {
 
-					_totalSupply += temp;
+						_totalSupply += temp;
 
-					Debug(_totalSupply, temp, "C", "");
-					if (_totalSupply >= upperCap) {
-						_totalSupply = upperCap;
-						break;
+						if (_totalSupply >= upperCap) {
+							_totalSupply = upperCap;
+							break;
+						}
 					}
 				}
-				lastUpdate = daysPassed;
 			}
 		}
 		return _totalSupply;
@@ -154,6 +118,9 @@ contract BaseToken is ERC20Standard{
 		} else {return false;}
 	}
 
+	/*TokenManager always has right to take funds from accounts,
+	is needed for the refund function.*/
+
 	function transferToCentral(address from, uint256 value) byManager updateSupply returns (bool success){
 		if (balances[from] >= value) {
 			balances[from] -=value;
@@ -163,19 +130,28 @@ contract BaseToken is ERC20Standard{
 		}
 	}
 
+	/*Lets tokenmanager empty an account for change over period,
+	in which users transfer funds from old contract to new contract*/
+
 	function emptyAccount(address owner) byManager {
 		balances[owner] = 0;
 	}
+	
+	/*Lets the manager add funds to accounts in new update.*/
 
+	
 	function add(address account,uint256 amount) byManager {
 		balances[account] += amount;
 	}
 	
+	/*Lets the manager block account to secure their vote.*/
 	
 	function block(address target) byManager {
 		blocked[target] = true;
 		accountsBlocked[noAccountsBlocked++] = target;
 	}
+
+	/*Lets the manager unblock all accounts after vote is finished.*/
 
 	function unblockAll()	byManager {
 		for (uint256 i = 0; i < noAccountsBlocked; i++) {
@@ -185,20 +161,69 @@ contract BaseToken is ERC20Standard{
 	}
 	
 	function isBlocked(address account) returns (bool) {
-		if (blocked[account] == true) {
-			return true;
-		} else {
-			return false;
-		}
+		return blocked[account];
 	}
 			
+	/*User can allow another user to spend funds on their behalf.*/
 
 	function approve(address spender, uint256 value) returns (bool success){
 		allowance[msg.sender][spender]=value;
 		Approval(msg.sender, spender, value);
 		return true;
 	}
+
+	/*Checks amount that spender can spend on behalf of owner.*/
 	function allow(address owner, address spender) constant returns (uint256 remaining){
 		return allowance[owner][spender];
+	}
+	
+	/*---modifiers---*/
+	
+	modifier byCreator() {
+		assert(msg.sender == creator);
+		_;
+	}
+
+	modifier byManager() {
+		assert(msg.sender == manager);
+		_;
+	}
+
+	/*Updates total supply of token. Equivalent to issuing 
+	the token, but it is done passively.*/
+
+	modifier updateSupply() {
+
+		if(!limitReached) {
+			uint256 daysPassed = (now - creationTime + daysSinceFirstCreation); 
+			if (daysPassed > lastUpdate) {
+
+				for (uint i = lastUpdate; i < daysPassed; i++) {
+
+					uint temp = issuanceRate[1] * i + issuanceRate[0];	
+
+					if (temp <= 0) {
+						if (issuanceRate[1] <= 0) {
+							limitReached = true;
+							break;
+						}
+					} else {
+
+						balances[manager] += temp;
+						totalSupply += temp;
+
+						if (totalSupply >= upperCap) {
+							uint previous = totalSupply;
+							totalSupply = upperCap;
+							balances[manager] -= (previous - totalSupply);
+							limitReached = true;
+							break;
+						}
+					}
+				}
+				lastUpdate = daysPassed;
+			}
+		}
+		_;
 	}
 }

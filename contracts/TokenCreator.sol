@@ -16,6 +16,11 @@ contract TokenCreator{
 		) payable { 
 		TokenManager manager = new TokenManager(initialSupply, name, 
 																						consensusPercent, issuanceRate, upperCap, contractRefunds);
+
+
+		if (!(address(manager).send(msg.value))){
+			throw;
+		}
 		if (!(address(manager).send(msg.value))){
 			throw;
 		}

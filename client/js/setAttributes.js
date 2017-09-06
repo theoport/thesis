@@ -35,7 +35,7 @@ window.App = {
 		});
 	},
 	setExchangeRate: function () {
-		tmInstance.setExchangeRate($("#rateAttr").val(), $("#largerAttr"), {from: account, gas: 400000}, (err,result) => {
+		tmInstance.setExchangeRate($("#rateAttr").toNumber() * 100, $("#largerAttr"), {from: account, gas: 400000}, (err,result) => {
 			if (err)
 				alert(err);
 			else 

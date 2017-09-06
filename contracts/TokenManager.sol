@@ -1,3 +1,11 @@
+/*This contract is the manager of the token and will stay the same
+throughout the lifetime of a token. It keeps track of the updated  
+Token contract, and resides over votes, auctions, bughunt, bountyhunts
+and udpates. It can also refund the ether spent on transactions within it
+in exchange for the equivalent amount in token. To activate this function, 
+contractRefunds should be made truthy.*/
+
+
 pragma solidity ^0.4.8;
 
 import "./NewToken.sol";
@@ -5,80 +13,68 @@ import "./NewToken.sol";
 contract TokenManager {
 
 	 
-	/* Constants that are set permanently at deployment of contract.
-	Could also make it possible to set them after deployment, but
-	would have to require further voting, as otherwise too much 
-	trust is put in the hands of the creator.*/
+	/* 	Variables that can be set by creator at any time.
+			Realistically, changing these value should be up for vote. */
 
-	uint256 public LOWESTETHER = 1 ether;
+	uint256 public LOWESTETHER;
+	uint256 public AUCTIONDURATION;
+	uint256 public BUGEXTENSION;
+	uint256 public BUGHUNT;
+	uint256 public BOUNTYHUNT;
+	uint256 public UPDATETRIES;
+	uint256 public PRICEHOURRATIO;
+	uint256 public VOTEDURATION;
+	uint256 public CHANGEOVERTIME;
+	uint256 public ETHERBALANCE;
+	uint256 public CONSENSUSPERCENT;
+	bool 		public contractRefunds;
 
-		uint256 public AUCTIONDURATION;
-		uint256 public BUGEXTENSION;
-		uint256 public BUGHUNT;
-		uint256 public BOUNTYHUNT;
-		uint256 public UPDATETRIES;
-		uint256 public PRICEHOURRATIO;
-		uint256 public VOTEDURATION;
-		uint256 public CHANGEOVERTIME;
-		uint256 public ETHERBALANCE;
+	/* 	Variables that cannot be set by anoyone outside the contract.
+			But can be accessed from other contracts. */
+	
+	uint 		public 		creationTime;
+	address public 		tokenAddress; 		
+	uint256 public 		version;			
 
-	enum subject{UPDATE, BUG} 
-	bool changeOverActive;
-	address creator;
-	uint public creationTime;
-	address public tokenAddress; // address of the token managed by this contract
-	address public newTokenAddress;
-	NewToken token;
-	NewToken newToken;
-	uint256 public consensusPercent;	// percentage required for any vote to succeed
-	bool public contractRefunds;	// does the contract refund, can be updated
-	uint256 public version;	// version number of token
-	Vote vote;
-	Auction auction;
-	Update update;
+	/* 	Variables that internal to contract. */
+
+	enum 							subject{UPDATE, BUG} 
+	bool 							changeOverActive;
+	address 					creator;
+	NewToken 					token;
+	NewToken 					newToken;
+	Vote 							vote;
+	Auction 					auction;
+	Update 						update;
 	BountyCompetition bountyCompetition;
-	Exchange public exchange;
+	Exchange 					exchange;
   
 	struct Exchange {
       uint256 rate;
       bool tokenToWei;
   }
 
-	/* Struct for competition between developers on who can implement the update 
-	for the best price. While a competition is active, no other competition can be started.*/
-			
 	struct BountyCompetition { 
+		bool 		active;
 		uint256 startTime;
 		uint256 endTime;
 		uint256 bestPrice;
 		address bidder;
-		bool active;
 	}
 	
-	/* Struct for vote of any kind. Each vote gets a unique id which increases by one 
-	for every new vote. While a vote is happening, no other votes can be started. 
-	Voters get amount of votes proprtional to their token balance. Once voted, the account
-	is blocked and only unblocked at the end of the vote. A vote ends by either exceeding the 
-	time limit or surpassing the required percentage.*/
-
 	struct Vote{
-		bool active;
-		uint256 totalYesVotes;
-		uint256 totalNoVotes;
-		uint256 totalPossibleVotes;
-		uint256 startTime;
-		uint256 endTime;
-		uint256[3] tag;
+		bool 				active;
+		uint256 		totalYesVotes;
+		uint256 		totalNoVotes;
+		uint256 		totalPossibleVotes;
+		uint256 		startTime;
+		uint256 		endTime;
+		uint256[3] 	tag;
 	}
 
-	/* Auction struct, at the moment only used for refuelling. To avoid attacks, bids that
-	have been overbidded will not immediately get sent back to the bidder but will be added
-	to the mapping returnBids and can be withdrawn by the bidder. Amount is the amount of
-	tokens that is being sold.*/
-
 	struct Auction{
+		bool 		active;
 		uint256 amount;
-		bool active;
 		address highestBidder;
 		uint256 highestBid;
 		uint256 startTime;
@@ -87,40 +83,25 @@ contract TokenManager {
 		mapping (address => uint256) returnBids;
 	}
 	
-	/* BugHunt represents the time phase after a developer submitted the upgraded token 
-	contract, in which anyone can search for bugs. If one is found, the hash of its description
-	is logged and the finder is rewarded a price in token once the community has voted that this 
-	is indeed a bug. The price for finding a bug is deducted from the reward for the upgraded contract,
-	as otherwise developer and bug-hunter can cooperate to make more money.*/
- 
 	struct BugHunt {
+		bool 		active;
 		uint256 startTime;
 		uint256 endTime;
-		bool active;
-		bool foundOne;
+		bool 		foundOne;
 		uint256 descriptionHash;
 		address finder;
 		uint256 bugId;
 	}
-
-	/* Update is for the time starting with bountyHunt and ending with the submission of the updated contract. 
-	Even updates that don't get voted through or dont find any developers willing to implement it receive a 
-	unique id. When an update is active, no new updates can be proposed. When the update is submitted, the bughunt
-	begins, and if one is found, the developer gets BUGEXTENSION more days to fix it. An update finishes when a 
-	developer submits bug-free code or when the time limit passes. In which case the developer is paid nothing and no
-	update is implemented. The timewindow is proportional to the price a developer will receive upon completion, where
-	the ratio can be changed. This is to stop attackers from offering very low prices and delaying the updates by not doing
-	anything. Not at all perfect yet.*/
  
 	struct Update {
+		bool 		active;
 		uint256 safetyHash;
 		uint256 id;
 		uint256 bugBounty;
-		bool hasSubmitted;
+		bool 		hasSubmitted;
 		uint256 timeWindow;
 		address developer;
 		uint256 price;
-		bool active;
 		uint256 startTime;
 		uint256 endTime;
 		BugHunt bugHunt;
@@ -130,50 +111,64 @@ contract TokenManager {
 	}
 		
 	event VoteStarted(uint256 time, uint256 finishTime, uint256[3] tag);
-	event BugHuntEnd(uint256 time, uint256 updateId);
 	event VotingOutcome(uint256 time, bool success, uint256[3] tag);
-	event UpdateOutcome(uint256 time,bool success, uint256 updateId);
-	event NewHighestBid(uint256 indexed auctionId, address sender, uint256 amount);
-	event AuctionEnd(uint256 time, uint256 auctionId, address winner, uint256 price, uint256 amount);
-	event Failure(uint256 time, bytes32 message, uint256 id);
-	event NewBountyPrice(uint256 indexed updateId, uint256 amount, address bidder);
-	event BountyEnded(uint256 indexed updateId, uint256 time, address winner, uint256 price); 
-	event BountyStarted(uint256 indexed updateId, uint256 time, uint256 finishTime, uint256 safetyHash);
-	event BugFound(uint256 indexed updateId, uint256 indexed bugId, address by, uint256 descriptionHash);
-	event AuctionStarted(uint256 time, uint256 finishTime, uint256 auctionId, uint256 amount);
+	event NewVote(uint256[3] indexed tag, uint256 yes, uint256 no, address from);
+
 	event BugHuntStarted(uint256 time, uint256 finishTime, uint256 id, uint256 creationTime, address updatedContract, uint256 safetyHash);
-	event UpdateStarted(uint256 time, uint256 updateId);
-	event DeveloperStarted(uint256 time, uint256 updateId, uint256 finishTime, address developer);
+	event BugHuntEnd(uint256 time, uint256 updateId);
+	event BugFound(uint256 indexed updateId, uint256 indexed bugId, address by, uint256 descriptionHash);
 	event WasABug(uint256 updateId, uint256 bugId, uint256 finishTime, address developer, uint256 tries); 
 	event WasNotABug(uint256 updateId, uint256 bugId);
-	event NewVote(uint256[3] indexed tag, uint256 yes, uint256 no, address from);
+
+	event UpdateStarted(uint256 time, uint256 updateId);
+	event UpdateOutcome(uint256 time,bool success, uint256 updateId);
+
+	event AuctionStarted(uint256 time, uint256 finishTime, uint256 auctionId, uint256 amount);
+	event AuctionEnd(uint256 time, uint256 auctionId, address winner, uint256 price, uint256 amount);
+	event NewHighestBid(uint256 indexed auctionId, address sender, uint256 amount);
+
+	event BountyStarted(uint256 indexed updateId, uint256 time, uint256 finishTime, uint256 safetyHash);
+	event BountyEnd(uint256 indexed updateId, uint256 time, address winner, uint256 price); 
+	event NewBountyPrice(uint256 indexed updateId, uint256 amount, address bidder);
+
+	event DeveloperStarted(uint256 time, uint256 updateId, uint256 finishTime, address developer);
 	event ChangeOver(uint256 finishTime, uint256 updateId);
 	event OldContractDead(uint256 updateId);
 
 	//Constructor, creates new token
 
 	function TokenManager(
-		uint256 _initialAmount, 
-		bytes32 _name, 
-		uint256 _consensusPercent,
-		uint256[2] _issuanceRate,
-		uint256 _upperCap,
-		bool _contractRefunds
+
+		uint256 		_initialAmount, 
+		bytes32 		_name, 
+		uint256 		_consensusPercent,
+		uint256[2] 	_issuanceRate,
+		uint256 		_upperCap,
+		bool 				_contractRefunds
+
 	) payable {
+
 		creator 					= tx.origin;
 		ETHERBALANCE			= msg.value;
-		consensusPercent 	= _consensusPercent;
+		CONSENSUSPERCENT 	= _consensusPercent;
 		contractRefunds 	= _contractRefunds;
 		version 					= 0;
 		creationTime 			= now; 
 		token 						= new NewToken(_initialAmount, _name, _issuanceRate, _upperCap, tx.origin);
 		tokenAddress 			= address(token);
+
 		}
+
+	//getter functions
+	
 	function getTokenCreationTime() constant returns (uint256) {return token.creationTime();}
 	function getTokenAddress() constant returns (address) {return tokenAddress;}
 	function getExchangeRate() constant returns (uint256, bool) {
 		return (exchange.rate, exchange.tokenToWei);
 	}
+
+	//setter functions
+
 	function setBugBounty(uint256 percent) {update.bugBounty = percent;}
 	function setContractRefunds(bool _x) public byCreator {contractRefunds = _x;}	
 	function setExchangeRate(uint256 _rate, bool _tokenToWei) byCreator {
@@ -191,6 +186,7 @@ contract TokenManager {
 	function setEtherBalance(uint256 _balance) public byCreator {ETHERBALANCE = _balance * (1 ether);}
 
 	//Fallback function
+
 	function () payable {
 	}
 	
@@ -202,14 +198,17 @@ contract TokenManager {
 	referral. After the bounty is started, anyone can compete for the job for the 
 	specified amount of time.*/
 
-	function startBounty (uint256 _id, uint256 _safetyHash)public{
+	function startBounty (uint256 _id, uint256 _safetyHash) public {
+
 		require (!changeOverActive && !bountyCompetition.active && !update.active);
+
 		bountyCompetition.active = true;
 		bountyCompetition.startTime = now;
 		bountyCompetition.endTime = bountyCompetition.startTime + BOUNTYHUNT;
 		bountyCompetition.bestPrice = 0;
 		update.id= _id;
 		update.safetyHash = _safetyHash;
+
 		UpdateStarted(bountyCompetition.startTime, update.id);
 		BountyStarted(update.id, bountyCompetition.startTime, bountyCompetition.endTime, _safetyHash);
 	}
@@ -219,22 +218,27 @@ contract TokenManager {
 	a bid alongside the update id for future referral */
 		
 	function bidForBounty (uint256 price) public {
+	
 		require((now >= bountyCompetition.startTime && now <= bountyCompetition.endTime)); 
+
 		if (price < bountyCompetition.bestPrice || bountyCompetition.bestPrice == 0) {
 			bountyCompetition.bestPrice = price;
 			bountyCompetition.bidder = msg.sender;
 			NewBountyPrice(update.id, price, msg.sender); 
 		}
+
 	}
 	
 	/* Function ends bounty, can be called by anyone as long as time is over and 
 	it hasn't been ended already. Goes straight into starting a vote for the update. */
 
 	function endBounty () public {
-		require(now >= bountyCompetition.endTime);
-		require(bountyCompetition.active);
+
+		require(bountyCompetition.active && now >= bountyCompetition.endTime);
+
 		bountyCompetition.active = false;
-		BountyEnded(update.id, now, bountyCompetition.bidder, bountyCompetition.bestPrice);
+		BountyEnd(update.id, now, bountyCompetition.bidder, bountyCompetition.bestPrice);
+
 		if (bountyCompetition.bestPrice == 0){
 			UpdateOutcome(now, false, update.id);
 		} else {
@@ -249,19 +253,17 @@ contract TokenManager {
 	
 
 	function foundBug (uint256 _descriptionHash, uint256 _id) public {
-		assert(update.bugHunt.active && update.bugHunt.endTime > now);
-		if (update.bugHunt.foundOne) {
-			Failure(now, "found", 7);
-			return;
-		}
+
+		require(!update.bugHunt.foundOne && update.bugHunt.active && update.bugHunt.endTime >= now);
+
 		update.bugHunt.foundOne = true;
 		update.bugHunt.descriptionHash = _descriptionHash;
 		update.bugHunt.finder = msg.sender;
-		//IS IT REALLY A BUG?	GIVE TIME FOR BUG FINDER AND DEVELOPER TO DISCUSS
 		update.endTime += VOTEDURATION;	
 		update.bugHunt.bugId = _id;
 		BugFound(update.id, update.bugHunt.bugId, msg.sender, _descriptionHash);
 		startVote([uint256(subject.BUG), update.id, update.bugHunt.bugId]);
+	
 	}
 
 	/* Starts a vote on the update and adds tag to vote, also adds developer and price to update struct
@@ -269,26 +271,26 @@ contract TokenManager {
 	a new bountyhunt. Can't be called by anyone but this contract*/
 
 	function voteOnUpdate (address _developer, uint256 _price) internal {
-		if (update.active) {
-			Failure(12,"D",12);
-		} else {
-		//require (!update.active);
+
+		require (!update.active);
+
+		update.active = true;
 		update.developer = _developer;
 		update.price = _price;
 		update.timeWindow = (_price / PRICEHOURRATIO);
-		update.active = true;
 		startVote([uint256(subject.UPDATE), update.id, 0]);
-		}
 	}
 	
 	/* If vote is successfull, start update, can only be called by this contract */
 
 	function startUpdate () internal{
+
 		update.numberOfTries = UPDATETRIES;
 		update.hasSubmitted = false;
 		update.startTime = now;
 		update.endTime = update.startTime + update.timeWindow;
 		DeveloperStarted(update.startTime, update.id, update.endTime, update.developer);
+
 	}
 
 	/* Function to submit an update, must be sent by developer before end of time window.
@@ -297,8 +299,8 @@ contract TokenManager {
 	
 	function submitUpdate (address _updatedContract) public{
 			
-		require (!update.hasSubmitted && update.developer == msg.sender);
-		assert(now <= update.endTime);
+		require (now <= update.endTime && !update.hasSubmitted && update.developer == msg.sender);
+
 		update.hasSubmitted = true;
 		update.bugHunt.active = true;
 		update.bugHunt.startTime = now;
@@ -307,34 +309,44 @@ contract TokenManager {
 		update.updatedContract = _updatedContract;	
 		newToken = NewToken(update.updatedContract);
 		BugHuntStarted(update.bugHunt.startTime, update.bugHunt.endTime, update.id, newToken.creationTime(), update.updatedContract, update.safetyHash);
+
 	}
 
 	/* If no bugs are found, time passes and anyone can finalise the update, sending the 
 	price to the developer. */	
 
 	function finaliseUpdate() public {
-		assert(update.active && now >= update.endTime && update.hasSubmitted);
+
+		require(update.active && now >= update.endTime && update.hasSubmitted);
+
+		//If paying developer fails, can't finalise update
 		if (!token.transfer(update.developer, update.price)){
-		    Failure(now, "Couldn't pay developer", 8);
-		    return;
+		    throw;
 		}
 		
-		newToken.initialise(token.creator(), token.name(), token.getIssuanceRate(), token.upperCap(), token.limitReached(), token.lastUpdate(), token.noAccountsBlocked(), token.totalSupply()); 	
 		update.active = false;
 		update.bugHunt.active = false;
-		version++;
-		BugHuntEnd(now, update.id);
-		UpdateOutcome(now, true, update.id);
 		changeOverActive = true;
+		newToken.initialise(token.creator(), token.name(), token.getIssuanceRate(), token.upperCap(), token.limitReached(), token.lastUpdate(), token.noAccountsBlocked(), token.totalSupply()); 	
+		version++;
 		update.timeToKill = now + CHANGEOVERTIME;
-		var amount = token.balanceOf(address(this));
+
+		uint256 amount = token.balanceOf(address(this));
 		token.emptyAccount(address(this));
 		newToken.add(address(this), amount);
+
+		BugHuntEnd(now, update.id);
+		UpdateOutcome(now, true, update.id);
 		ChangeOver(update.timeToKill, update.id);
 	}
 
+	/* When changeOver is over, anyone can kill the old contract, 
+	which is then completely replaced by new contract. */ 
+
 	function killOldContract() public {
+
 		require(changeOverActive && now >= update.timeToKill);
+
 		changeOverActive = false;
 		token.kill();
 		tokenAddress = update.updatedContract;
@@ -343,8 +355,13 @@ contract TokenManager {
 		OldContractDead(update.id);
 	}
 
+	/* Lets users transfer their funds from the old contract to the new contract,
+	while change over period is active.*/
+
 	function transferToNewContract() public {
+
 		require(changeOverActive);
+
 		if (token.balanceOf(msg.sender) > 0) {
 			var amount = token.balanceOf(msg.sender);
 			token.emptyAccount(msg.sender);
@@ -352,8 +369,13 @@ contract TokenManager {
 		}
 	}
 
+	/* Lets anyone end an update when the developer has missed the deadline,
+	while change over period is active.*/
+
 	function endUpdate() public {
-		assert(update.active && now >= update.endTime && !update.hasSubmitted);
+
+		require(update.active && now >= update.endTime && !update.hasSubmitted);
+
 		update.active = false;
 		UpdateOutcome(now, false, update.id);
 	}
@@ -361,7 +383,11 @@ contract TokenManager {
 
 	/*****************REFUEL***************/
 	
-	function startAuction(uint256 amountOfToken) {
+
+	/* This function should only be called by contract when it is refuelling itself. 
+	Will start an auction to the amount of token, that is calculated wiht the exchange rate. */
+		
+	function startAuction(uint256 amountOfToken) internal {
 		auction.amount = amountOfToken;
 		auction.startTime = now;
 		auction.endTime = auction.startTime + AUCTIONDURATION;
@@ -369,25 +395,37 @@ contract TokenManager {
 		auction.highestBidder = 0;
 		auction.highestBid = 0;
 		auction.id++;
+
 		AuctionStarted(auction.startTime, auction.endTime, auction.id, auction.amount);
 	}
+
+	/* Function to submit a bid for the refuelling auction, can be called by anyone. 
+	When bidding, users send the bid as value. If their bid gets beaten, they can withdraw
+	the amount back. This is to prevent attackers from delaying the auction by blocking send.*/	
 	
-	function bid() payable {
+	function bid() public payable {
 		
-		assert(now >= auction.startTime && now <= auction.endTime);
-		assert(msg.value > auction.highestBid);
+		require(now >= auction.startTime && now <= auction.endTime && msg.value > auction.highestBid);
+
 		if (auction.highestBidder != 0){
 			auction.returnBids[auction.highestBidder] += auction.highestBid;
 		}
+
 		auction.highestBidder = msg.sender;
 		auction.highestBid = msg.value;		
+
 		NewHighestBid(auction.id, msg.sender, msg.value);
 	}		
 
-	function withdrawReturnedBid() returns (bool) {
+	/* Function to withdraw previously beaten bids */
+
+	function withdrawReturnedBid() public returns (bool) {
+
 		if (auction.returnBids[msg.sender] > 0)	{
+
 			var temp = auction.returnBids[msg.sender];
 			auction.returnBids[msg.sender] = 0;
+
 			if (!msg.sender.send(temp)) {
 				auction.returnBids[msg.sender] = temp;
 				return false;
@@ -396,17 +434,24 @@ contract TokenManager {
 		}
 	}
 
-	function getWithdrawable(address owner) constant returns (uint256) {
+	/*Function to get the withdrawable amount for a user */
+
+	function getWithdrawable(address owner) constant public returns (uint256) {
 		return auction.returnBids[owner];
 	}
+
+	/*Function to end auction, can be called by anyone.
+	Transfers prize to winner, and if it fails their previous bid gets added
+	to their withdrawable bets */  
 		
-	function endAuction(){
-		assert(auction.active);
-		assert(now >= auction.endTime);
+	function endAuction() public {
+
+		require(auction.active && now >= auction.endTime);
+
 		auction.active = false;
+
 		if (!(token.transfer(auction.highestBidder, auction.amount))) {
 			auction.returnBids[auction.highestBidder] += auction.highestBid;
-			Failure(now, "Ending auction failed", 9);
 			return;
 		}
 		AuctionEnd(now, auction.id, auction.highestBidder, auction.highestBid, auction.amount);
@@ -414,12 +459,15 @@ contract TokenManager {
 		
 		
 	/******************VOTE*********************/
+
+	/*Function to start vote, can only be called by contract,
+	as only token manager is allowed to schedule votes */
+	
 	
 	function startVote(uint256[3] _tag) internal {
-		if (vote.active) {
-			Failure(13,"H",13);
-		} else {
-		//require(!vote.active);
+
+		require(!vote.active);
+
 		vote.totalPossibleVotes = token.totalSupply() - token.balanceOf(address(this));
 		vote.totalNoVotes = 0;
 		vote.totalYesVotes = 0;
@@ -428,53 +476,49 @@ contract TokenManager {
 		vote.endTime = vote.startTime + VOTEDURATION;
 		vote.tag = _tag;
 		token.block(address(this));
+
 		VoteStarted(vote.startTime, vote.endTime, _tag); 
-		}
 	}
 
-	function submitVote (bool yes) returns (bool){
-		if (!vote.active) {
-			Failure(2,"AAA",2);
-/*
-		} else if (token.isBlocked(msg.sender)) {
-			Failure(3,"AAA",2);
-		} else if (now < vote.startTime) {
-			Failure(now,"AAA",vote.startTime);
-		} else if (now > vote.endTime) {
-			Failure(now, "CCCCC", vote.endTime);
-*/
-		} else {
+	/*Function to submit binary vote. Freezes account until end of vote
+	and automatically checks if a majority was reached or beaten, to end vote */ 
 
-		//require (vote.active && !(token.isBlocked(msg.sender)) && now >= vote.startTime && now <= vote.endTime );
+	function submitVote (bool yes) public returns (bool){
+
+		require (vote.active && !(token.isBlocked(msg.sender)) && now >= vote.startTime && now <= vote.endTime );
+
 		if (token.balanceOf(msg.sender) > 0) {
+
 			token.block(msg.sender);
+
 			if (yes) {
 				vote.totalYesVotes += token.balanceOf(msg.sender);
 			}
 			else {
 				vote.totalNoVotes += token.balanceOf(msg.sender);
 			}
+
 			NewVote(vote.tag, (vote.totalYesVotes * 100) / vote.totalPossibleVotes, (vote.totalNoVotes * 100) / vote.totalPossibleVotes, msg.sender);
-			if (((vote.totalYesVotes / vote.totalPossibleVotes) * 100) > consensusPercent || ((vote.totalNoVotes / vote.totalPossibleVotes) * 100) > (100 - consensusPercent)) {
+			if ((((vote.totalYesVotes * 100) / vote.totalPossibleVotes) > CONSENSUSPERCENT) || (((vote.totalNoVotes * 100)  / vote.totalPossibleVotes) > (100 - CONSENSUSPERCENT))) {
 				endVote();
 				return true;
 			}
 			return true;
 		}
-		}
 	}
+	
+	/*Function to end vote, can be called by anyone.
+	Either time is over or majority was reached or beaten.
+	Checks if vote was on update or bug, and performs appropriate
+	actions for given outcome*/
 
-	function endVote() returns (bool){
-		if (!vote.active) {
-			Failure(4,"DDD",4);
-		} else if(vote.totalPossibleVotes == 0) {
-			Failure(5,"EEE",5);
-		} else  {
-		//require(vote.active);
+	function endVote() public returns (bool){
+
+		require(vote.active);
 		token.unblockAll();
-		if (((vote.totalYesVotes / vote.totalPossibleVotes) * 100) >= consensusPercent){
+
+		if (((vote.totalYesVotes * 100) / vote.totalPossibleVotes) >= CONSENSUSPERCENT){
 			
-			VotingOutcome(now, true, vote.tag);
 			vote.active = false;
 			if (uint256(vote.tag[0]) == uint256(subject.BUG)) {
 				update.bugHunt.foundOne = false;
@@ -495,29 +539,35 @@ contract TokenManager {
 				BugHuntEnd(now, update.id);
 				WasABug(update.id, update.bugHunt.bugId, update.endTime, update.developer, update.numberOfTries);
 				return true;
+
 			} else if (uint256(vote.tag[0]) == uint256(subject.UPDATE)) { 
 				startUpdate();
 				return true;
 			}	
 
-		} else if (now >= vote.endTime || vote.active && ((vote.totalNoVotes / vote.totalPossibleVotes) * 100) > (100 - consensusPercent)) {
+			VotingOutcome(now, true, vote.tag);
+
+		} else if (now >= vote.endTime || vote.active && ((vote.totalNoVotes * 100)/ vote.totalPossibleVotes) > (100 - CONSENSUSPERCENT)) {
+
 			vote.active = false;
-			VotingOutcome(now, false, vote.tag);
+
 			if (uint256(vote.tag[0]) == uint256(subject.UPDATE)) {
 				update.active = false;
 				UpdateOutcome(now, false, update.id);	
 				return true;
 			}
+
 			else if (uint256(vote.tag[0]) == uint256(subject.BUG)) {
 				update.bugHunt.foundOne = false;
 				WasNotABug(update.id, update.bugHunt.bugId);
 				return true;
 			}
+
+			VotingOutcome(now, false, vote.tag);
 		} 
-		}
 	}
 
-	/*******************REFUND******************/
+	/*******************MODIFIERS******************/
 
 	
 	modifier byCreator(){
@@ -525,43 +575,49 @@ contract TokenManager {
 		_;
 	}
 
+	/*Tracks the gas used in a transaction and refunds that amount at the end
+	adds it to the returnBids mapping from auction. Checks if sender has enough token in the beginning
+	and checks if ether, falls below lowest ether balance at the end to start auction. */
+
 	modifier canRefund(){
-		_;
-/*		
+
 		if (contractRefunds){
 			
-			assert(token.balanceOf(msg.sender) > gasToToken(msg.gas));
+			require(token.balanceOf(msg.sender) > gasToToken(msg.gas));
 			var gasUsed = msg.gas;
 		
 		}
 			_;
+
 		if (contractRefunds){
 	
 			gasUsed -= msg.gas;
-			token.transferToCentral(msg.sender, gasToToken(gasUsed));
-			if (!(msg.sender).send(gasUsed * tx.gasprice)){
-				Failure(now, "Couldn't refund", 10);
-				token.transfer(msg.sender, gasToToken(gasUsed));
-			} 
+			if (token.transferToCentral(msg.sender, gasToToken(gasUsed))){
+				auction.returnBids[msg.sender] += (gasUsed * tx.gasprice);
+			}
+
 			uint256 _balance = this.balance;
+
 			if (_balance < LOWESTETHER) {
 				startAuction(weiToToken(ETHERBALANCE = _balance));
 			}
 		}
-*/
 	} 
 
 
-	//should probably be done frontend;
 	function gasToToken(uint256 amount) constant returns (uint256){
-		return weiToToken(amount) * tx.gasprice;
+		return weiToToken(amount) / tx.gasprice;
 	}
 
+	/*Function to convert wei to token. As solidity cannot do floating points,
+	a bool is needed to indicate whether the exchange rate is above or below 1,
+	prompting multiplication or division respectively. The exchange rate is stored
+	as multiplied by 100 to inprove accuracy.*/
 	
 	function weiToToken(uint256 amount) constant returns (uint256){
 		
 		if (exchange.tokenToWei == true){
-			return (amount) / (exchange.rate / 100);
+			return (amount * 100) / (exchange.rate);
 		}
 		else if (exchange.tokenToWei == false){
 			return (amount * exchange.rate ) / 100;

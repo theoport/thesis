@@ -1,3 +1,11 @@
+/*This contract is updatable and should be used to implement new token methods.
+The constructor should be changed by the update developer as only the manager address,
+creation time, and days since forst creation of the token should be set by the update
+developer. All other parameters are synchronized by the TokenManager once an update is
+approved.*/
+
+
+
 import "./BaseToken.sol";
 
 pragma solidity ^0.4.8;

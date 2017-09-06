@@ -68,7 +68,7 @@ window.App = {
 						
 							let newVote = tmInstance.NewVote({tag: voteStarts[i].args.tag}, {fromBlock: 0, toBlock: 'latest'});	
 							let bountyStart = tmInstance.BountyStarted({updateId: voteStarts[i].args.tag[1]}, {fromBlock: 0, toBlock: 'latest'});
-							let bountyEnd = tmInstance.BountyEnded({updateId: voteStarts[i].args.tag[1]}, {fromBlock: 0, toBlock: 'latest'});
+							let bountyEnd = tmInstance.BountyEnd({updateId: voteStarts[i].args.tag[1]}, {fromBlock: 0, toBlock: 'latest'});
 						
 							bountyStart.get((err, bountyStarts) => {
 								if (bountyStarts.length != 1) {

@@ -47,7 +47,7 @@ window.App = {
 		finishedBounties= [];
 	
 		bountyStart = tmInstance.BountyStarted({}, {fromBlock: 0, toBlock: 'latest'});	
-		bountyFinish = tmInstance.BountyEnded({}, {fromBlock: 0, toBlock: 'latest'});
+		bountyFinish = tmInstance.BountyEnd({}, {fromBlock: 0, toBlock: 'latest'});
 
 		bountyFinish.get((err, bountyEnds) => {
 			for (let i = 0; i < bountyEnds.length ; i++) {

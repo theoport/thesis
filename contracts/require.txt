@@ -1,0 +1,8 @@
+require(!vote.active);
+
+...
+
+if (!(address(manager).send(msg.value))){
+	throw;
+}
+

@@ -1,3 +1,6 @@
+/*This contract is an abstract interface that contains all the functions
+that most wallet interfaces require to recognise the token.*/
+
 pragma solidity ^0.4.8;
 
 /*ERC20 standard:*/
