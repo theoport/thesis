@@ -1,3 +1,5 @@
+
+
 Web-app using node.js, EJS, Truffle
 
 See academic report for details and use 
@@ -21,5 +23,6 @@ run "npm run start"
 
 website should be availble on localhost:8080, you need to install MetaMask chrome plugin to interact with the website
 
-
+NOTE: code is not production-ready, feel free to use but do so with care, any contributions are welcome
+contact: theodor.port@gmx.de
 
