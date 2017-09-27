@@ -13,7 +13,7 @@ start your local ethereum node
 
 start your mongodb database
 
-run "truffle migrate" to deploy contracts 
+run "truffle migrate" in truffle directory to deploy contracts 
 
 run "npm run build" 
 
