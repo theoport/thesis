@@ -1,5 +1,5 @@
 import {default as Web3} from 'web3'
-import tokenManagerObject from '../../build/contracts/TokenManager.json';
+import tokenManagerObject from '../../truffle/build/contracts/TokenManager.json';
 import {default as configDB} from '../../config/database.js';
 
 let TokenManager;
@@ -125,8 +125,8 @@ window.App = {
 							$("#active").append($("<a></a>")
 													.attr({'class': 'topic topic-update',
 													'href': './forum/' + updateStatus[i][0]})
-													.html("<div style=\"background-color:yellow;\" class=\" form-inline media\">" +
-														"<div class=\"form-group\"><div class=\"media-body\">" +	
+													.html("<div style=\"background-color:gold; border-style:solid; border-width:1px;\" class=\" form-inline media\">" +
+														"<div class=\"media-body\">" +	
 														"<h4 class=\"media-heading form-control\">" +
 														userMap.get(updateMap.get(updateStatus[i][0]).userId).username +
 														"<small>" +
@@ -134,7 +134,7 @@ window.App = {
 														"</small></h4>" +
 														"<h5>" +
 														updateMap.get(updateStatus[i][0]).title +
-														"</h5></div></div>" +
+														"</h5></div>" +
 														"<div class=\"form-group\"><span class=\"badge\" id=\"upvoteCount" +
 														updateStatus[i][0] + "\"></span></div></div>"));
 									
@@ -147,7 +147,7 @@ window.App = {
 													.attr({'class': 'topic topic-update',
 													'href': './forum/' + updateStatus[i][0]})
 													.html("<div class=\"form-inline media\">" +
-														"<div class=\"form-group\"><div class=\"media-body\">" +	
+														"<div  style=\"border-style:solid; border-width:1px;\" class=\"form-group\"><div class=\"media-body\">" +	
 														userMap.get(updateMap.get(updateStatus[i][0]).userId).username +
 														"<small>" +
 														updateMap.get(updateStatus[i][0]).creationDate +
@@ -169,7 +169,7 @@ window.App = {
 							$("#archived").append($("<a></a>")
 													.attr({'class': 'topic topic-update',
 													'href': './forum/' + updateStatus[i][0]})
-													.html("<div style=\"background-color:green;\"class=\" form-inline media\">" +
+													.html("<div style=\"background-color:yellowgreen; border-style:solid; border-width:1px;\" class=\" form-inline media\">" +
 														"<div class=\"form-group\"><div class=\"media-body\">" +	
 														"<h4 class=\"media-heading\">" +
 														userMap.get(updateMap.get(updateStatus[i][0]).userId).username +
@@ -190,8 +190,8 @@ window.App = {
 							$("#archived").append($("<a></a>")
 													.attr({'class': 'topic topic-update',
 													'href': './forum/' + updateStatus[i][0]})
-													.html("<div style=\"background-color:red;\"class=\"form-inline media\">" +
-														"<div class=\"form-group\"><div class=\"media-body\">" +	
+													.html("<div class=\"form-inline media\">" +
+														"<div style=\"background-color:tomato;border-style:solid; border-width:1px;\" class=\"form-group\"><div class=\"media-body\">" +	
 														"<h4 class=\"media-heading\">" +
 														userMap.get(updateMap.get(updateStatus[i][0]).userId).username +
 														"<small>" +

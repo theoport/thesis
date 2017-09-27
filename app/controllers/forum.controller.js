@@ -1,10 +1,13 @@
 
-const mongoose = require('mongoose');
-const Comment= require('../models/Comment');
-const Topic= require('../models/Topic');
-const Upvote = require('../models/Upvote');
-const BountyDescription= require('../models/BountyDescription');
-const Bug= require('../models/Bug');
+const nl2br 						= require('nl2br');
+const mongoose 					= require('mongoose');
+
+const Comment						= require('../models/Comment');
+const Topic							= require('../models/Topic');
+const Upvote 						= require('../models/Upvote');
+const BountyDescription = require('../models/BountyDescription');
+const Bug								= require('../models/Bug');
+const Token 						= require('../models/Token');
 
 
 module.exports = {
@@ -22,12 +25,31 @@ module.exports = {
 };
 
 function getTopics(req,res){
+
 	var $tokenId = req.params.id;
-	Topic.find({tokenId: $tokenId}, (err, topics) => {
-		if (err){
-			res.status(400).json(err);
+
+	Token.findOne({id: $tokenId}, (err, token) => {
+
+		if (err) {
+			res.json({message: "error"});
+		} else if (!token){
+			res.json({message: "NO TOKEN"});
+		} else if (token.firstTokenId == '0') {
+			Topic.find({tokenId: $tokenId}, (err, topics) => {
+
+				if (err){
+					res.status(400).json(err);
+				}
+				res.json(topics);
+			});
+		} else {
+			Topic.find({tokenId: token.firstTokenId}, (err,topics) => {
+				if (err){
+					res.status(400).json(err);
+				}
+				res.json(topics);
+			});
 		}
-		res.json(topics);
 	});
 }
 
@@ -104,7 +126,7 @@ function getBountyDescription (req,res) {
 		} else if (!bounty) {
 			res.status(404).json({message: "description not found"});
 		} else {
-			res.send(bounty.description);
+			res.send("<pre>" + nl2br(bounty.description, false) + "</pre>");
 		}
 	});
 }
@@ -164,3 +186,4 @@ function getBounty(req,res) {
 		}
 	});
 }
+

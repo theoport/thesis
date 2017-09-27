@@ -1,7 +1,0 @@
-if (exchange.tokenToWei == true){
-	return (amount * 100) / (exchange.rate);
-}
-else if (exchange.tokenToWei == false){
-	return (amount * exchange.rate ) / 100;
-}
-

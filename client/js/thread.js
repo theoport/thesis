@@ -1,5 +1,5 @@
 import {default as Web3} from 'web3'
-import tokenManagerObject from '../../build/contracts/TokenManager.json';
+import tokenManagerObject from '../../truffle/build/contracts/TokenManager.json';
 import {default as SHA256} from 'crypto-js/sha256';
 import {default as configDB} from '../../config/database.js';
 

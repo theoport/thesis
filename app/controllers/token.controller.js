@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-const Token = require('../models/Token');
 const nl2br = require('nl2br');
 
+const Token = require('../models/Token');
 
 module.exports = {
 	getAllTokens: getAllTokens,

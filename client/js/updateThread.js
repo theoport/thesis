@@ -1,5 +1,5 @@
 import {default as Web3} from 'web3'
-import tokenManagerObject from '../../build/contracts/TokenManager.json';
+import tokenManagerObject from '../../truffle/build/contracts/TokenManager.json';
 import {default as SHA256} from 'crypto-js/sha256';
 import {default as configDB} from '../../config/database.js';
 
@@ -28,8 +28,6 @@ window.App = {
 		var _date = new Date(token.creationDate);
 		if (SHA256((_date.getTime() / 1000) + token.address + token.managerAddress) != token.id) {
 			alert("DANGER, DATA HAS BEEN ALTERED");
-		} else {
-			alert("Data is good");
 		}
 	},
 
@@ -86,7 +84,7 @@ window.App = {
 								"<h5>" + topic.title +
 								"<span class=\"badge\" id=\"upvoteCount\">" + 
 								"</span></h5>" +
-								"<p>" + topic.description+ "</p></div>"));
+								"<p>" + topic.description+ "</p></div><hr>"));
 												
 		$.ajax({
 			type: 'GET',
@@ -112,7 +110,7 @@ window.App = {
 										"</small></h5>" +
 										"<p>" +
 										comments[i].content +
-										"</p></div>"));
+										"</p></div><hr>"));
 		}
 	},
 	
@@ -143,7 +141,7 @@ window.App = {
 									"</small></h5>" +
 									"<p>" +
 									responseData.content +
-									"</p></div>"));
+									"</p></div><hr>"));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					console.log(textStatus);

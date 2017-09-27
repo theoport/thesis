@@ -35,19 +35,19 @@
 	</div>
 </nav>
 <div class="container-fluid text-left">
-	<div class="col-sm-3 sidenav" style="overflow:scroll;" >
+	<div class="col-sm-3 sidenav" style="overflow:scroll; height:400px;" >
 		<div class="media" id="latestEvents"></div>
 	</div>
 	<div class="col-sm-6 jumbotron">
 		<h1><%= token.name %></h1> 
 		<h3>Your account balance is: <span id="accountBalance"><i>undefined</i> </span>  <%= token.name -%></h3>
-		<a class="btn btn-default" href="<%= '/tokenHome/' + token.id + '/setAttributes' -%>">Set Attributes of Manager contract</a><small>(Will only work of you are the creator of this token)</small>
+		<a class="btn btn-default" href="<%= '/tokenHome/' + token.id + '/setAttributes' -%>">Set Attributes of Manager contract</a><small>(Will only work if you are the creator of this token)</small>
 	</div>
 
 	<div class="col-sm-3 noticeboard">
-		<div id="update"></div>
-		<div id="vote"></div>
-		<div id="auction"></div>
+		<div style="background-color:lightcyan;" id="update"></div>
+		<div style="background-color:burlywood;" id="vote"></div>
+		<div style="background-color:lightslategrey;" id="auction"></div>
 	</div>
 		
 </div>

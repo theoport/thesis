@@ -5,8 +5,8 @@ import NewTokentxt from '../../public/txt/NewToken.txt';
 import BaseTokentxt from '../../public/txt/BaseToken.txt';
 import ERC20Standardtxt from '../../public/txt/ERC20Standard.txt';
 
-import createTokenObject from '../../build/contracts/TokenCreator.json';
-import tokenObject from '../../build/contracts/NewToken.json';
+import createTokenObject from '../../truffle/build/contracts/TokenCreator.json';
+import tokenObject from '../../truffle/build/contracts/NewToken.json';
 
 let ropstenStartBlock = 1590000;
 
@@ -113,7 +113,7 @@ window.App = {
 				+ "<br> with manager at " + result.args.tokenManagerAddress);
 
 				let _description = $("#description").val();	
-				let _sourceCode = ERC20Standardtxt + BaseTokentxt + NewTokentxt;
+				let _sourceCode = NewTokentxt + BaseTokentxt + ERC20Standardtxt;
 				let _date = new Date(result.args.creationTime.toNumber() * 1000);
 				let _id = SHA256(result.args.creationTime + result.args.tokenAddress + result.args.tokenManagerAddress);
 				console.log("HERE");
@@ -128,6 +128,7 @@ window.App = {
 						managerAddress: result.args.tokenManagerAddress,
 						creationDate: _date,
 						previousAddress: "0",
+						firstTokenId: "0",
 						description: _description,
 						abi: tokenObject.abi,
 						sourceCode: _sourceCode 

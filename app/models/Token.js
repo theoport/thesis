@@ -9,6 +9,7 @@ const tokenSchema = new Schema({
 	managerAddress:			{type: String, 	required: true},
 	creationDate: 			{type: Date, 		required: true},
 	previousAddress:	 	{type: String, 	required: true},
+	firstTokenId: 			{type: String, 	required: true},
 	description: 				{type: String, 	required: false},
 	sourceCode: 				{type: String, 	required: true},
 	abi: 								{type: Object, 	required: true}

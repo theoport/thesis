@@ -31,19 +31,16 @@
 </nav>
 <div class="col-sm-6 col-sm-offset-3">
 	<div class="jumbotron text-center">
-		<h1>Everything you need to know about this token.</h1>
-		<h1><small>Information updated to the moment you loaded this page(<span id="date"></span>)</small></h1>
-		<input id="amount" placeholder="amount">
-		<input id="to" placeholder="to">
-		<button class="btn btn-default" onclick="App.mint()">mint</button>
+		<h3>Everything you need to know about this token.</h3>
+		<h5><small>Information updated to the moment you loaded this page(<span id="date"></span>)</small></h5>
 		
-		<p>Duration of auctions: <span id="auctionDuration"></span></p>
-		<p>Extra time developer gets when bug was found in their submitted code: <span id="bugExtension"></span></p>
-		<p>Duration of BugHunts: <span id="bugHuntDuration"></span></p>
-		<p>Duration of BountyHunts: <span id="bountyHuntDuration"></span></p>
+		<p>Duration of auctions: <span id="auctionDuration"></span> Hours</p>
+		<p>Extra time developer gets when bug was found in their submitted code: <span id="bugExtension"></span> Hours</p>
+		<p>Duration of BugHunts: <span id="bugHuntDuration"></span> Hours</p>
+		<p>Duration of BountyHunts: <span id="bountyHuntDuration"></span> Hours</p>
 		<p>Number of tries developer gets to submit bug-free code: <span id="updateTries"></span></p>
 		<p>Price developer gets paid per hour: <span id="priceHourRatio"></span> <%= token.name %></p>
-		<p>Duration of votes: <span id="voteDuration"></span></p>
+		<p>Duration of votes: <span id="voteDuration"></span> Hours</p>
 		<p>Creator of token: <%= token.creator %></p>
 		<p>Token lives at: <%= token.address %></p>
 		<p>TokenManager lives at: <%= token.managerAddress %></p>
@@ -57,7 +54,7 @@
 		<p>Ether balance of TokenManager: <span id="etherBalance"></span> wei</p>
 		<p>TokenManager will try to refuel to <span id="topEther"></span> wei once balance is below <span id="lowEther"><span> wei</p>
 		<p>Token Source Code: <a href="<%= '/api/tokens/' + token.id + '/sourceCode' -%>" target="_blank" class="btn btn-default"><span class="fa fa-file-text-o"></span></a></p>
-		<p>Time to transfer funds from old contract to new contract:<span id="changeOverTime"></span></p>
+		<p>Time to transfer funds from old contract to new contract:<span id="changeOverTime"></span> Hours</p>
 	
 		<hr>
 		<a class="btn btn-default" href="<%= '/tokenHome/' + token.id %>"><span class="fa fa-home"></span> Go Back to tokenHome</a>

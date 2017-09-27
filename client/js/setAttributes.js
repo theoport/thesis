@@ -1,6 +1,6 @@
 import { default as Web3 } from 'web3';
 import { default as SHA256} from 'crypto-js/sha256';
-import { default as tokenManagerObject } from '../../build/contracts/TokenManager.json';
+import { default as tokenManagerObject } from '../../truffle/build/contracts/TokenManager.json';
 
 let TokenManager, tmInstance;
 let account;
@@ -30,16 +30,23 @@ window.App = {
 		tmInstance.setContractRefunds($("#refundAttr").val() * 100, {from: account, gas: 400000}, (err,result) => {
 			if (err)
 				alert(err);
-			else 
-				alert(result);
 		});
 	},
 	setExchangeRate: function () {
-		tmInstance.setExchangeRate($("#rateAttr").toNumber() * 100, $("#largerAttr"), {from: account, gas: 400000}, (err,result) => {
+		console.log($("#rateAttr").val());
+		console.log($("#rateAttr").val() * 100);
+		tmInstance.setExchangeRate($("#rateAttr").val() * 100, $("#largerAttr").val(), {from: account, gas: 400000}, (err,result) => {
 			if (err)
 				alert(err);
-			else 
-				alert(result);
+		});
+
+	},
+
+	setBugBounty: function () {
+		console.log($("#bugBountyAttr").val());
+		tmInstance.setBugBounty($("#bugBountyAttr").val(), {from: account, gas: 400000}, (err,result) => {
+			if (err)
+				alert(err);
 		});
 
 	},
@@ -48,8 +55,6 @@ window.App = {
 		tmInstance.setBugHunt($("#insectAttr").val(), {from: account, gas: 400000}, (err,result) => {
 			if (err)
 				alert(err);
-			else 
-				alert(result);
 		});
 
 	},
@@ -60,8 +65,6 @@ window.App = {
 		tmInstance.setChangeOverTime($("#changeAttr").val(), {from: account, gas: 400000}, (err,result) => {
 			if (err)
 				alert(err);
-			else 
-				alert(result);
 		});
 
 	},
@@ -72,8 +75,6 @@ window.App = {
 		tmInstance.setEtherBalance(_value, {from: account, gas: 400000}, (err,result) => {
 			if (err)
 				alert(err);
-			else 
-				alert(result);
 		});
 
 	},
@@ -84,8 +85,6 @@ window.App = {
 		tmInstance.setBugExtension($("#bugAttr").val(), {from: account, gas: 400000}, (err,result) => {
 			if (err)
 				alert(err);
-			else 
-				alert(result);
 		});
 
 	},
@@ -95,8 +94,6 @@ window.App = {
 		tmInstance.setBountyHunt($("#bountyAttr").val(), {from: account, gas: 400000}, (err,result) => {
 			if (err)
 				alert(err);
-			else 
-				alert(result);
 		});
 
 	},
@@ -106,8 +103,6 @@ window.App = {
 		tmInstance.setUpdateTries($("#triesAttr").val(), {from: account, gas: 400000}, (err,result) => {
 			if (err)
 				alert(err);
-			else 
-				alert(result);
 		});
 
 	},
@@ -117,8 +112,6 @@ window.App = {
 		tmInstance.setPriceHourRatio($("#ratioAttr").val(), {from: account, gas: 400000}, (err,result) => {
 			if (err)
 				alert(err);
-			else 
-				alert(result);
 		});
 		
 	},
@@ -128,8 +121,6 @@ window.App = {
 		tmInstance.setVoteDuration($("#voteAttr").val(), {from: account, gas: 400000}, (err,result) => {
 			if (err)
 				alert(err);
-			else 
-				alert(result);
 		});
 	
 	},
@@ -139,10 +130,23 @@ window.App = {
 		tmInstance.setAuctionDuration($("#auctionAttr").val(), {from: account, gas: 400000}, (err,result) => {
 			if (err)
 				alert(err);
-			else 
-				alert(result);
 		});
 	},
+
+	setAll: function() {
+		self.setAuctionDuration();
+		self.setVoteDuration();
+		self.setPriceHourRatio();
+		self.setUpdateTries();
+		self.setBugExtension();
+		self.setBountyHunt();
+		self.setEtherBalance();
+		self.setChangeOverTime();
+		self.setBugHunt();
+		self.setBugBounty();
+		self.setExchangeRate();
+	},
+	
 
 	checkData: function() {
 		console.log(token);

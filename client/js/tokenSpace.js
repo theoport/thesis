@@ -1,13 +1,14 @@
 import {default as Web3} from 'web3';
 import {default as SHA256} from 'crypto-js/sha256';
 
-import createTokenObject from '../../build/contracts/TokenCreator.json';
-import tokenManagerObject from '../../build/contracts/TokenManager.json';
+import createTokenObject from '../../truffle/build/contracts/TokenCreator.json';
+import tokenManagerObject from '../../truffle/build/contracts/TokenManager.json';
 
 let CreateToken, TokenManager;
 let ctAddress, ctInstance, netId;
 let tmAddress, tmInstance;
 let tokens = [];
+let creationTimes = [];
 
 window.App = {
 	start: function() {
@@ -41,11 +42,28 @@ window.App = {
 				} else {
 
 					for (let i = 0; i < logs.length ; i++) {
-						self.pushToken(logs[i].args.tokenManagerAddress, logs[i].args.creationTime.toNumber());
+						if (i == logs.length -1)
+							self.getCreationTimes(logs[i].args.tokenManagerAddress, true);
+						else 
+							self.getCreationTimes(logs[i].args.tokenManagerAddress, false);
 					}
-
 				}
 			});
+		});
+	},
+
+	getCreationTimes: function(_tmAddress, finished) {
+	
+		self = this;
+	
+		tmInstance = TokenManager.at(_tmAddress);
+		tmInstance.getTokenCreationTime((err,result) => {
+			creationTimes.push([_tmAddress, result.toNumber()]);
+			if (finished){
+				for (let i = 0; i < creationTimes.length ; i++) {
+					self.pushToken(creationTimes[i][0], creationTimes[i][1]);
+				}
+			}	
 		});
 	},
 
@@ -53,11 +71,14 @@ window.App = {
 		tmInstance = TokenManager.at(_tmAddress);
 
 		tmInstance.getTokenAddress((err, result) => {
-			var tokenAddress = result;
+			let tokenAddress = result;
 			if (err) {
 				console.log(err);
 			} else {	
-
+				console.log("In order");
+				console.log(_time);
+				console.log(tokenAddress);
+				console.log(_tmAddress);
 				let id = SHA256(_time + tokenAddress + _tmAddress).toString();
 				console.log(id);
 
@@ -80,7 +101,7 @@ window.App = {
 															.attr('value', tempId)
 															.text(tempName + ", " + tempAddr)); 
 						$("#descriptionList").append($("<tr></tr>")
-															.html("<td>" + tempName + "</td><td>" + tempDesc + "</td>")); 
+															.html("<td>" + tempName + "</td><td><h6>" + tempDesc + "</h6></td>")); 
 					},
 					error: function(jqXHR, textStatus, errorThrown) {
 						console.log(textStatus);			

@@ -1,6 +1,6 @@
 import { default as Web3 } from 'web3';
 import { default as SHA256} from 'crypto-js/sha256';
-import { default as tokenManagerObject } from '../../build/contracts/TokenManager.json';
+import { default as tokenManagerObject } from '../../truffle/build/contracts/TokenManager.json';
 
 let activeBounty, bestBounty, bountyHunter, account;
 let finishedBounties;
@@ -70,7 +70,7 @@ window.App = {
 								}
 							}
 							if (bountyHunter== account) {
-								$("#youWin").text("Congrats! You hold the best bounty.");
+								$("#youWin").html("<div style=\"background-color:green;\">Congrats! You hold the best bounty.</div>");
 							}
 							if (bids.length == 0) {
 								$("#bestBounty").text("NO BIDS");
@@ -105,7 +105,7 @@ window.App = {
 				console.log("best bounty is " + bestBounty);
 				console.log("hunter is " + bountyHunter);
 				if (bountyHunter == account) {
-					$("#youWin").html("Congrats! You hold the best bounty.");
+					$("#youWin").html("<div style=\"background-color:green;\">Congrats! You hold the best bounty.</div>");
 				} else {
 					$("#youWin").html("");
 				}

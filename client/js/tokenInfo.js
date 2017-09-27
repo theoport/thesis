@@ -1,7 +1,7 @@
 import { default as Web3 } from 'web3';
 import { default as SHA256} from 'crypto-js/sha256';
-import { default as tokenManagerObject } from '../../build/contracts/TokenManager.json';
-import { default as tokenObject } from '../../build/contracts/NewToken.json';
+import { default as tokenManagerObject } from '../../truffle/build/contracts/TokenManager.json';
+import { default as tokenObject } from '../../truffle/build/contracts/NewToken.json';
 
 let TokenManager, tmInstance;
 let Token, tokenInstance;
@@ -43,13 +43,14 @@ window.App = {
 		$("#date").html(date);
 		
 		tmInstance.AUCTIONDURATION((err,result) => {
-			$("#auctionDuration").text(result);
+			$("#auctionDuration").text(result/60);
 		});
 
 		tmInstance.exchange((err, result) => {
+			console.log(result);
 			let rate = result[0];
 			if (result[1]) {
-				$("#exchangeRate").text(rate);
+				$("#exchangeRate").text(rate/100);
 			} else {
 				if (rate != 0) {
 					rate = 1 / rate;
@@ -70,15 +71,15 @@ window.App = {
 		});
 
 		tmInstance.BUGEXTENSION((err,result) => {
-			$("#bugExtension").text(result);
+			$("#bugExtension").text(result/60);
 		});
 
 		tmInstance.BUGHUNT((err,result) => {
-			$("#bugHuntDuration").text(result);
+			$("#bugHuntDuration").text(result/60);
 		});
 
 		tmInstance.BOUNTYHUNT((err,result) => {
-			$("#bountyHuntDuration").text(result);
+			$("#bountyHuntDuration").text(result/60);
 		});
 
 		tmInstance.UPDATETRIES((err,result) => {
@@ -86,9 +87,9 @@ window.App = {
 		});
 
 		tmInstance.VOTEDURATION((err,result) => {
-			$("#voteDuration").text(result);
+			$("#voteDuration").text(result/60);
 		});
-		tmInstance.consensusPercent((err,result) => {
+		tmInstance.CONSENSUSPERCENT((err,result) => {
 			$("#consensusPercent").text(result);
 		});
 
@@ -112,7 +113,7 @@ window.App = {
 		});
 	
 		tmInstance.CHANGEOVERTIME((err, result) => {
-			$("#changeOverTime").text(result);
+			$("#changeOverTime").text(result/60);
 		});
 
 		tmInstance.PRICEHOURRATIO((err, result) => {

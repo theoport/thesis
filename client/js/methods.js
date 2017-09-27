@@ -142,6 +142,7 @@ window.App = {
 
 			html += "</div></div>";
 			html += "<button class=\"btn btn-default blockchain\" onclick=\"App.sendTransaction(" + methodId + ")\">Send Method</button>";
+			html += "<br><hr>";
 			$("#methods").append(html);
 			console.log(html);
 		}

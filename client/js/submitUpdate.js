@@ -1,6 +1,9 @@
 import { default as Web3 } from 'web3';
 import { default as SHA256} from 'crypto-js/sha256';
-import { default as tokenManagerObject } from '../../build/contracts/TokenManager.json';
+import { default as tokenManagerObject } from '../../truffle/build/contracts/TokenManager.json';
+
+import BaseTokentxt from '../../public/txt/BaseToken.txt';
+import ERC20Standardtxt from '../../public/txt/ERC20Standard.txt';
 
 let TokenManager, tmInstance;
 let NewToken, newTokenInstance;
@@ -27,45 +30,73 @@ window.App = {
 	},
 			
 	submitUpdate: function() {
-		let _abi = $("#abi").val();
-		let _address = $("#address").val();
-		let	_sourceCode = $("#sourceCode").val();
-		let creationTime;	
-		NewToken = web3.eth.contract(_abi);
-		newTokenInstance = NewToken.at(_address);	
-	
-		newTokenInstance.creationTime((err, result) => {
-			
-			creationTime = result;
-			let _date = new Date(creationTime.toNumber() * 1000);
 
-			$.ajax({
-				type: 'POST',
-				url: '/api/tokens',
-				datatype: 'json',
-				data: {
-					id: SHA256(creationTime + _address + token.managerAddress),
-					description: token.description,
-					name: token.name,
-					creationDate: _date,
-					creator: token.creator,
-					managerAddress: token.managerAddress,
-					previousAddress: token.address,
-					abi: _abi,
-					address: _address,
-					sourceCode: _souceCode 
-				},
-				success: function(responseData, textStatus, jqXHR) {
+		let abiFile = $("#ABI").prop('files')[0];
+		let	sourceCodeFile = $("#sourceCode").prop('files')[0];
+		let _address = $("#address").val();
+		let _abi, _sourceCode, creationTime;
+
+		let readerABI = new FileReader();
+
+		readerABI.onload = ((abi) => {
+
+			_abi = JSON.parse(abi.target.result);
+			let readerSource = new FileReader();
+			readerSource.onload = ((sourceCode) => {
+
+				_sourceCode = sourceCode.target.result + BaseTokentxt + ERC20Standardtxt;
+				NewToken = web3.eth.contract(_abi);
+				newTokenInstance = NewToken.at(_address);	
+				console.log(newTokenInstance);
+			
+				newTokenInstance.creationTime((err, result) => {
+	
+					creationTime = result.toNumber();
+					console.log("in order");
+					console.log(creationTime);
+					console.log(_address);
+					console.log(token.managerAddress);
+				
+					if (err) {
+						console.log(err);
+					}	
+					let _date = new Date(creationTime * 1000);
+					let firstId = token.firstTokenId =='0'? token.id : token.firstTokenId;
+			
+
 					tmInstance.submitUpdate(_address, {from: account, gas: 4000000}, (err, result) => {
 						if (err) {
 							alert(err);
 						} else {
-							alert(result);
+
+							$.ajax({
+								type: 'POST',
+								url: '/api/tokens',
+								datatype: 'json',
+								data: {
+									id: SHA256(creationTime + _address + token.managerAddress).toString(),
+									description: token.description,
+									name: token.name,
+									creationDate: _date,
+									creator: token.creator,
+									managerAddress: token.managerAddress,
+									previousAddress: token.address,
+									abi: _abi,
+									firstTokenId: firstId,
+									address: _address,
+									sourceCode: _sourceCode 
+								},
+								success: function(responseData, textStatus, jqXHR) {
+									console.log("token saved to db");
+								}
+							});	
 						}
-					});	
-				}
+					});
+				});
 			});
+			readerSource.readAsText(sourceCodeFile);	
 		});
+		readerABI.readAsText(abiFile);
 	},
 
 	checkData: function() {

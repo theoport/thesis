@@ -1,7 +1,7 @@
 
 import { default as Web3 } from 'web3';
 import { default as SHA256} from 'crypto-js/sha256';
-import { default as tokenManagerObject } from '../../build/contracts/TokenManager.json';
+import { default as tokenManagerObject } from '../../truffle/build/contracts/TokenManager.json';
 import { default as BigNumber } from 'bignumber.js';
 
 let TokenManager, tmInstance;

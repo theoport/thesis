@@ -54,7 +54,7 @@
 			<button class="btn btn-default blockchain" onClick="App.setChangeOverTime()">Set</button>
 		</div>
 
-		<label for="bugExtension">Additional days for developer after bug was found:</label>
+		<label for="bugExtension">Additional hours for developer after bug was found:</label>
 		<div class="input-inline" id="bugExtension">
 			<div class="input-group">
 			<input type="text" id="bugAttr" class="form-control" placeholder="e.g. 3"></input>
@@ -105,6 +105,15 @@
 			<button class="btn btn-default blockchain" onClick="App.setAuctionDuration()">Set</button>
 		</div>
 
+		<label for="bugBounty">Percentage of developer salary received for bug:</label>
+		<div class="input-inline" id="bugBounty">
+			<div class="input-group">
+			<input type="text" id="bugBountyAttr" class="form-control" placeholder="e.g. 5"></input>
+			<span class="input-group-addon">%</span>
+			</div>
+			<button class="btn btn-default blockchain" onClick="App.setBugBounty()">Set</button>
+		</div>
+
 		<label for="refund">Should the Contract refund?</label>
 		<div id="refund" class="input-inline">
 			<select class="form-control" id="refundAttr">
@@ -113,6 +122,8 @@
 			</select>
 			<button class="btn btn-default blockchain" onClick="App.setContractRefunds()">Set</button>
 		</div>
+		<button class="btn btn-default blockchain" onClick="App.setAll()">Set All</button>
+		<a class="btn btn-default" href="<%= '/tokenHome/' + token.id %>"><span class="fa fa-home"></span> Go Back to tokenHome</a>
 	</div>
 </div>
 

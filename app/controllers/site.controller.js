@@ -59,20 +59,28 @@ function showTokenHome(req,res) {
 	Token.findOne({id: _id}, (err, token) => {
 		if (err) {
 			res.json({message: "error"});
+		} else if (!token){
+			res.json({message: "NO TOKEN"});
+		} else if (token.firstTokenId == '0') {
+			Topic.find({categoryId: '0', tokenId: _id}, (err,updateTopics) => {
+				if (err) {
+					res.status(400).json(err);
+				} else if(!updateTopics) {
+					res.render('pages/tokenHome', {updateTopics: [], token: token, user: req.user});
+				} else {
+					res.render('pages/tokenHome', {updateTopics: updateTopics, token: token, user: req.user});
+				}
+			});
 		} else {
-			if (!token) { 
-				res.json({message: "NO TOKEN"});
-			} else {
-				Topic.find({categoryId: '0', tokenId: _id}, (err,updateTopics) => {
-					if (err) {
-						res.status(400).json(err);
-					} else if(!updateTopics) {
-						res.render('pages/tokenHome', {updateTopics: [], token: token, user: req.user});
-					} else {
-						res.render('pages/tokenHome', {updateTopics: updateTopics, token: token, user: req.user});
-					}
-				});
-			}
+			Topic.find({categoryId: '0', tokenId: token.firstTokenId}, (err,updateTopics) => {
+				if (err) {
+					res.status(400).json(err);
+				} else if(!updateTopics) {
+					res.render('pages/tokenHome', {updateTopics: [], token: token, user: req.user});
+				} else {
+					res.render('pages/tokenHome', {updateTopics: updateTopics, token: token, user: req.user});
+				}
+			});
 		}
 	});
 }

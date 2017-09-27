@@ -20,7 +20,8 @@
 			<ul class="nav navbar-nav">
 				<li><a href="<%= '/tokenHome/' + token.id -%>">Home</a></li>
 				<li><a href="<%= '/tokenHome/' + token.id + '/forum'-%>">Forum</a></li>
-				<li><a href="<%= '/tokenHome/' + token.id + '/contact'-%>">Contact</a></li>
+				<li><a href="<%= '/tokenHome/' + token.id + '/methods'-%>">Methods</a></li>
+				<li><a href="<%= '/tokenHome/' + token.id + '/info'-%>">Info</a></li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<li><%= user.username %></li>
@@ -29,30 +30,16 @@
 		</div>
 	</div>
 </nav>
-<div class="container-fluid">
-	<div class ="form-inline">
-		<div class="form-group">
-			<div id="topicHeader" class="form-control">
-			</div>
-		</div>
-		<div class="form-group">
-			<button class="btn btn-default" onclick="App.upvote()">Upvote</button> 
-		</div>
-		<a class="btn btn-default blockchain" href="<%= '/tokenHome/' + token.id + '/startBounty/' + topic.id %>"> 
-			Start Bounty
-		</a>
-	</div>
+<div class="container-fluid form-control">
+	<div id="topicHeader" ></div>
 	<div id="comments"></div>
-	<div class="form-inline">
-		<div class="form-group">
-			<input class="form-control" type="text" id="commentContent" placeholder="Make Comment"></input>
-		</div>
-		<div class="form-group">
-			<button class="btn btn-default" onclick="App.makeComment()">
-				Add
-			</button>
-		</div>
-	</div>
-</div>
-		
+	<input class="form-control" type="text" id="commentContent" placeholder="Make Comment"></input>
+	<button class="btn btn-default" onclick="App.makeComment()">
+		Add
+	</button>
+	<br>
+	<button class="btn btn-default" onclick="App.upvote()">Upvote</button> 
+	<a class="btn btn-default blockchain" href="<%= '/tokenHome/' + token.id + '/startBounty/' + topic.id %>"> 
+				Start Bounty
+	</a>
 </div>

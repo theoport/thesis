@@ -1,6 +1,6 @@
 import { default as Web3 } from 'web3';
 import { default as SHA256} from 'crypto-js/sha256';
-import { default as tokenManagerObject } from '../../build/contracts/TokenManager.json';
+import { default as tokenManagerObject } from '../../truffle/build/contracts/TokenManager.json';
 import { default as BigNumber} from 'bignumber.js';
 
 let TokenManager, tmInstance;
@@ -50,8 +50,7 @@ window.App = {
 		});
 
 		let _safetyHash = new BigNumber(safetyHash, 16);
-		let updateId = new BigNumber(topic._id, 16);
-		tmInstance.foundBug(_safetyHash, updateId, {from: account, gas: 4000000}, (err, result) => {
+		tmInstance.foundBug(_safetyHash, bugId, {from: account, gas: 4000000}, (err, result) => {
 			if (err) {
 				alert(err);
 			} else {

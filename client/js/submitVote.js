@@ -1,11 +1,12 @@
 import { default as Web3 } from 'web3';
 import { default as SHA256} from 'crypto-js/sha256';
-import { default as tokenManagerObject } from '../../build/contracts/TokenManager.json';
+import { default as tokenManagerObject } from '../../truffle/build/contracts/TokenManager.json';
 import { default as BigNumber} from 'bignumber.js';
 
 let TokenManager, tmInstance;
 let account;
 let updateNames = new Map();
+let loadBlock;
 
 window.App = {
 	start: function() {
@@ -25,6 +26,11 @@ window.App = {
 				account = accs[0];
 				self.fillPage();
 			}
+		});
+			
+		web3.eth.getBlockNumber((err, result) => {
+			loadBlock = result;
+			self.startWatch();
 		});
 	},
 		
@@ -47,18 +53,18 @@ window.App = {
 							
 							let finishDate = new Date(voteStarts[i].args.finishTime * 1000);
 
-							activeVote[0] = voteStarts[i].args.tag[0];	
+							activeVote[0] = voteStarts[i].args.tag.toString();	
 							activeVote[1] = voteStarts[i].args.tag[1].toString(16);;	
 							activeVote[2] = voteStarts[i].args.tag[2].toString(16);	
 							console.log(activeVote);
-							$("#voteInfo").html("<h4>Vote on Update " +
+							$("#voteInfo").html("<h3>Vote on Update " +
 							"<a href=\"/tokenHome/" + token.id + "/forum/" +
 							activeVote[1] + "\" target=\"_blank\">" +
-							activeVote[1] + "</a></h4>" +
-							"<h6>Developer: <span id=\"developer\"></span></h6>" +	
-							"<h6>Price: <span id=\"price\"></span> " + token.name + "</h6>" +	
-							"<h6>Time they get: <span id=\"time\"></span> Hours</h6>" +	
-							"<h6>Description:</h6>" +	
+							activeVote[1] + "</a></h3>" +
+							"<h4>Developer: <span id=\"developer\"></span></h4>" +	
+							"<h4>Price: <span id=\"price\"></span> " + token.name + "</h4>" +	
+							"<h4>Time they get: <span id=\"time\"></span> Hours</h4>" +	
+							"<h4>Description:</h4>" +	
 							"<div id=\"description\"></div>" +
 							"<p>Vote Count:<br>" +
 							"<span id=\"yesVotes\">0</span>% are in favour update <br>" +
@@ -66,7 +72,7 @@ window.App = {
 							"<span id=\"consensus\"></span>% required to pass<br>" +
 							"Vote finished on: " + finishDate + "</p>");
 						
-							let newVote = tmInstance.NewVote({tag: voteStarts[i].args.tag}, {fromBlock: 0, toBlock: 'latest'});	
+							let newVote = tmInstance.NewVote({fromBlock: 0, toBlock: 'latest'});	
 							let bountyStart = tmInstance.BountyStarted({updateId: voteStarts[i].args.tag[1]}, {fromBlock: 0, toBlock: 'latest'});
 							let bountyEnd = tmInstance.BountyEnd({updateId: voteStarts[i].args.tag[1]}, {fromBlock: 0, toBlock: 'latest'});
 						
@@ -110,23 +116,25 @@ window.App = {
 
 							newVote.get((err, votes) => {
 								for(let i = 0; i < votes.length ; i++) {
-									$("#yesVotes").text(votes[i].args.yes);		
-									$("#noVotes").text(votes[i].args.no);		
-									if (votes[i].args.from == account){
-										alert("You have already votes from this address." +
-										"If you want to vote with newly reveived funds, place them into another account and vote from there."); 
+									if (votes[i].args.tag.toString() == activeVote[0]){
+										$("#yesVotes").text(votes[i].args.yes);		
+										$("#noVotes").text(votes[i].args.no);		
+										if (votes[i].args.from == account){
+											alert("You have already votes from this address." +
+											"If you want to vote with newly reveived funds, place them into another account and vote from there."); 
+										}
 									}
 								}	
 							});
 							 
-							tmInstance.consensusPercent((err,result) => {
+							tmInstance.CONSENSUSPERCENT((err,result) => {
 								$("#consensus").text(result);
 							});
 
 						} else if (voteStarts[i].args.tag[0] == 1){
 
 							let finishDate = new Date(voteStarts[i].args.finishTime * 1000);
-							activeVote[0] = voteStarts[i].args.tag[0];	
+							activeVote[0] = voteStarts[i].args.tag.toString();	
 							activeVote[1] = voteStarts[i].args.tag[1].toString(16);;	
 							activeVote[2] = voteStarts[i].args.tag[2].toString(16);	
 							$("#voteInfo").html("<h4>Vote on Bug for update" +
@@ -142,7 +150,7 @@ window.App = {
 							"<span id=\"consensus\"></span>% required to pass<br>" +
 							"Vote finishes on: " + finishDate + "</p>");
 
-							let newVote = tmInstance.NewVote({tag: voteStarts[i].args.tag}, {fromBlock: 0, toBlock: 'latest'});	
+							let newVote = tmInstance.NewVote({fromBlock: 0, toBlock: 'latest'});	
 							let bugFound = tmInstance.BugFound({bugId: voteStarts[i].args.tag[2], updateId: voteStarts[i].args.tag[1]}, {fromBlock: 0, toBlock: 'latest'});
 							
 							bugFound.get((err, bug) => {
@@ -169,17 +177,19 @@ window.App = {
 							});
 
 							newVote.get((err, votes) => {
-								for(let i = 0; i < newVotes.length ; i++) {
-									$("#yesVotes").text(votes[i].args.yes);		
-									$("#noVotes").text(votes[i].args.no);		
-									if (votes[i].args.from == account){
-										alert("You have already votes from this address." +
-										"If you want to vote with newly reveived funds, place them into another account and vote from there."); 
+								for(let i = 0; i < votes.length ; i++) {
+									if (votes[i].args.tag.toString() == activeVote[0]){
+										$("#yesVotes").text(votes[i].args.yes);		
+										$("#noVotes").text(votes[i].args.no);		
+										if (votes[i].args.from == account){
+											alert("You have already voted from this address." +
+											"If you want to vote with newly reveived funds, place them into another account and vote from there."); 
+										}
 									}
 								}	
 							});
 							 
-							tmInstance.consensusPercent((err,result) => {
+							tmInstance.CONSENSUSPERCENT((err,result) => {
 								$("#consensus").text(result);
 							});
 					
@@ -189,6 +199,19 @@ window.App = {
 			});
 		});
 	},
+
+	startWatch: function() {
+			
+		let newVote = tmInstance.NewVote({},{fromBlock: 'latest'});
+
+		newVote.watch((err,vote) => {
+			if (vote.blockNUmber != loadBlock) {
+				$("#yesVotes").text(vote.args.yes);		
+				$("#noVotes").text(vote.args.no);		
+			}
+		});
+	},
+					
 				 
 	submitYesVote: function() {
 		tmInstance.submitVote(true, {from: account, gas: 4000000}, (err, result) => {

@@ -1,29 +1,25 @@
-# truffle-init-webpack
-Example webpack project with Truffle. Includes contracts, migrations, tests, user interface and webpack build pipeline.
+Web-app using node.js, EJS, Truffle
 
-## Usage
+See academic report for details and use 
 
-To initialize a project with this example, run `truffle init webpack` inside an empty directory.
 
-## Building and the frontend
+To execute locally:
 
-1. First run `truffle compile`, then run `truffle migrate` to deploy the contracts onto your network of choice (default "development").
-1. Then run `npm run dev` to build the app and serve it on http://localhost:8080
+From base repository call "npm install" 
 
-## Possible upgrades
+If errors occur, make sure you have at least npm version 5.0 and node version 8.0
 
-* Use the webpack hotloader to sense when contracts or javascript have been recompiled and rebuild the application. Contributions welcome!
+start your local ethereum node
 
-## Common Errors
+start your mongodb database
 
-* **Error: Can't resolve '../build/contracts/MetaCoin.json'**
+run "truffle migrate" to deploy contracts 
 
-This means you haven't compiled or migrated your contracts yet. Run `truffle compile` and `truffle migrate` first.
+run "npm run build" 
 
-Full error:
+run "npm run start"
 
-```
-ERROR in ./app/main.js
-Module not found: Error: Can't resolve '../build/contracts/MetaCoin.json' in '/Users/tim/Documents/workspace/Consensys/test3/app'
- @ ./app/main.js 11:16-59
-```
+website should be availble on localhost:8080, you need to install MetaMask chrome plugin to interact with the website
+
+
+
