@@ -1,63 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Submit Bug</title>
-	<script> const token=<%- JSON.stringify(token) -%></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<script src="/build/tokenInfo.bundle.js"></script>
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-	<link rel="stylesheet" href="/css/app.css">
+  <title>Submit Bug</title>
+  <script> const token=<%- JSON.stringify(token) -%></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="/build/tokenInfo.bundle.js"></script>
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
 <nav class="navbar navbar-inverse">
-	<div class="container-fluid">
-		<div class="collapse navbar-collapse">
-			<ul class="nav navbar-nav">
-				<li><a href="<%= '/tokenHome/' + token.id -%>">Home</a></li>
-				<li><a href="<%= '/tokenHome/' + token.id + '/forum'-%>">Forum</a></li>
-				<li><a href="<%= '/tokenHome/' + token.id + '/methods'-%>">Methods</a></li>
-				<li class="active"><a href="<%= '/tokenHome/' + token.id + '/info'-%>">Info</a></li>
-			</ul>
-			<ul class="nav navbar-nav navbar-right">
-				<% if (typeof(user) != 'undefined') {%>
-				<li><%= user.username %></li>
-				<% } %>
-				<li><a href="/logout"><span class="fa fa-sign-out"></span>Sign out</a></li>
-			</ul>
-		</div>
-	</div>
+  <div class="container-fluid">
+    <div class="collapse navbar-collapse">
+      <ul class="nav navbar-nav">
+        <li><a href="<%= '/tokenHome/' + token.id -%>">Home</a></li>
+        <li><a href="<%= '/tokenHome/' + token.id + '/forum'-%>">Forum</a></li>
+        <li><a href="<%= '/tokenHome/' + token.id + '/methods'-%>">Methods</a></li>
+        <li class="active"><a href="<%= '/tokenHome/' + token.id + '/info'-%>">Info</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <% if (typeof(user) != 'undefined') {%>
+        <li><%= user.username %></li>
+        <% } %>
+        <li><a href="/logout"><span class="fa fa-sign-out"></span>Sign out</a></li>
+      </ul>
+    </div>
+  </div>
 </nav>
 <div class="col-sm-6 col-sm-offset-3">
-	<div class="jumbotron text-center">
-		<h3>Everything you need to know about this token.</h3>
-		<h5><small>Information updated to the moment you loaded this page(<span id="date"></span>)</small></h5>
-		
-		<p>Duration of auctions: <span id="auctionDuration"></span> Hours</p>
-		<p>Extra time developer gets when bug was found in their submitted code: <span id="bugExtension"></span> Hours</p>
-		<p>Duration of BugHunts: <span id="bugHuntDuration"></span> Hours</p>
-		<p>Duration of BountyHunts: <span id="bountyHuntDuration"></span> Hours</p>
-		<p>Number of tries developer gets to submit bug-free code: <span id="updateTries"></span></p>
-		<p>Price developer gets paid per hour: <span id="priceHourRatio"></span> <%= token.name %></p>
-		<p>Duration of votes: <span id="voteDuration"></span> Hours</p>
-		<p>Creator of token: <%= token.creator %></p>
-		<p>Token lives at: <%= token.address %></p>
-		<p>TokenManager lives at: <%= token.managerAddress %></p>
-		<p>Token was initially created: <%= token.creationDate %></p>
-		<p>Consensus needed for successful votes: <span id="consensusPercent"></span>%</p>
-		<p>Total token in circulation: <span id="totalToken"></span></p>
-		<p>Token in Central Bank: <span id="centralToken"></span></p>
-		<p>Does the token refund?<span id="refund"></span></p>
-		<p>Version:<span id="version"></span></p>
-		<p>Exchange rate: <span id="exchangeRate"></span> <%=token.name %> / wei</p>
-		<p>Ether balance of TokenManager: <span id="etherBalance"></span> wei</p>
-		<p>TokenManager will try to refuel to <span id="topEther"></span> wei once balance is below <span id="lowEther"><span> wei</p>
-		<p>Token Source Code: <a href="<%= '/api/tokens/' + token.id + '/sourceCode' -%>" target="_blank" class="btn btn-default"><span class="fa fa-file-text-o"></span></a></p>
-		<p>Time to transfer funds from old contract to new contract:<span id="changeOverTime"></span> Hours</p>
-	
-		<hr>
-		<a class="btn btn-default" href="<%= '/tokenHome/' + token.id %>"><span class="fa fa-home"></span> Go Back to tokenHome</a>
-	</div>
+  <div class="jumbotron text-center">
+    <h3>Everything you need to know about this token.</h3>
+    <h5><small>Information updated to the moment you loaded this page(<span id="date"></span>)</small></h5>
+    
+    <p>Duration of auctions: <span id="auctionDuration"></span> Hours</p>
+    <p>Extra time developer gets when bug was found in their submitted code: <span id="bugExtension"></span> Hours</p>
+    <p>Duration of BugHunts: <span id="bugHuntDuration"></span> Hours</p>
+    <p>Duration of BountyHunts: <span id="bountyHuntDuration"></span> Hours</p>
+    <p>Number of tries developer gets to submit bug-free code: <span id="updateTries"></span></p>
+    <p>Price developer gets paid per hour: <span id="priceHourRatio"></span> <%= token.name %></p>
+    <p>Duration of votes: <span id="voteDuration"></span> Hours</p>
+    <p>Creator of token: <%= token.creator %></p>
+    <p>Token lives at: <%= token.address %></p>
+    <p>TokenManager lives at: <%= token.managerAddress %></p>
+    <p>Token was initially created: <%= token.creationDate %></p>
+    <p>Consensus needed for successful votes: <span id="consensusPercent"></span>%</p>
+    <p>Total token in circulation: <span id="totalToken"></span></p>
+    <p>Token in Central Bank: <span id="centralToken"></span></p>
+    <p>Does the token refund?<span id="refund"></span></p>
+    <p>Version:<span id="version"></span></p>
+    <p>Exchange rate: <span id="exchangeRate"></span> <%=token.name %> / wei</p>
+    <p>Ether balance of TokenManager: <span id="etherBalance"></span> wei</p>
+    <p>TokenManager will try to refuel to <span id="topEther"></span> wei once balance is below <span id="lowEther"><span> wei</p>
+    <p>Token Source Code: <a href="<%= '/api/tokens/' + token.id + '/sourceCode' -%>" target="_blank" class="btn btn-default"><span class="fa fa-file-text-o"></span></a></p>
+    <p>Time to transfer funds from old contract to new contract:<span id="changeOverTime"></span> Hours</p>
+  
+    <hr>
+    <a class="btn btn-default" href="<%= '/tokenHome/' + token.id %>"><span class="fa fa-home"></span> Go Back to tokenHome</a>
+  </div>
 </div>
 

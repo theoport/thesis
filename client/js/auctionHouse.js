@@ -8,126 +8,126 @@ let newHighestBid, auctionStart, auctionFinish;
 let TokenManager, tmInstance;
 
 window.App = {
-	start: function() {
+  start: function() {
 
-		self = this;
-		self.checkData();
-		
-		TokenManager=web3.eth.contract(tokenManagerObject.abi);	
-		tmInstance = TokenManager.at(token.managerAddress);
+    self = this;
+    self.checkData();
+    
+    TokenManager=web3.eth.contract(tokenManagerObject.abi); 
+    tmInstance = TokenManager.at(token.managerAddress);
 
-		web3.eth.getAccounts((err,accs) => {
-			if (err != null) {
-				alert(err);
-			} else if (accs.length == 0) {
-				alert("No accounts detected");
-			} else {
-				account = accs[0];
-			}
-			self.fillPage();
-		});
-	},
+    web3.eth.getAccounts((err,accs) => {
+      if (err != null) {
+        alert(err);
+      } else if (accs.length == 0) {
+        alert("No accounts detected");
+      } else {
+        account = accs[0];
+      }
+      self.fillPage();
+    });
+  },
 
-	fillPage: function() {
-		
-		finishedAuctions = [];
-	
-		auctionStart = tmInstance.AuctionStarted({},{fromBlock: 0});	
-		auctionFinish = tmInstance.AuctionEnd({}, {fromBlock: 0});
+  fillPage: function() {
+    
+    finishedAuctions = [];
+  
+    auctionStart = tmInstance.AuctionStarted({},{fromBlock: 0});  
+    auctionFinish = tmInstance.AuctionEnd({}, {fromBlock: 0});
 
-		auctionFinish.get((err, auctionEnds) => {
-			for (var i = 0; i < auctionEnds.length ; i++) {
-				finishedAuctions.push(auctionEnds[i].args.auctionId);	
-			}
-			auctionStart.get((err,auctionStarts) => {
-				for (var i = 0; i <auctionStarts.length; i++) {
-					if ($.inArray(auctionStarts[i].args.auctionId, finishedAuctions) < 0) {
-						activeAuction = auctionStarts[i].args.auctionId;
-						$("#auctionId").html(auctionStarts[i].args.auctionId);
-						$("#amountOfToken").html(auctionStarts[i].args.amount);
-						var finishDate = new Date(auctionStarts[i].args.finishTime * 1000);
-						$("#auctionEndTime").html(finishDate);	
-						newHighestBid = tmInstance.NewHighestBid({auctionId: activeAuction});
-						highestBid = 0;
-						newHighestBid.get((err, bids) =>{
-							for (var i = 0; i < bids.length ; i++){
-								if (bids[i].args.amount > highestBid) {
-									highestBid = bids[i].args.amount;
-									highestBidder = bids[i].args.sender;
-								}
-							}
-							if (highestBidder == account) {
-								$("#youWin").html("Congrats! You hold the highest bid.");
-							}
-							$("#highestBid").html(highestBid);
-						});
-						tmInstance.getWithdrawable(account, (err, withdrawable) => {
-							if (typeof(withdrawable) == 'undefined') {
-								withdrawable = 0;
-							}
-							$("#pastBets").html(withdrawable);
-							self.startWatch();
-						});
-						return;
-					}
-				}
-			$(document).html("<p>Error: No active auctions</p>");
-			});
-		});
-	},
-	
-	startWatch: function() {	
-		newHighestBid.watch((err, bid) =>{
-			if (bid.args.amount > highestBid) {
-				highestBid = bid.args.amount;
-				$("#highestBid").html(highestBid);
+    auctionFinish.get((err, auctionEnds) => {
+      for (var i = 0; i < auctionEnds.length ; i++) {
+        finishedAuctions.push(auctionEnds[i].args.auctionId); 
+      }
+      auctionStart.get((err,auctionStarts) => {
+        for (var i = 0; i <auctionStarts.length; i++) {
+          if ($.inArray(auctionStarts[i].args.auctionId, finishedAuctions) < 0) {
+            activeAuction = auctionStarts[i].args.auctionId;
+            $("#auctionId").html(auctionStarts[i].args.auctionId);
+            $("#amountOfToken").html(auctionStarts[i].args.amount);
+            var finishDate = new Date(auctionStarts[i].args.finishTime * 1000);
+            $("#auctionEndTime").html(finishDate);  
+            newHighestBid = tmInstance.NewHighestBid({auctionId: activeAuction});
+            highestBid = 0;
+            newHighestBid.get((err, bids) =>{
+              for (var i = 0; i < bids.length ; i++){
+                if (bids[i].args.amount > highestBid) {
+                  highestBid = bids[i].args.amount;
+                  highestBidder = bids[i].args.sender;
+                }
+              }
+              if (highestBidder == account) {
+                $("#youWin").html("Congrats! You hold the highest bid.");
+              }
+              $("#highestBid").html(highestBid);
+            });
+            tmInstance.getWithdrawable(account, (err, withdrawable) => {
+              if (typeof(withdrawable) == 'undefined') {
+                withdrawable = 0;
+              }
+              $("#pastBets").html(withdrawable);
+              self.startWatch();
+            });
+            return;
+          }
+        }
+      $(document).html("<p>Error: No active auctions</p>");
+      });
+    });
+  },
+  
+  startWatch: function() {  
+    newHighestBid.watch((err, bid) =>{
+      if (bid.args.amount > highestBid) {
+        highestBid = bid.args.amount;
+        $("#highestBid").html(highestBid);
 
-				if (bid.args.sender == account) {
-					$("#youWin").html("Congrats! You hold the highest bid");
-				}
-				else {
-					$("#youWin").html("");
-				}
-					
-				tmInstance.getWithdrawable(account, (err, withdrawable) => {
-					if (typeof(withdrawable) == 'undefined') {
-						withdrawable = 0;
-					}
-					$("#pastBets").html(withdrawable);
-				});
-			}
-		});
-	},
+        if (bid.args.sender == account) {
+          $("#youWin").html("Congrats! You hold the highest bid");
+        }
+        else {
+          $("#youWin").html("");
+        }
+          
+        tmInstance.getWithdrawable(account, (err, withdrawable) => {
+          if (typeof(withdrawable) == 'undefined') {
+            withdrawable = 0;
+          }
+          $("#pastBets").html(withdrawable);
+        });
+      }
+    });
+  },
 
-	withdraw: function() {
-		tmInstance.withdrawReturnedBid({from: account, gas: 4000000}, (err, result) => {
-			if (err) {
-				alert(err);
-			} else {
-				alert(result);
-			}
-		});
-	},
-			
-	submitBid: function() {
-		var _value = $("#bid").val();
-		tmInstance.bid({from: account, gas: 4000000, value:	_value}, (err,result) => {
-			if (err) {
-				alert(err);
-			} else {
-				alert(result);
-			}
-		});
-	},
-			
+  withdraw: function() {
+    tmInstance.withdrawReturnedBid({from: account, gas: 4000000}, (err, result) => {
+      if (err) {
+        alert(err);
+      } else {
+        alert(result);
+      }
+    });
+  },
+      
+  submitBid: function() {
+    var _value = $("#bid").val();
+    tmInstance.bid({from: account, gas: 4000000, value: _value}, (err,result) => {
+      if (err) {
+        alert(err);
+      } else {
+        alert(result);
+      }
+    });
+  },
+      
 
-	checkData: function() {
-		console.log(token);
-		var _date = new Date(token.creationDate);
-		if (SHA256((_date.getTime() / 1000) + token.address + token.managerAddress) != token.id) {
-			alert("DANGER, DATA HAS BEEN ALTERED");
-		}
-	}
+  checkData: function() {
+    console.log(token);
+    var _date = new Date(token.creationDate);
+    if (SHA256((_date.getTime() / 1000) + token.address + token.managerAddress) != token.id) {
+      alert("DANGER, DATA HAS BEEN ALTERED");
+    }
+  }
 };
 window.addEventListener('load', function() {
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)

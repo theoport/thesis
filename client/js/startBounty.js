@@ -1,4 +1,3 @@
-
 import { default as Web3 } from 'web3';
 import { default as SHA256} from 'crypto-js/sha256';
 import { default as tokenManagerObject } from '../../truffle/build/contracts/TokenManager.json';
@@ -8,69 +7,69 @@ let TokenManager, tmInstance;
 let account;
 
 window.App = {
-	start: function() {
+  start: function() {
 
-		self = this;
-		self.checkData();
+    self = this;
+    self.checkData();
 
-		TokenManager=web3.eth.contract(tokenManagerObject.abi);	
-		tmInstance = TokenManager.at(token.managerAddress);
-		
-		web3.eth.getAccounts((err,accs) => {
-			if (err != null) {
-				alert(err);
-			} else if (accs.length == 0) {
-				alert("No accounts detected");
-			} else {
-				account = accs[0];
-			}
-		});
-	},	
+    TokenManager=web3.eth.contract(tokenManagerObject.abi); 
+    tmInstance = TokenManager.at(token.managerAddress);
+    
+    web3.eth.getAccounts((err,accs) => {
+      if (err != null) {
+        alert(err);
+      } else if (accs.length == 0) {
+        alert("No accounts detected");
+      } else {
+        account = accs[0];
+      }
+    });
+  },  
 
-	startBounty: function() {
-	
-		let _desc = $("#description").val();
-		let safetyHash = SHA256('' + _desc).toString();	
-		let _bountyId = SHA256(safetyHash + topic._id).toString();
+  startBounty: function() {
+  
+    let _desc = $("#description").val();
+    let safetyHash = SHA256('' + _desc).toString(); 
+    let _bountyId = SHA256(safetyHash + topic._id).toString();
 
-		$.ajax({
-			type: 'POST',
-			url: '/api/bounty',
-			datatype: 'json',
-			data: {
-				description: _desc,
-				updateId: topic._id,
-				bountyId : _bountyId
-			},
-			success: function(responseData, textStatus, jqXHR) {
-				console.log(responseData);	
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				console.log(textStatus);
-				console.log(errorThrown);
-			}
+    $.ajax({
+      type: 'POST',
+      url: '/api/bounty',
+      datatype: 'json',
+      data: {
+        description: _desc,
+        updateId: topic._id,
+        bountyId : _bountyId
+      },
+      success: function(responseData, textStatus, jqXHR) {
+        console.log(responseData);  
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log(textStatus);
+        console.log(errorThrown);
+      }
 
-		});
+    });
 
-		let _safetyHash = new BigNumber(safetyHash, 16);
-		let updateId = new BigNumber(topic._id, 16);
-		tmInstance.startBounty(updateId, _safetyHash, {from: account, gas: 4000000}, (err,result) => {
-			if (err) {
-				alert(err);
-			} else {
-				alert(result);
-			}
-		});
-	},
-			
+    let _safetyHash = new BigNumber(safetyHash, 16);
+    let updateId = new BigNumber(topic._id, 16);
+    tmInstance.startBounty(updateId, _safetyHash, {from: account, gas: 4000000}, (err,result) => {
+      if (err) {
+        alert(err);
+      } else {
+        alert(result);
+      }
+    });
+  },
+      
 
-	checkData: function() {
-		console.log(token);
-		var _date = new Date(token.creationDate);
-		if (SHA256((_date.getTime() / 1000) + token.address + token.managerAddress) != token.id) {
-			alert("DANGER, DATA HAS BEEN ALTERED");
-		}
-	}
+  checkData: function() {
+    console.log(token);
+    var _date = new Date(token.creationDate);
+    if (SHA256((_date.getTime() / 1000) + token.address + token.managerAddress) != token.id) {
+      alert("DANGER, DATA HAS BEEN ALTERED");
+    }
+  }
 };
 
 window.addEventListener('load', function() {

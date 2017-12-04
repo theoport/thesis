@@ -1,44 +1,44 @@
 /*
 * {
-	border-style: solid;
-	border-width: 1px;
+  border-style: solid;
+  border-width: 1px;
 }
 */
 
 body {
-	padding-top: 80px;
+  padding-top: 80px;
 }
 
 .topcorner {
-	position: fixed;
-	top: 0;
-	right: 0;
-	background-color: PaleGreen;
-	border-radius: 20px;
-	padding: 20px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  background-color: PaleGreen;
+  border-radius: 20px;
+  padding: 20px;
 }
 
 .blockchain {
-	background-color: Navy;
-	color: White;
-	font-family: "Lucida Console", Monaco, monospace;
+  background-color: Navy;
+  color: White;
+  font-family: "Lucida Console", Monaco, monospace;
 }
 
 label {
-	text-align: left;
+  text-align: left;
 }
 
 table {
-	border-collapse: collapse;
-	width: 100%;
+  border-collapse: collapse;
+  width: 100%;
 }
 
 tr, th {
-	border: 1px solid #dddddd;
-	text-align: left;
-	padding: 8px;
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
 }
 
 tr:nth-child(even) {
-	background-color: #dddddd;
+  background-color: #dddddd;
 }

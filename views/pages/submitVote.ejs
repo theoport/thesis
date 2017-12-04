@@ -1,28 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Submit vote</title>
+  <title>Submit vote</title>
 
-	<script> const token=<%- JSON.stringify(token) -%></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<script src="/build/submitVote.bundle.js"></script>
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-	<link rel="stylesheet" href="/css/app.css">
+  <script> const token=<%- JSON.stringify(token) -%></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="/build/submitVote.bundle.js"></script>
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
 <div class="col-sm-6 col-sm-offset-3">
-	<div class="jumbotron text-center">
-		<h1>Submit Vote</h1>
-		<br>
-		<div id="voteInfo"></div>
-		<span>
-			<button class="btn btn-default blockchain" id="voteYes" onclick="App.submitYesVote()">YES</button>
-			<button class="btn btn-default blockchain" id="voteNo" onclick="App.submitNoVote()">NO</button>
-		</span>
-		<hr>
-		<a class="btn btn-default" href="<%= '/tokenHome/' + token.id %>"><span class="fa fa-home"></span> Go Back to tokenHome</a>
-	</div>
+  <div class="jumbotron text-center">
+    <h1>Submit Vote</h1>
+    <br>
+    <div id="voteInfo"></div>
+    <span>
+      <button class="btn btn-default blockchain" id="voteYes" onclick="App.submitYesVote()">YES</button>
+      <button class="btn btn-default blockchain" id="voteNo" onclick="App.submitNoVote()">NO</button>
+    </span>
+    <hr>
+    <a class="btn btn-default" href="<%= '/tokenHome/' + token.id %>"><span class="fa fa-home"></span> Go Back to tokenHome</a>
+  </div>
 </div>
 

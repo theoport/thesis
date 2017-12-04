@@ -10,136 +10,136 @@ let TokenManager, tmInstance;
 let loadBlock;
 
 window.App = {
-	start: function() {
+  start: function() {
 
-		self = this;
-		self.checkData();
+    self = this;
+    self.checkData();
 
-		TokenManager=web3.eth.contract(tokenManagerObject.abi);	
-		tmInstance = TokenManager.at(token.managerAddress);
-		
-		web3.eth.getAccounts((err,accs) => {
-			if (err != null) {
-				alert(err);
-			} else if (accs.length == 0) {
-				alert("No accounts detected");
-			} else {
-				account = accs[0];
-			}
-			tmInstance.PRICEHOURRATIO((err,result) => {
-				if (err) {
-					alert(err); 
-				} else {
-					priceHourRatio = result;
-				}
-				web3.eth.getBlockNumber((err, result) => {
-					loadBlock = result;	
-					self.fillPage();
-				});
-			});
-		});
-	},
+    TokenManager=web3.eth.contract(tokenManagerObject.abi); 
+    tmInstance = TokenManager.at(token.managerAddress);
+    
+    web3.eth.getAccounts((err,accs) => {
+      if (err != null) {
+        alert(err);
+      } else if (accs.length == 0) {
+        alert("No accounts detected");
+      } else {
+        account = accs[0];
+      }
+      tmInstance.PRICEHOURRATIO((err,result) => {
+        if (err) {
+          alert(err); 
+        } else {
+          priceHourRatio = result;
+        }
+        web3.eth.getBlockNumber((err, result) => {
+          loadBlock = result; 
+          self.fillPage();
+        });
+      });
+    });
+  },
 
-	fillPage: function() {
-	
-		self = this;	
-	
-		finishedBounties= [];
-	
-		bountyStart = tmInstance.BountyStarted({}, {fromBlock: 0, toBlock: 'latest'});	
-		bountyFinish = tmInstance.BountyEnd({}, {fromBlock: 0, toBlock: 'latest'});
+  fillPage: function() {
+  
+    self = this;  
+  
+    finishedBounties= [];
+  
+    bountyStart = tmInstance.BountyStarted({}, {fromBlock: 0, toBlock: 'latest'});  
+    bountyFinish = tmInstance.BountyEnd({}, {fromBlock: 0, toBlock: 'latest'});
 
-		bountyFinish.get((err, bountyEnds) => {
-			for (let i = 0; i < bountyEnds.length ; i++) {
-				finishedBounties.push(bountyEnds[i].args.updateId.toString(16));	
-			}
-			bountyStart.get((err,bountyStarts) => {
-				for (let i = 0; i < bountyStarts.length; i++) {
-					if ($.inArray(bountyStarts[i].args.updateId.toString(16), finishedBounties) < 0) {
-						activeBounty= bountyStarts[i].args.updateId.toString(16);
-						let finishDate = new Date(bountyStarts[i].args.finishTime * 1000);
-						console.log(finishDate);
-						$("#bountyEndTime").text(finishDate);	
-						newBestBounty = tmInstance.NewBountyPrice({updateId: bountyStarts[i].args.updateId},{fromBlock: 0, toBlock: 'latest'});
-						bestBounty = Number.MAX_VALUE;
-						newBestBounty.get((err, bids) =>{
-							for (let i = 0; i < bids.length ; i++){
-								if (bids[i].args.amount < bestBounty) {
-									bestBounty = bids[i].args.amount;
-									bountyHunter= bids[i].args.bidder;
-								}
-							}
-							if (bountyHunter== account) {
-								$("#youWin").html("<div style=\"background-color:green;\">Congrats! You hold the best bounty.</div>");
-							}
-							if (bids.length == 0) {
-								$("#bestBounty").text("NO BIDS");
-								$("#currentHours").html("<i>undefined</i>");
-							} else {	
-								$("#bestBounty").text(bestBounty);
-								let hours = bestBounty / priceHourRatio;
-								$("#currentHours").html(hours);
-							}
-							self.startWatch();
-						});
-						return;
-					}
-				}
-			$(document).html("<p>Error: No active BountyHunts</p>");
-			});
-		});
-	},
-	
-	startWatch: function() {	
-		newBestBounty.watch((err, bounty) =>{
-			console.log("loadBlock is " + loadBlock);
-			console.log("bounty block is " + bounty.blockNumber);
-			console.log("best bounty is " + bestBounty);
-			console.log("hunter is " + bountyHunter);
-			console.log("pricehourratio is " + priceHourRatio);
-			if (bounty.blockNumber != loadBlock) {
-				if (bounty.args.amount < bestBounty) {
-					bestBounty = bounty.args.amount;
-					bountyHunter= bounty.args.bidder;
-				}
-				console.log("best bounty is " + bestBounty);
-				console.log("hunter is " + bountyHunter);
-				if (bountyHunter == account) {
-					$("#youWin").html("<div style=\"background-color:green;\">Congrats! You hold the best bounty.</div>");
-				} else {
-					$("#youWin").html("");
-				}
-				$("#bestBounty").text(bestBounty);
-				let hours = bestBounty / priceHourRatio;
-				$("#currentHours").html(hours);
-			}
-		});
-	},
+    bountyFinish.get((err, bountyEnds) => {
+      for (let i = 0; i < bountyEnds.length ; i++) {
+        finishedBounties.push(bountyEnds[i].args.updateId.toString(16));  
+      }
+      bountyStart.get((err,bountyStarts) => {
+        for (let i = 0; i < bountyStarts.length; i++) {
+          if ($.inArray(bountyStarts[i].args.updateId.toString(16), finishedBounties) < 0) {
+            activeBounty= bountyStarts[i].args.updateId.toString(16);
+            let finishDate = new Date(bountyStarts[i].args.finishTime * 1000);
+            console.log(finishDate);
+            $("#bountyEndTime").text(finishDate); 
+            newBestBounty = tmInstance.NewBountyPrice({updateId: bountyStarts[i].args.updateId},{fromBlock: 0, toBlock: 'latest'});
+            bestBounty = Number.MAX_VALUE;
+            newBestBounty.get((err, bids) =>{
+              for (let i = 0; i < bids.length ; i++){
+                if (bids[i].args.amount < bestBounty) {
+                  bestBounty = bids[i].args.amount;
+                  bountyHunter= bids[i].args.bidder;
+                }
+              }
+              if (bountyHunter== account) {
+                $("#youWin").html("<div style=\"background-color:green;\">Congrats! You hold the best bounty.</div>");
+              }
+              if (bids.length == 0) {
+                $("#bestBounty").text("NO BIDS");
+                $("#currentHours").html("<i>undefined</i>");
+              } else {  
+                $("#bestBounty").text(bestBounty);
+                let hours = bestBounty / priceHourRatio;
+                $("#currentHours").html(hours);
+              }
+              self.startWatch();
+            });
+            return;
+          }
+        }
+      $(document).html("<p>Error: No active BountyHunts</p>");
+      });
+    });
+  },
+  
+  startWatch: function() {  
+    newBestBounty.watch((err, bounty) =>{
+      console.log("loadBlock is " + loadBlock);
+      console.log("bounty block is " + bounty.blockNumber);
+      console.log("best bounty is " + bestBounty);
+      console.log("hunter is " + bountyHunter);
+      console.log("pricehourratio is " + priceHourRatio);
+      if (bounty.blockNumber != loadBlock) {
+        if (bounty.args.amount < bestBounty) {
+          bestBounty = bounty.args.amount;
+          bountyHunter= bounty.args.bidder;
+        }
+        console.log("best bounty is " + bestBounty);
+        console.log("hunter is " + bountyHunter);
+        if (bountyHunter == account) {
+          $("#youWin").html("<div style=\"background-color:green;\">Congrats! You hold the best bounty.</div>");
+        } else {
+          $("#youWin").html("");
+        }
+        $("#bestBounty").text(bestBounty);
+        let hours = bestBounty / priceHourRatio;
+        $("#currentHours").html(hours);
+      }
+    });
+  },
 
-	updateHours: function(price) {
-		let hours = price / priceHourRatio; 
-		$("#hours").html(hours);	
-	},
-			
-	submitBid: function() {
-		let _value = $("#bid").val();
-		tmInstance.bidForBounty(_value, {from: account, gas: 4000000}, (err,result) => {
-			if (err) {
-				alert(err);
-			} else {
-				alert(result);
-			}
-		});
-	},
-			
+  updateHours: function(price) {
+    let hours = price / priceHourRatio; 
+    $("#hours").html(hours);  
+  },
+      
+  submitBid: function() {
+    let _value = $("#bid").val();
+    tmInstance.bidForBounty(_value, {from: account, gas: 4000000}, (err,result) => {
+      if (err) {
+        alert(err);
+      } else {
+        alert(result);
+      }
+    });
+  },
+      
 
-	checkData: function() {
-		console.log(token);
-		let _date = new Date(token.creationDate);
-		if (SHA256((_date.getTime() / 1000) + token.address + token.managerAddress) != token.id) {
-			alert("DANGER, DATA HAS BEEN ALTERED");
-		}
-	}
+  checkData: function() {
+    console.log(token);
+    let _date = new Date(token.creationDate);
+    if (SHA256((_date.getTime() / 1000) + token.address + token.managerAddress) != token.id) {
+      alert("DANGER, DATA HAS BEEN ALTERED");
+    }
+  }
 };
 window.addEventListener('load', function() {
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)

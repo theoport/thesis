@@ -1,45 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Creating your own token</title>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<script src="/build/updateThread.bundle.js"></script>
-	<script> var comments = <%- JSON.stringify(comments) %></script>
-	<script> var user = <%- JSON.stringify(user) %></script>
-	<script> var topic= <%- JSON.stringify(topic) %></script>
-	<script> var token = <%- JSON.stringify(token) %></script>
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-	<link rel="stylesheet" href="/css/app.css">
+  <title>Creating your own token</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="/build/updateThread.bundle.js"></script>
+  <script> var comments = <%- JSON.stringify(comments) %></script>
+  <script> var user = <%- JSON.stringify(user) %></script>
+  <script> var topic= <%- JSON.stringify(topic) %></script>
+  <script> var token = <%- JSON.stringify(token) %></script>
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
 <nav class="navbar navbar-inverse">
-	<div class="container-fluid">
-		<div class="collapse navbar-collapse">
-			<ul class="nav navbar-nav">
-				<li><a href="<%= '/tokenHome/' + token.id -%>">Home</a></li>
-				<li><a href="<%= '/tokenHome/' + token.id + '/forum'-%>">Forum</a></li>
-				<li><a href="<%= '/tokenHome/' + token.id + '/methods'-%>">Methods</a></li>
-				<li><a href="<%= '/tokenHome/' + token.id + '/info'-%>">Info</a></li>
-			</ul>
-			<ul class="nav navbar-nav navbar-right">
-				<li><%= user.username %></li>
-				<li><a href="/tokenSpace"><span class="fa fa-sign-out"></span>Sign out</a></li>
-			</ul>
-		</div>
-	</div>
+  <div class="container-fluid">
+    <div class="collapse navbar-collapse">
+      <ul class="nav navbar-nav">
+        <li><a href="<%= '/tokenHome/' + token.id -%>">Home</a></li>
+        <li><a href="<%= '/tokenHome/' + token.id + '/forum'-%>">Forum</a></li>
+        <li><a href="<%= '/tokenHome/' + token.id + '/methods'-%>">Methods</a></li>
+        <li><a href="<%= '/tokenHome/' + token.id + '/info'-%>">Info</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><%= user.username %></li>
+        <li><a href="/tokenSpace"><span class="fa fa-sign-out"></span>Sign out</a></li>
+      </ul>
+    </div>
+  </div>
 </nav>
 <div class="container-fluid form-control">
-	<div id="topicHeader" ></div>
-	<div id="comments"></div>
-	<input class="form-control" type="text" id="commentContent" placeholder="Make Comment"></input>
-	<button class="btn btn-default" onclick="App.makeComment()">
-		Add
-	</button>
-	<br>
-	<button class="btn btn-default" onclick="App.upvote()">Upvote</button> 
-	<a class="btn btn-default blockchain" href="<%= '/tokenHome/' + token.id + '/startBounty/' + topic.id %>"> 
-				Start Bounty
-	</a>
+  <div id="topicHeader" ></div>
+  <div id="comments"></div>
+  <input class="form-control" type="text" id="commentContent" placeholder="Make Comment"></input>
+  <button class="btn btn-default" onclick="App.makeComment()">
+    Add
+  </button>
+  <br>
+  <button class="btn btn-default" onclick="App.upvote()">Upvote</button> 
+  <a class="btn btn-default blockchain" href="<%= '/tokenHome/' + token.id + '/startBounty/' + topic.id %>"> 
+        Start Bounty
+  </a>
 </div>

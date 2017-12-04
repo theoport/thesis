@@ -1,84 +1,84 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Creating your own token</title>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<script src="/build/tokenForum.bundle.js"></script>
-	<script> var user = <%- JSON.stringify(user) %></script>
-	<script> var token = <%- JSON.stringify(token) %></script>
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-	<link rel="stylesheet" href="/css/app.css">
+  <title>Creating your own token</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="/build/tokenForum.bundle.js"></script>
+  <script> var user = <%- JSON.stringify(user) %></script>
+  <script> var token = <%- JSON.stringify(token) %></script>
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
 <% if (token.hasOwnProperty('error')) { %>
-	<div class="alert alert-danger"><%= token.error%></div>
+  <div class="alert alert-danger"><%= token.error%></div>
 <% } %>
 <nav class="navbar navbar-inverse">
-	<div class="container-fluid">
-		<div class="collapse navbar-collapse">
-			<ul class="nav navbar-nav">
-				<li><a href="<%= '/tokenHome/' + token.id -%>">Home</a></li>
-				<li class="active"><a href="<%= '/tokenHome/' + token.id + '/forum'-%>">Forum</a></li>
-				<li><a href="<%= '/tokenHome/' + token.id + '/methods'-%>">Methods</a></li>
-				<li><a href="<%= '/tokenHome/' + token.id + '/info'-%>">Info</a></li>
-			</ul>
-			<ul class="nav navbar-nav navbar-right">
-				<% if (typeof(user) != 'undefined') {%>
-				<li><%= user.username %></li>
-				<%}%>
-				<li><a href="/tokenSpace"><span class="fa fa-sign-out"></span>Sign out</a></li>
-			</ul>
-		</div>
-	</div>
+  <div class="container-fluid">
+    <div class="collapse navbar-collapse">
+      <ul class="nav navbar-nav">
+        <li><a href="<%= '/tokenHome/' + token.id -%>">Home</a></li>
+        <li class="active"><a href="<%= '/tokenHome/' + token.id + '/forum'-%>">Forum</a></li>
+        <li><a href="<%= '/tokenHome/' + token.id + '/methods'-%>">Methods</a></li>
+        <li><a href="<%= '/tokenHome/' + token.id + '/info'-%>">Info</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <% if (typeof(user) != 'undefined') {%>
+        <li><%= user.username %></li>
+        <%}%>
+        <li><a href="/tokenSpace"><span class="fa fa-sign-out"></span>Sign out</a></li>
+      </ul>
+    </div>
+  </div>
 </nav>
 
 <div class="container-fluid">
 
-	<!-- LEFT TAB NAVI ////////////////////////////// -->	
-	<div class="col-sm-3">
-		<ul class="nav nav-pills nav-stacked">
-			<li class="active"><a href="#updateCat" data-toggle="pill">Updates <span class="badge">0</span></a></li>
-			<li><a href="#issuesCat" data-toggle="pill">Issues<span class="badge">0</span></a></li>
-			<li><a href="#generalCat" data-toggle="pill">General<span class="badge">0</span></a></li>
-		</ul>
-	</div>
+  <!-- LEFT TAB NAVI ////////////////////////////// --> 
+  <div class="col-sm-3">
+    <ul class="nav nav-pills nav-stacked">
+      <li class="active"><a href="#updateCat" data-toggle="pill">Updates <span class="badge">0</span></a></li>
+      <li><a href="#issuesCat" data-toggle="pill">Issues<span class="badge">0</span></a></li>
+      <li><a href="#generalCat" data-toggle="pill">General<span class="badge">0</span></a></li>
+    </ul>
+  </div>
 
-	<!-- LEFT TAB CONTENT ////////////////////////////// -->	
-	<div class="col-sm-9" id="mainSection"> 
-	<div class="tab-content">
+  <!-- LEFT TAB CONTENT ////////////////////////////// -->  
+  <div class="col-sm-9" id="mainSection"> 
+  <div class="tab-content">
 
-	<!-- UPDATE////////////////////////////// -->	
-		<div id="updateCat" class="tab-pane fade in active">
-			<ul class="nav nav-tabs">
-				<li class="active"><a href="#active" data-toggle="pill">Active<span class="badge">0</span></a></li>
-				<li><a href="#archived" data-toggle="pill">Archived<span class="badge">0</span></a></li>
-			</ul>
+  <!-- UPDATE////////////////////////////// --> 
+    <div id="updateCat" class="tab-pane fade in active">
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#active" data-toggle="pill">Active<span class="badge">0</span></a></li>
+        <li><a href="#archived" data-toggle="pill">Archived<span class="badge">0</span></a></li>
+      </ul>
 
-			<div class="tab-content">
+      <div class="tab-content">
 
-				<div id="active" class="tab-pane fade in active">
-				</div>
+        <div id="active" class="tab-pane fade in active">
+        </div>
 
-				<div id="archived" class="tab-pane fade in">
-				</div>
+        <div id="archived" class="tab-pane fade in">
+        </div>
 
-			</div>
-			<a href="./forum/submitTopic" class="btn btn-success">Create new thread</a> 
+      </div>
+      <a href="./forum/submitTopic" class="btn btn-success">Create new thread</a> 
 
-		</div>
-		<!-- ISSUES //////////////////////////////// -->
-		<div id="issuesCat" class="tab-pane fade in">
-			<div id="issues"></div>
-			<a href="./forum/submitTopic" class="btn btn-success">Create new thread</a> 
-		</div>
+    </div>
+    <!-- ISSUES //////////////////////////////// -->
+    <div id="issuesCat" class="tab-pane fade in">
+      <div id="issues"></div>
+      <a href="./forum/submitTopic" class="btn btn-success">Create new thread</a> 
+    </div>
 
-		<!-- GENERAL //////////////////////////////// -->
-		<div id="generalCat" class="tab-pane fade in">
-			<div id="general"></div>
-			<a href='./forum/submitTopic' class="btn btn-success">Create new thread</a> 
-		</div>
-		</div>
-	</div>
+    <!-- GENERAL //////////////////////////////// -->
+    <div id="generalCat" class="tab-pane fade in">
+      <div id="general"></div>
+      <a href='./forum/submitTopic' class="btn btn-success">Create new thread</a> 
+    </div>
+    </div>
+  </div>
 </div>

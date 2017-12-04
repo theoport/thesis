@@ -1,37 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>This is the TokenSpace</title>
-	<script>var token = <%- JSON.stringify(token) -%></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<script src="/build/methods.bundle.js"></script>
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-	<link rel="stylesheet" href="/css/app.css">
+  <title>This is the TokenSpace</title>
+  <script>var token = <%- JSON.stringify(token) -%></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="/build/methods.bundle.js"></script>
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
 <nav class="navbar navbar-inverse">
-	<div class="container-fluid">
-		<div class="collapse navbar-collapse">
-			<ul class="nav navbar-nav">
-				<li><a href="<%= '/tokenHome/' + token.id -%>">Home</a></li>
-				<li><a href="<%= '/tokenHome/' + token.id + '/forum'-%>">Forum</a></li>
-				<li class="active" ><a href="<%= '/tokenHome/' + token.id + '/methods'-%>">Methods</a></li>
-				<li><a href="<%= '/tokenHome/' + token.id + '/info'-%>">Info</a></li>
-			</ul>
-			<ul class="nav navbar-nav navbar-right">
-				<% if (typeof(user) != 'undefined') {%>
-				<li><%= user.username %></li>
-				<% } %>
-				<li><a href="/logout"><span class="fa fa-sign-out"></span>Sign out</a></li>
-			</ul>
-		</div>
-	</div>
+  <div class="container-fluid">
+    <div class="collapse navbar-collapse">
+      <ul class="nav navbar-nav">
+        <li><a href="<%= '/tokenHome/' + token.id -%>">Home</a></li>
+        <li><a href="<%= '/tokenHome/' + token.id + '/forum'-%>">Forum</a></li>
+        <li class="active" ><a href="<%= '/tokenHome/' + token.id + '/methods'-%>">Methods</a></li>
+        <li><a href="<%= '/tokenHome/' + token.id + '/info'-%>">Info</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <% if (typeof(user) != 'undefined') {%>
+        <li><%= user.username %></li>
+        <% } %>
+        <li><a href="/logout"><span class="fa fa-sign-out"></span>Sign out</a></li>
+      </ul>
+    </div>
+  </div>
 </nav>
 <div class="container-fluid">
-	<div id="methods" class="col-sm-12">
-		<h1>TokenMethods</h1>
-		<br>
-	</div>
+  <div id="methods" class="col-sm-12">
+    <h1>TokenMethods</h1>
+    <br>
+  </div>
 </div>

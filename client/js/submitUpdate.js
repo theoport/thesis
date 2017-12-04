@@ -10,102 +10,102 @@ let NewToken, newTokenInstance;
 let account;
 
 window.App = {
-	start: function() {
+  start: function() {
 
-		self = this;
-		self.checkData();
+    self = this;
+    self.checkData();
 
-		TokenManager=web3.eth.contract(tokenManagerObject.abi);	
-		tmInstance = TokenManager.at(token.managerAddress);
-		
-		web3.eth.getAccounts((err,accs) => {
-			if (err != null) {
-				alert(err);
-			} else if (accs.length == 0) {
-				alert("No accounts detected");
-			} else {
-				account = accs[0];
-			}
-		});
-	},
-			
-	submitUpdate: function() {
+    TokenManager=web3.eth.contract(tokenManagerObject.abi); 
+    tmInstance = TokenManager.at(token.managerAddress);
+    
+    web3.eth.getAccounts((err,accs) => {
+      if (err != null) {
+        alert(err);
+      } else if (accs.length == 0) {
+        alert("No accounts detected");
+      } else {
+        account = accs[0];
+      }
+    });
+  },
+      
+  submitUpdate: function() {
 
-		let abiFile = $("#ABI").prop('files')[0];
-		let	sourceCodeFile = $("#sourceCode").prop('files')[0];
-		let _address = $("#address").val();
-		let _abi, _sourceCode, creationTime;
+    let abiFile = $("#ABI").prop('files')[0];
+    let sourceCodeFile = $("#sourceCode").prop('files')[0];
+    let _address = $("#address").val();
+    let _abi, _sourceCode, creationTime;
 
-		let readerABI = new FileReader();
+    let readerABI = new FileReader();
 
-		readerABI.onload = ((abi) => {
+    readerABI.onload = ((abi) => {
 
-			_abi = JSON.parse(abi.target.result);
-			let readerSource = new FileReader();
-			readerSource.onload = ((sourceCode) => {
+      _abi = JSON.parse(abi.target.result);
+      let readerSource = new FileReader();
+      readerSource.onload = ((sourceCode) => {
 
-				_sourceCode = sourceCode.target.result + BaseTokentxt + ERC20Standardtxt;
-				NewToken = web3.eth.contract(_abi);
-				newTokenInstance = NewToken.at(_address);	
-				console.log(newTokenInstance);
-			
-				newTokenInstance.creationTime((err, result) => {
-	
-					creationTime = result.toNumber();
-					console.log("in order");
-					console.log(creationTime);
-					console.log(_address);
-					console.log(token.managerAddress);
-				
-					if (err) {
-						console.log(err);
-					}	
-					let _date = new Date(creationTime * 1000);
-					let firstId = token.firstTokenId =='0'? token.id : token.firstTokenId;
-			
+        _sourceCode = sourceCode.target.result + BaseTokentxt + ERC20Standardtxt;
+        NewToken = web3.eth.contract(_abi);
+        newTokenInstance = NewToken.at(_address); 
+        console.log(newTokenInstance);
+      
+        newTokenInstance.creationTime((err, result) => {
+  
+          creationTime = result.toNumber();
+          console.log("in order");
+          console.log(creationTime);
+          console.log(_address);
+          console.log(token.managerAddress);
+        
+          if (err) {
+            console.log(err);
+          } 
+          let _date = new Date(creationTime * 1000);
+          let firstId = token.firstTokenId =='0'? token.id : token.firstTokenId;
+      
 
-					tmInstance.submitUpdate(_address, {from: account, gas: 4000000}, (err, result) => {
-						if (err) {
-							alert(err);
-						} else {
+          tmInstance.submitUpdate(_address, {from: account, gas: 4000000}, (err, result) => {
+            if (err) {
+              alert(err);
+            } else {
 
-							$.ajax({
-								type: 'POST',
-								url: '/api/tokens',
-								datatype: 'json',
-								data: {
-									id: SHA256(creationTime + _address + token.managerAddress).toString(),
-									description: token.description,
-									name: token.name,
-									creationDate: _date,
-									creator: token.creator,
-									managerAddress: token.managerAddress,
-									previousAddress: token.address,
-									abi: _abi,
-									firstTokenId: firstId,
-									address: _address,
-									sourceCode: _sourceCode 
-								},
-								success: function(responseData, textStatus, jqXHR) {
-									console.log("token saved to db");
-								}
-							});	
-						}
-					});
-				});
-			});
-			readerSource.readAsText(sourceCodeFile);	
-		});
-		readerABI.readAsText(abiFile);
-	},
+              $.ajax({
+                type: 'POST',
+                url: '/api/tokens',
+                datatype: 'json',
+                data: {
+                  id: SHA256(creationTime + _address + token.managerAddress).toString(),
+                  description: token.description,
+                  name: token.name,
+                  creationDate: _date,
+                  creator: token.creator,
+                  managerAddress: token.managerAddress,
+                  previousAddress: token.address,
+                  abi: _abi,
+                  firstTokenId: firstId,
+                  address: _address,
+                  sourceCode: _sourceCode 
+                },
+                success: function(responseData, textStatus, jqXHR) {
+                  console.log("token saved to db");
+                }
+              }); 
+            }
+          });
+        });
+      });
+      readerSource.readAsText(sourceCodeFile);  
+    });
+    readerABI.readAsText(abiFile);
+  },
 
-	checkData: function() {
-		console.log(token);
-		var _date = new Date(token.creationDate);
-		if (SHA256((_date.getTime() / 1000) + token.address + token.managerAddress) != token.id) {
-			alert("DANGER, DATA HAS BEEN ALTERED");
-		}
-	}
+  checkData: function() {
+    console.log(token);
+    var _date = new Date(token.creationDate);
+    if (SHA256((_date.getTime() / 1000) + token.address + token.managerAddress) != token.id) {
+      alert("DANGER, DATA HAS BEEN ALTERED");
+    }
+  }
 };
 window.addEventListener('load', function() {
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)

@@ -8,146 +8,146 @@ let Token, tokenInstance;
 let account;
 
 window.App = {
-	start: function() {
+  start: function() {
 
-		self = this;
-		self.checkData();
+    self = this;
+    self.checkData();
 
-		TokenManager=web3.eth.contract(tokenManagerObject.abi);	
-		tmInstance = TokenManager.at(token.managerAddress);
-		Token = web3.eth.contract(token.abi);
-		tokenInstance = Token.at(token.address);
+    TokenManager=web3.eth.contract(tokenManagerObject.abi); 
+    tmInstance = TokenManager.at(token.managerAddress);
+    Token = web3.eth.contract(token.abi);
+    tokenInstance = Token.at(token.address);
 
-		console.log(token.abi);	
-		console.log(token.address);
-		console.log(token.managerAddress);
-		
-		web3.eth.getAccounts((err,accs) => {
-			if (err != null) {
-				alert(err);
-			} else if (accs.length == 0) {
-				alert("No accounts detected");
-			} else {
-				account = accs[0];
-			}
-			console.log(account);
-			self.fillPage();
-		});
+    console.log(token.abi); 
+    console.log(token.address);
+    console.log(token.managerAddress);
+    
+    web3.eth.getAccounts((err,accs) => {
+      if (err != null) {
+        alert(err);
+      } else if (accs.length == 0) {
+        alert("No accounts detected");
+      } else {
+        account = accs[0];
+      }
+      console.log(account);
+      self.fillPage();
+    });
 
-	},
-			
-	fillPage: function() {
-	
-		let date = new Date();
-		console.log(date);
-		$("#date").html(date);
-		
-		tmInstance.AUCTIONDURATION((err,result) => {
-			$("#auctionDuration").text(result/60);
-		});
+  },
+      
+  fillPage: function() {
+  
+    let date = new Date();
+    console.log(date);
+    $("#date").html(date);
+    
+    tmInstance.AUCTIONDURATION((err,result) => {
+      $("#auctionDuration").text(result/60);
+    });
 
-		tmInstance.exchange((err, result) => {
-			console.log(result);
-			let rate = result[0];
-			if (result[1]) {
-				$("#exchangeRate").text(rate/100);
-			} else {
-				if (rate != 0) {
-					rate = 1 / rate;
-				}
-				$("#exchangeRate").text(rate);
-			}
-		});
+    tmInstance.exchange((err, result) => {
+      console.log(result);
+      let rate = result[0];
+      if (result[1]) {
+        $("#exchangeRate").text(rate/100);
+      } else {
+        if (rate != 0) {
+          rate = 1 / rate;
+        }
+        $("#exchangeRate").text(rate);
+      }
+    });
 
-		tmInstance.ETHERBALANCE((err, result) => {
-			$("#topEther").text(result/1000000000000000000); });
+    tmInstance.ETHERBALANCE((err, result) => {
+      $("#topEther").text(result/1000000000000000000); });
 
-		tmInstance.LOWESTETHER((err, result) => {
-			$("#lowEther").text(result/1000000000000000000);
-		});
+    tmInstance.LOWESTETHER((err, result) => {
+      $("#lowEther").text(result/1000000000000000000);
+    });
 
-		web3.eth.getBalance(token.managerAddress, (err,result) => {
-			$("#etherBalance").text(result);
-		});
+    web3.eth.getBalance(token.managerAddress, (err,result) => {
+      $("#etherBalance").text(result);
+    });
 
-		tmInstance.BUGEXTENSION((err,result) => {
-			$("#bugExtension").text(result/60);
-		});
+    tmInstance.BUGEXTENSION((err,result) => {
+      $("#bugExtension").text(result/60);
+    });
 
-		tmInstance.BUGHUNT((err,result) => {
-			$("#bugHuntDuration").text(result/60);
-		});
+    tmInstance.BUGHUNT((err,result) => {
+      $("#bugHuntDuration").text(result/60);
+    });
 
-		tmInstance.BOUNTYHUNT((err,result) => {
-			$("#bountyHuntDuration").text(result/60);
-		});
+    tmInstance.BOUNTYHUNT((err,result) => {
+      $("#bountyHuntDuration").text(result/60);
+    });
 
-		tmInstance.UPDATETRIES((err,result) => {
-			$("#updateTries").text(result);
-		});
+    tmInstance.UPDATETRIES((err,result) => {
+      $("#updateTries").text(result);
+    });
 
-		tmInstance.VOTEDURATION((err,result) => {
-			$("#voteDuration").text(result/60);
-		});
-		tmInstance.CONSENSUSPERCENT((err,result) => {
-			$("#consensusPercent").text(result);
-		});
+    tmInstance.VOTEDURATION((err,result) => {
+      $("#voteDuration").text(result/60);
+    });
+    tmInstance.CONSENSUSPERCENT((err,result) => {
+      $("#consensusPercent").text(result);
+    });
 
-		tokenInstance.getTotalSupply({from: account, gas: 4000000},(err,result) => {
-			console.log("HELOY");	
-			console.log(result);
-			console.log(err);
-			$("#totalToken").text(result);
-		});
+    tokenInstance.getTotalSupply({from: account, gas: 4000000},(err,result) => {
+      console.log("HELOY"); 
+      console.log(result);
+      console.log(err);
+      $("#totalToken").text(result);
+    });
 
-		tokenInstance.balanceOf(token.managerAddress, (err,result) => {
-			$("#centralToken").text(result);
-		});
+    tokenInstance.balanceOf(token.managerAddress, (err,result) => {
+      $("#centralToken").text(result);
+    });
 
-		tmInstance.contractRefunds((err, result) => {
-			if (result == true){
-				$("#refund").html("Yes");
-			} else if (result == false){
-				$("#refund").html("No");
-			}
-		});
-	
-		tmInstance.CHANGEOVERTIME((err, result) => {
-			$("#changeOverTime").text(result/60);
-		});
+    tmInstance.contractRefunds((err, result) => {
+      if (result == true){
+        $("#refund").html("Yes");
+      } else if (result == false){
+        $("#refund").html("No");
+      }
+    });
+  
+    tmInstance.CHANGEOVERTIME((err, result) => {
+      $("#changeOverTime").text(result/60);
+    });
 
-		tmInstance.PRICEHOURRATIO((err, result) => {
-			$("#priceHourRatio").text(result);
-		});
+    tmInstance.PRICEHOURRATIO((err, result) => {
+      $("#priceHourRatio").text(result);
+    });
 
-		tmInstance.version((err,result) => {
-			$("#version").text(result);
-		});
-	},
+    tmInstance.version((err,result) => {
+      $("#version").text(result);
+    });
+  },
 
-	checkData: function() {
-		console.log(token.creationDate);
-		let _date = new Date(token.creationDate);
-		let _dateNow = new Date();
-		let _testDate = new Date(_date.getTime());
-		let _testDate2 = new Date(_dateNow.getTime());
-			
-		console.log(_testDate);
-		console.log(_testDate2);
-	
-		console.log(_date);
-		console.log(_date.getTime()/1000);
-		console.log(_date.getTime());
+  checkData: function() {
+    console.log(token.creationDate);
+    let _date = new Date(token.creationDate);
+    let _dateNow = new Date();
+    let _testDate = new Date(_date.getTime());
+    let _testDate2 = new Date(_dateNow.getTime());
+      
+    console.log(_testDate);
+    console.log(_testDate2);
+  
+    console.log(_date);
+    console.log(_date.getTime()/1000);
+    console.log(_date.getTime());
 
-		console.log(_dateNow);
-		console.log(_dateNow.getTime()/1000);
-		console.log(_dateNow.getTime());
-	
+    console.log(_dateNow);
+    console.log(_dateNow.getTime()/1000);
+    console.log(_dateNow.getTime());
+  
 
-		if (SHA256((_date.getTime() / 1000) + token.address + token.managerAddress) != token.id) {
-			alert("DANGER, DATA HAS BEEN ALTERED");
-		}
-	}
+    if (SHA256((_date.getTime() / 1000) + token.address + token.managerAddress) != token.id) {
+      alert("DANGER, DATA HAS BEEN ALTERED");
+    }
+  }
 };
 window.addEventListener('load', function() {
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)

@@ -1,20 +1,20 @@
-const mongoDB					= require('mongodb'),
-			express 				= require('express'),
-			expressLayouts 	= require('express-ejs-layouts'),
-			bodyParser 			= require('body-parser'),
-			mongoose 				= require('mongoose'),
-			morgan 					= require('morgan'),
-			passport 				= require('passport'),
-			cookieParser 		= require('cookie-parser'),
-			session 				= require('express-session'),
-			flash 					= require('connect-flash'),
-			app 						= express(),
-			path						= require('path'),
-			uriUtil					= require('mongodb-uri'),
-			hostname 				= process.env.HOST || "localhost",
-			port 						= process.env.PORT || 8080;
-			
-			
+const mongoDB        =  require('mongodb'),
+      express        =  require('express'),
+      expressLayouts =  require('express-ejs-layouts'),
+      bodyParser     =  require('body-parser'),
+      mongoose       =  require('mongoose'),
+      morgan         =  require('morgan'),
+      passport       =  require('passport'),
+      cookieParser   =  require('cookie-parser'),
+      session        =  require('express-session'),
+      flash          =  require('connect-flash'),
+      app            =  express(),
+      path           =  require('path'),
+      uriUtil        =  require('mongodb-uri'),
+      hostname       =  process.env.HOST || "localhost",
+      port           =  process.env.PORT || 8080;
+      
+      
 require('./config/passport.js')(passport);                  
 app.use(morgan('dev'));
 //configure
@@ -46,11 +46,11 @@ const mongooseURI = uriUtil.formatMongoose(process.env.MONGO_URI);
 const dbOptions = {useMongoClient: true};
 
 app.listen(port, function() {
-	mongoose.connect(mongooseURI, dbOptions, (err) => {
-		if (err) {
-			console.log(err);
-		}
-		console.log("Xcoin server is running");
-	});
+  mongoose.connect(mongooseURI, dbOptions, (err) => {
+    if (err) {
+      console.log(err);
+    }
+    console.log("Xcoin server is running");
+  });
 });
 

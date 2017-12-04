@@ -6,155 +6,155 @@ let TokenManager, tmInstance;
 let account;
 
 window.App = {
-	start: function() {
+  start: function() {
 
-		self = this;
-	
-		self.checkData();
+    self = this;
+  
+    self.checkData();
 
-		TokenManager = web3.eth.contract(tokenManagerObject.abi);
-		tmInstance = TokenManager.at(token.managerAddress);
+    TokenManager = web3.eth.contract(tokenManagerObject.abi);
+    tmInstance = TokenManager.at(token.managerAddress);
 
-		web3.eth.getAccounts((err,accs) => {
-			if (err != null) {
-				alert(err);
-			} else if (accs.length == 0) {
-				alert("No accounts detected");
-			} else {
-				account = accs[0];
-			}
-		});
-	},
-	setContractRefunds: function() {
-	
-		tmInstance.setContractRefunds($("#refundAttr").val() * 100, {from: account, gas: 400000}, (err,result) => {
-			if (err)
-				alert(err);
-		});
-	},
-	setExchangeRate: function () {
-		console.log($("#rateAttr").val());
-		console.log($("#rateAttr").val() * 100);
-		tmInstance.setExchangeRate($("#rateAttr").val() * 100, $("#largerAttr").val(), {from: account, gas: 400000}, (err,result) => {
-			if (err)
-				alert(err);
-		});
+    web3.eth.getAccounts((err,accs) => {
+      if (err != null) {
+        alert(err);
+      } else if (accs.length == 0) {
+        alert("No accounts detected");
+      } else {
+        account = accs[0];
+      }
+    });
+  },
+  setContractRefunds: function() {
+  
+    tmInstance.setContractRefunds($("#refundAttr").val() * 100, {from: account, gas: 400000}, (err,result) => {
+      if (err)
+        alert(err);
+    });
+  },
+  setExchangeRate: function () {
+    console.log($("#rateAttr").val());
+    console.log($("#rateAttr").val() * 100);
+    tmInstance.setExchangeRate($("#rateAttr").val() * 100, $("#largerAttr").val(), {from: account, gas: 400000}, (err,result) => {
+      if (err)
+        alert(err);
+    });
 
-	},
+  },
 
-	setBugBounty: function () {
-		console.log($("#bugBountyAttr").val());
-		tmInstance.setBugBounty($("#bugBountyAttr").val(), {from: account, gas: 400000}, (err,result) => {
-			if (err)
-				alert(err);
-		});
+  setBugBounty: function () {
+    console.log($("#bugBountyAttr").val());
+    tmInstance.setBugBounty($("#bugBountyAttr").val(), {from: account, gas: 400000}, (err,result) => {
+      if (err)
+        alert(err);
+    });
 
-	},
-	setBugHunt: function () {
-		console.log($("#insectAttr").val());
-		tmInstance.setBugHunt($("#insectAttr").val(), {from: account, gas: 400000}, (err,result) => {
-			if (err)
-				alert(err);
-		});
+  },
+  setBugHunt: function () {
+    console.log($("#insectAttr").val());
+    tmInstance.setBugHunt($("#insectAttr").val(), {from: account, gas: 400000}, (err,result) => {
+      if (err)
+        alert(err);
+    });
 
-	},
+  },
 
-	setChangeOverTime: function () {
+  setChangeOverTime: function () {
 
-		console.log($("#changeAttr").val());
-		tmInstance.setChangeOverTime($("#changeAttr").val(), {from: account, gas: 400000}, (err,result) => {
-			if (err)
-				alert(err);
-		});
+    console.log($("#changeAttr").val());
+    tmInstance.setChangeOverTime($("#changeAttr").val(), {from: account, gas: 400000}, (err,result) => {
+      if (err)
+        alert(err);
+    });
 
-	},
+  },
 
-	setEtherBalance: function () {
-		console.log($("#etherAttr").val());
-		let _value = $("#etherAttr").val();
-		tmInstance.setEtherBalance(_value, {from: account, gas: 400000}, (err,result) => {
-			if (err)
-				alert(err);
-		});
+  setEtherBalance: function () {
+    console.log($("#etherAttr").val());
+    let _value = $("#etherAttr").val();
+    tmInstance.setEtherBalance(_value, {from: account, gas: 400000}, (err,result) => {
+      if (err)
+        alert(err);
+    });
 
-	},
+  },
 
-	setBugExtension: function () {
-		console.log($("#bugAttr").val());
+  setBugExtension: function () {
+    console.log($("#bugAttr").val());
 
-		tmInstance.setBugExtension($("#bugAttr").val(), {from: account, gas: 400000}, (err,result) => {
-			if (err)
-				alert(err);
-		});
+    tmInstance.setBugExtension($("#bugAttr").val(), {from: account, gas: 400000}, (err,result) => {
+      if (err)
+        alert(err);
+    });
 
-	},
-	setBountyHunt: function () {
-		console.log($("#bountyAttr").val());
+  },
+  setBountyHunt: function () {
+    console.log($("#bountyAttr").val());
 
-		tmInstance.setBountyHunt($("#bountyAttr").val(), {from: account, gas: 400000}, (err,result) => {
-			if (err)
-				alert(err);
-		});
+    tmInstance.setBountyHunt($("#bountyAttr").val(), {from: account, gas: 400000}, (err,result) => {
+      if (err)
+        alert(err);
+    });
 
-	},
-	setUpdateTries: function () {
-		console.log($("#triesAttr").val());
+  },
+  setUpdateTries: function () {
+    console.log($("#triesAttr").val());
 
-		tmInstance.setUpdateTries($("#triesAttr").val(), {from: account, gas: 400000}, (err,result) => {
-			if (err)
-				alert(err);
-		});
+    tmInstance.setUpdateTries($("#triesAttr").val(), {from: account, gas: 400000}, (err,result) => {
+      if (err)
+        alert(err);
+    });
 
-	},
-	setPriceHourRatio: function () {
-		console.log($("#ratioAttr").val());
+  },
+  setPriceHourRatio: function () {
+    console.log($("#ratioAttr").val());
 
-		tmInstance.setPriceHourRatio($("#ratioAttr").val(), {from: account, gas: 400000}, (err,result) => {
-			if (err)
-				alert(err);
-		});
-		
-	},
-	setVoteDuration: function () {
+    tmInstance.setPriceHourRatio($("#ratioAttr").val(), {from: account, gas: 400000}, (err,result) => {
+      if (err)
+        alert(err);
+    });
+    
+  },
+  setVoteDuration: function () {
 
-		console.log($("#voteAttr").val());
-		tmInstance.setVoteDuration($("#voteAttr").val(), {from: account, gas: 400000}, (err,result) => {
-			if (err)
-				alert(err);
-		});
-	
-	},
-	setAuctionDuration: function () {
+    console.log($("#voteAttr").val());
+    tmInstance.setVoteDuration($("#voteAttr").val(), {from: account, gas: 400000}, (err,result) => {
+      if (err)
+        alert(err);
+    });
+  
+  },
+  setAuctionDuration: function () {
 
-		console.log($("#auctionAttr").val());
-		tmInstance.setAuctionDuration($("#auctionAttr").val(), {from: account, gas: 400000}, (err,result) => {
-			if (err)
-				alert(err);
-		});
-	},
+    console.log($("#auctionAttr").val());
+    tmInstance.setAuctionDuration($("#auctionAttr").val(), {from: account, gas: 400000}, (err,result) => {
+      if (err)
+        alert(err);
+    });
+  },
 
-	setAll: function() {
-		self.setAuctionDuration();
-		self.setVoteDuration();
-		self.setPriceHourRatio();
-		self.setUpdateTries();
-		self.setBugExtension();
-		self.setBountyHunt();
-		self.setEtherBalance();
-		self.setChangeOverTime();
-		self.setBugHunt();
-		self.setBugBounty();
-		self.setExchangeRate();
-	},
-	
+  setAll: function() {
+    self.setAuctionDuration();
+    self.setVoteDuration();
+    self.setPriceHourRatio();
+    self.setUpdateTries();
+    self.setBugExtension();
+    self.setBountyHunt();
+    self.setEtherBalance();
+    self.setChangeOverTime();
+    self.setBugHunt();
+    self.setBugBounty();
+    self.setExchangeRate();
+  },
+  
 
-	checkData: function() {
-		console.log(token);
-		var _date = new Date(token.creationDate);
-		if (SHA256((_date.getTime() / 1000) + token.address + token.managerAddress) != token.id) {
-			alert("DANGER, DATA HAS BEEN ALTERED");
-		}
-	}
+  checkData: function() {
+    console.log(token);
+    var _date = new Date(token.creationDate);
+    if (SHA256((_date.getTime() / 1000) + token.address + token.managerAddress) != token.id) {
+      alert("DANGER, DATA HAS BEEN ALTERED");
+    }
+  }
 };
 window.addEventListener('load', function() {
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)

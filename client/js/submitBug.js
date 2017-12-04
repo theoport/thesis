@@ -7,65 +7,65 @@ let TokenManager, tmInstance;
 let account;
 
 window.App = {
-	start: function() {
+  start: function() {
 
-		self = this;
-		self.checkData();
+    self = this;
+    self.checkData();
 
-		TokenManager=web3.eth.contract(tokenManagerObject.abi);	
-		tmInstance = TokenManager.at(token.managerAddress);
-		
-		web3.eth.getAccounts((err,accs) => {
-			if (err != null) {
-				alert(err);
-			} else if (accs.length == 0) {
-				alert("No accounts detected");
-			} else {
-				account = accs[0];
-			}
-		});
-	},
-			
-	submitBug: function() {
-		var _desc= $("#description").val();
-		var safetyHash = SHA256('' + _desc).toString();
-		let _bugId = SHA256(safetyHash + topic.id).toString();
+    TokenManager=web3.eth.contract(tokenManagerObject.abi); 
+    tmInstance = TokenManager.at(token.managerAddress);
+    
+    web3.eth.getAccounts((err,accs) => {
+      if (err != null) {
+        alert(err);
+      } else if (accs.length == 0) {
+        alert("No accounts detected");
+      } else {
+        account = accs[0];
+      }
+    });
+  },
+      
+  submitBug: function() {
+    var _desc= $("#description").val();
+    var safetyHash = SHA256('' + _desc).toString();
+    let _bugId = SHA256(safetyHash + topic.id).toString();
 
-		$.ajax({
-			type: 'POST',
-			url: '/api/bugs',
-			data: {
-				bugId: _bugId, 
-				updateId: topic._id,
-				description: _desc
-			},
+    $.ajax({
+      type: 'POST',
+      url: '/api/bugs',
+      data: {
+        bugId: _bugId, 
+        updateId: topic._id,
+        description: _desc
+      },
 
-			success: function(responseData, textStatus, jqXHR) {
-				console.log(responseData);
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				console.log(textStatus);
-				console.log(errorThrown);
-			}
-		});
+      success: function(responseData, textStatus, jqXHR) {
+        console.log(responseData);
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log(textStatus);
+        console.log(errorThrown);
+      }
+    });
 
-		let _safetyHash = new BigNumber(safetyHash, 16);
-		tmInstance.foundBug(_safetyHash, bugId, {from: account, gas: 4000000}, (err, result) => {
-			if (err) {
-				alert(err);
-			} else {
-				alert(result);
-			}
-		});	
-	},
+    let _safetyHash = new BigNumber(safetyHash, 16);
+    tmInstance.foundBug(_safetyHash, bugId, {from: account, gas: 4000000}, (err, result) => {
+      if (err) {
+        alert(err);
+      } else {
+        alert(result);
+      }
+    }); 
+  },
 
-	checkData: function() {
-		console.log(token);
-		var _date = new Date(token.creationDate);
-		if (SHA256((_date.getTime() / 1000) + token.address + token.managerAddress) != token.id) {
-			alert("DANGER, DATA HAS BEEN ALTERED");
-		}
-	}
+  checkData: function() {
+    console.log(token);
+    var _date = new Date(token.creationDate);
+    if (SHA256((_date.getTime() / 1000) + token.address + token.managerAddress) != token.id) {
+      alert("DANGER, DATA HAS BEEN ALTERED");
+    }
+  }
 };
 window.addEventListener('load', function() {
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)

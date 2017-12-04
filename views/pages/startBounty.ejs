@@ -1,40 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Start Bounty</title>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<script> const token = <%- JSON.stringify(token) -%></script>
-	<script> const topic = <%- JSON.stringify(topic) -%></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<script src="/build/startBounty.bundle.js"></script>
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-	<link rel="stylesheet" href="/css/app.css">
+  <title>Start Bounty</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script> const token = <%- JSON.stringify(token) -%></script>
+  <script> const topic = <%- JSON.stringify(topic) -%></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="/build/startBounty.bundle.js"></script>
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
 <div class="col-sm-6 col-sm-offset-3">
-	<div class="jumbotron text-center">
-		<h1>Start BountyHunt</h1>
-		<h4>For Update: <a href="<%= '/tokenHome/' + token.id + '/forum/' + topic.id %>"><%= topic.title %></a>
-		<br>
+  <div class="jumbotron text-center">
+    <h1>Start BountyHunt</h1>
+    <h4>For Update: <a href="<%= '/tokenHome/' + token.id + '/forum/' + topic.id %>"><%= topic.title %></a>
+    <br>
 
-		<p>Please give a detailed description of the update.</p>
-		<p>The more detailed the description, the more likely it is<br>that this update will be implemented and that you will rewarded</p>
-		<p>Also make sure that enough support was indicated for this <br>update as this will also increase the chances of you being rewarded.</p>
+    <p>Please give a detailed description of the update.</p>
+    <p>The more detailed the description, the more likely it is<br>that this update will be implemented and that you will rewarded</p>
+    <p>Also make sure that enough support was indicated for this <br>update as this will also increase the chances of you being rewarded.</p>
 
-		<label for="description">Description</label>
-		<div class="input-group">		
-			<span class="input-group-btn">
-				<button class="btn btn-secondary" type="button" id="descriptionInfo">
-					<span class="fa fa-info"></span>
-				</button>
-			</span>	
-		</div>
-		<textarea rows="5" id="description" class="form-control"></textarea>
-		<button class="btn btn-default blockchain" id="startBounty" onclick="App.startBounty()">Start BountyHunt</button>
-		<div id="status"></div>
-		<hr>
-		<a class="btn btn-default" href="<%= '/tokenHome/' + token.id %>"><span class="fa fa-home"></span> Go Back to tokenHome</a>
-	</div>
+    <label for="description">Description</label>
+    <div class="input-group">   
+      <span class="input-group-btn">
+        <button class="btn btn-secondary" type="button" id="descriptionInfo">
+          <span class="fa fa-info"></span>
+        </button>
+      </span> 
+    </div>
+    <textarea rows="5" id="description" class="form-control"></textarea>
+    <button class="btn btn-default blockchain" id="startBounty" onclick="App.startBounty()">Start BountyHunt</button>
+    <div id="status"></div>
+    <hr>
+    <a class="btn btn-default" href="<%= '/tokenHome/' + token.id %>"><span class="fa fa-home"></span> Go Back to tokenHome</a>
+  </div>
 </div>
 
