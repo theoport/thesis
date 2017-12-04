@@ -1,9 +1,6 @@
-
-
-Web-app using node.js, EJS, Truffle
+Web-app to create and manage tokens on the Ethereum blockchain using node.js, EJS, Truffle
 
 See academic report for details and use 
-
 
 To execute locally:
 
